@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+out/
+*.egg-info/
+*.vsix
+.governed/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Test artifacts
+test-results/
+playwright-report/
+coverage/
+.pytest_cache/
+
+# Logs
+*.log
+npm-debug.log*
+.claude/settings.local.json
+
+# Lock files (uncomment the one you DON'T use)
+# package-lock.json
+# yarn.lock
+# poetry.lock

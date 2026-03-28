@@ -1,0 +1,83 @@
+# CLAUDE.md
+
+## Repo Identity
+
+This repository is the Blue Collar Governance Plugin runtime trust layer. It is a private control surface for non-technical AI operators and builders. Governed Workflow is the methodology spine behind the work, but this repository is not the governed-workflow repo.
+
+## Session Posture
+
+- Treat every substantive change as governed work.
+- Plan before execution unless the Architect explicitly narrows the task to a trivial correction.
+- Keep Wave 1 constrained to the trust-kernel mission and the six locked systems.
+- Prefer plain language, minimal diffs, and evidence-backed statements.
+- If repo truth and conversation diverge, repo truth wins until the canon surfaces are updated.
+
+## Non-Negotiables
+
+- HOLD > GUESS
+- Evidence-first
+- No silent mangling
+- Contract discipline
+- Minimal diffs
+- No destructive git
+- No public/private confusion
+- No theory bleed into the runtime spec
+- No adjacent improvements while here
+
+## Current Repo Truth
+
+- Status: early private bootstrap
+- Git: initialized on `main`, no commits yet, no remote configured
+- Runtime implementation: not started
+- Wave 1 system implementation: not started
+- Hook/runtime compatibility paths: not implemented yet
+- Package metadata or publishing surfaces: not implemented yet
+- Canon spec for current scope: `docs/specs/WAVE1_TRUST_KERNEL.md`
+
+## Canon And Reference Boundary
+
+- Canon surfaces are the root governance files and promoted docs under `docs/specs/`.
+- `raw/governed-workflow/` contains governed-workflow source docs and skills as reference inputs only.
+- `raw/starters/` contains starter/template source material only.
+- Reference inputs do not override canon and do not create runtime claims by themselves.
+
+## Required Sync Surfaces
+
+Inspect and update these when behavior, workflow, setup truth, contracts, or repo navigation change:
+
+- `README.md`
+- `CLAUDE.md`
+- `REPO_INDEX.md`
+- `docs/INDEX.md`
+- `docs/indexes/WHERE_TO_CHANGE_X.md`
+- `TEAM_CHARTER.md`
+- `AI_EXECUTION_DOCTRINE.md`
+- `CONTRIBUTING.md`
+- `MIGRATIONS.md`
+
+A stale `README.md` or `CLAUDE.md` is a ship blocker.
+
+## Closeout Requirements
+
+Every governed execution closeout should state:
+
+- Changes made
+- Acceptance criteria status
+- Remaining HOLDs
+- Next actions
+- Signoff status
+
+Also confirm sync status for:
+
+- `README.md`
+- `CLAUDE.md`
+- `REPO_INDEX.md`
+- `docs/INDEX.md`
+- `docs/indexes/WHERE_TO_CHANGE_X.md`
+- `MIGRATIONS.md` when touched
+
+## Practical Reminders
+
+- Do not claim runtime behavior that does not exist.
+- Do not treat reference material as implementation authority.
+- Do not start feature work for `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, or `SessionReceipt` without an approved governed plan.
