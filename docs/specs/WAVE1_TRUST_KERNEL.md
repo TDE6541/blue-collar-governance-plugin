@@ -61,7 +61,7 @@ Defines the core Hold object, lifecycle, and state-handling expectations. The pr
 
 ### `ConstraintsRegistry`
 
-Defines persistent never-do rules and their enforcement classes.
+Defines persistent never-do rules, enforcement classes, and registry precedence expectations. The promoted contract baseline for this system is `docs/specs/CONSTRAINTS_REGISTRY.md`.
 
 ### `SafetyInterlocks`
 
@@ -99,7 +99,7 @@ Wave 1 does not include:
 Wave 1 should be built in this order:
 
 1. `HoldEngine` - contract baseline established in `docs/specs/HOLD_ENGINE.md`
-2. `ConstraintsRegistry`
+2. `ConstraintsRegistry` - contract baseline established in `docs/specs/CONSTRAINTS_REGISTRY.md`
 3. `SafetyInterlocks`
 4. `ScopeGuard`
 5. `SessionBrief`
@@ -127,5 +127,6 @@ Current promoted state:
 
 - Wave 0 bootstrap is in place and committed.
 - `HoldEngine` has a promoted contract baseline in `docs/specs/HOLD_ENGINE.md`.
-- `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt` contract specs are not documented yet.
+- `ConstraintsRegistry` has a promoted contract baseline in `docs/specs/CONSTRAINTS_REGISTRY.md`.
+- `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt` contract specs are not documented yet.
 - No Wave 1 runtime implementation has started.

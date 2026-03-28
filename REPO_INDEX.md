@@ -32,6 +32,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 
 - `docs/specs/WAVE1_TRUST_KERNEL.md` — Wave 1 scope, naming freeze, non-goals, build order, and acceptance criteria
 - `docs/specs/HOLD_ENGINE.md` — Hold object contract, lifecycle, and status rules
+- `docs/specs/CONSTRAINTS_REGISTRY.md` — never-do rule contract, enforcement classes, and registry invariants
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -39,7 +40,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 
 - The repo is in bootstrap state with Wave 0 committed.
 - Git is initialized on `main`.
-- HoldEngine has a promoted contract spec.
+- HoldEngine and ConstraintsRegistry have promoted contract specs.
 - No runtime systems are implemented yet.
 - No remote is configured yet.
 - The remaining Wave 1 system contracts are not documented yet.
