@@ -1,6 +1,6 @@
 # Blue Collar Governance Plugin
 
-**Status:** Early private bootstrap  
+**Status:** Early private bootstrap with a complete Wave 1 spec baseline  
 **Repo type:** Private runtime/control layer  
 **Implementation state:** No Wave 1 runtime systems implemented yet
 
@@ -12,8 +12,9 @@ Governed Workflow is the methodology spine behind the work. This repository is n
 
 ## Current Truth
 
-- Wave 0 bootstrap is complete enough to support planning and governed execution.
-- Wave 1 is still at spec and contract stage.
+- Wave 0 bootstrap is committed.
+- All six Wave 1 systems now exist as promoted contract/spec objects under `docs/specs/`.
+- Wave 1 is still spec-first; no runtime implementation has started.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No skins, marketplace packaging, or public-product polish work is in scope for Wave 1.
 
@@ -30,6 +31,15 @@ Wave 1 is limited to six systems:
 
 The authoritative Wave 1 scope, naming freeze, non-goals, build order, and acceptance criteria live in `docs/specs/WAVE1_TRUST_KERNEL.md`.
 
+Promoted Wave 1 contract baselines:
+
+- `docs/specs/HOLD_ENGINE.md`
+- `docs/specs/CONSTRAINTS_REGISTRY.md`
+- `docs/specs/SAFETY_INTERLOCKS.md`
+- `docs/specs/SCOPE_GUARD.md`
+- `docs/specs/SESSION_BRIEF.md`
+- `docs/specs/SESSION_RECEIPT.md`
+
 ## Start Here
 
 Read these in order:
@@ -38,7 +48,8 @@ Read these in order:
 2. `TEAM_CHARTER.md`
 3. `AI_EXECUTION_DOCTRINE.md`
 4. `docs/specs/WAVE1_TRUST_KERNEL.md`
-5. `REPO_INDEX.md`
+5. `docs/INDEX.md`
+6. `REPO_INDEX.md`
 
 ## Repository Structure
 
@@ -74,7 +85,7 @@ Read these in order:
 
 ## Working In This Repo
 
-There is no runtime setup sequence yet because runtime code has not been implemented. Current work should stay inside bootstrap, planning, specifications, contracts, and repo-truth alignment unless a governed wave is explicitly approved.
+There is no runtime setup sequence yet because runtime code has not been implemented. Current work should stay inside governed specification, contract, verification, and repo-truth alignment until a runtime implementation wave is explicitly approved.
 
 ## Contributing
 
