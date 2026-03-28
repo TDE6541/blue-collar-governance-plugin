@@ -69,7 +69,7 @@ Defines dangerous-action categories, hard stops, explicit authorization gates, a
 
 ### `ScopeGuard`
 
-Defines the asked-vs-done comparison model and routing for approve, reject, or extend decisions.
+Defines the asked-vs-done comparison model and routing for approve, reject, or extend decisions. The promoted contract baseline for this system is `docs/specs/SCOPE_GUARD.md`.
 
 ### `SessionBrief`
 
@@ -101,7 +101,7 @@ Wave 1 should be built in this order:
 1. `HoldEngine` - contract baseline established in `docs/specs/HOLD_ENGINE.md`
 2. `ConstraintsRegistry` - contract baseline established in `docs/specs/CONSTRAINTS_REGISTRY.md`
 3. `SafetyInterlocks` - contract baseline established in `docs/specs/SAFETY_INTERLOCKS.md`
-4. `ScopeGuard`
+4. `ScopeGuard` - contract baseline established in `docs/specs/SCOPE_GUARD.md`
 5. `SessionBrief`
 6. `SessionReceipt`
 7. integration and sync pass
@@ -129,5 +129,6 @@ Current promoted state:
 - `HoldEngine` has a promoted contract baseline in `docs/specs/HOLD_ENGINE.md`.
 - `ConstraintsRegistry` has a promoted contract baseline in `docs/specs/CONSTRAINTS_REGISTRY.md`.
 - `SafetyInterlocks` has a promoted contract baseline in `docs/specs/SAFETY_INTERLOCKS.md`.
-- `ScopeGuard`, `SessionBrief`, and `SessionReceipt` contract specs are not documented yet.
+- `ScopeGuard` has a promoted contract baseline in `docs/specs/SCOPE_GUARD.md`.
+- `SessionBrief` and `SessionReceipt` contract specs are not documented yet.
 - No Wave 1 runtime implementation has started.
