@@ -33,7 +33,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - ConstraintsRegistry contract spec: `docs/specs/CONSTRAINTS_REGISTRY.md`
 - SafetyInterlocks contract spec: `docs/specs/SAFETY_INTERLOCKS.md`
 - ScopeGuard contract spec: `docs/specs/SCOPE_GUARD.md`
-- Remaining Wave 1 system contracts: `SessionBrief` and `SessionReceipt`
+- SessionBrief contract spec: `docs/specs/SESSION_BRIEF.md`
+- Remaining Wave 1 system contracts: `SessionReceipt`
 - Wave 1 runtime implementation: not started
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
@@ -43,6 +44,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/CONSTRAINTS_REGISTRY.md`
   - `docs/specs/SAFETY_INTERLOCKS.md`
   - `docs/specs/SCOPE_GUARD.md`
+  - `docs/specs/SESSION_BRIEF.md`
 
 ## Canon And Reference Boundary
 

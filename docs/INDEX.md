@@ -11,11 +11,12 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/CONSTRAINTS_REGISTRY.md` - authoritative ConstraintsRegistry contract baseline for persistent never-do rules
 - `docs/specs/SAFETY_INTERLOCKS.md` - authoritative SafetyInterlocks contract baseline for dangerous-action control
 - `docs/specs/SCOPE_GUARD.md` - authoritative ScopeGuard contract baseline for asked-vs-done comparison
+- `docs/specs/SESSION_BRIEF.md` - authoritative SessionBrief contract baseline for the startup session surface
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 
 ## Current State
 
-- `docs/specs/` contains the Wave 1 umbrella spec plus promoted contract specs for HoldEngine, ConstraintsRegistry, SafetyInterlocks, and ScopeGuard.
+- `docs/specs/` contains the Wave 1 umbrella spec plus promoted contract specs for HoldEngine, ConstraintsRegistry, SafetyInterlocks, ScopeGuard, and SessionBrief.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
 - `docs/learning-notes/` is not present because no exploration lane is needed for the current repo state.

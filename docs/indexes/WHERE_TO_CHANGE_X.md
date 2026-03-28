@@ -23,6 +23,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/CONSTRAINTS_REGISTRY.md` for persistent never-do rules, enforcement classes, and registry precedence.
 - Change `docs/specs/SAFETY_INTERLOCKS.md` for dangerous-action categories, hard stops, and authorization gates.
 - Change `docs/specs/SCOPE_GUARD.md` for asked-vs-done comparison and approve/reject/extend routing.
+- Change `docs/specs/SESSION_BRIEF.md` for startup scope, hazards, off-limits areas, constraints, and risk mode.
 
 ## Contract And Migration Truth
 

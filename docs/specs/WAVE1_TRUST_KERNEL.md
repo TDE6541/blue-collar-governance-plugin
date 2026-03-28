@@ -73,7 +73,7 @@ Defines the asked-vs-done comparison model and routing for approve, reject, or e
 
 ### `SessionBrief`
 
-Defines the session-start surface for scope, hazards, off-limits areas, constraints, and risk mode.
+Defines the startup session surface for scope, hazards, off-limits areas, constraints, and risk mode. The promoted contract baseline for this system is `docs/specs/SESSION_BRIEF.md`.
 
 ### `SessionReceipt`
 
@@ -102,7 +102,7 @@ Wave 1 should be built in this order:
 2. `ConstraintsRegistry` - contract baseline established in `docs/specs/CONSTRAINTS_REGISTRY.md`
 3. `SafetyInterlocks` - contract baseline established in `docs/specs/SAFETY_INTERLOCKS.md`
 4. `ScopeGuard` - contract baseline established in `docs/specs/SCOPE_GUARD.md`
-5. `SessionBrief`
+5. `SessionBrief` - contract baseline established in `docs/specs/SESSION_BRIEF.md`
 6. `SessionReceipt`
 7. integration and sync pass
 8. final verification
@@ -130,5 +130,6 @@ Current promoted state:
 - `ConstraintsRegistry` has a promoted contract baseline in `docs/specs/CONSTRAINTS_REGISTRY.md`.
 - `SafetyInterlocks` has a promoted contract baseline in `docs/specs/SAFETY_INTERLOCKS.md`.
 - `ScopeGuard` has a promoted contract baseline in `docs/specs/SCOPE_GUARD.md`.
-- `SessionBrief` and `SessionReceipt` contract specs are not documented yet.
+- `SessionBrief` has a promoted contract baseline in `docs/specs/SESSION_BRIEF.md`.
+- `SessionReceipt` contract spec is not documented yet.
 - No Wave 1 runtime implementation has started.
