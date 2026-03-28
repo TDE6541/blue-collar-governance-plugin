@@ -77,7 +77,7 @@ Defines the startup session surface for scope, hazards, off-limits areas, constr
 
 ### `SessionReceipt`
 
-Defines the end-of-session as-built record for planned versus actual work, holds, exclusions, and approved drift.
+Defines the end-of-session as-built record for planned versus actual work, holds, exclusions, and approved drift. The promoted contract baseline for this system is `docs/specs/SESSION_RECEIPT.md`.
 
 ## Explicit Non-Goals
 
@@ -103,7 +103,7 @@ Wave 1 should be built in this order:
 3. `SafetyInterlocks` - contract baseline established in `docs/specs/SAFETY_INTERLOCKS.md`
 4. `ScopeGuard` - contract baseline established in `docs/specs/SCOPE_GUARD.md`
 5. `SessionBrief` - contract baseline established in `docs/specs/SESSION_BRIEF.md`
-6. `SessionReceipt`
+6. `SessionReceipt` - contract baseline established in `docs/specs/SESSION_RECEIPT.md`
 7. integration and sync pass
 8. final verification
 
@@ -131,5 +131,5 @@ Current promoted state:
 - `SafetyInterlocks` has a promoted contract baseline in `docs/specs/SAFETY_INTERLOCKS.md`.
 - `ScopeGuard` has a promoted contract baseline in `docs/specs/SCOPE_GUARD.md`.
 - `SessionBrief` has a promoted contract baseline in `docs/specs/SESSION_BRIEF.md`.
-- `SessionReceipt` contract spec is not documented yet.
+- `SessionReceipt` has a promoted contract baseline in `docs/specs/SESSION_RECEIPT.md`.
 - No Wave 1 runtime implementation has started.

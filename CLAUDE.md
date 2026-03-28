@@ -34,7 +34,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - SafetyInterlocks contract spec: `docs/specs/SAFETY_INTERLOCKS.md`
 - ScopeGuard contract spec: `docs/specs/SCOPE_GUARD.md`
 - SessionBrief contract spec: `docs/specs/SESSION_BRIEF.md`
-- Remaining Wave 1 system contracts: `SessionReceipt`
+- SessionReceipt contract spec: `docs/specs/SESSION_RECEIPT.md`
 - Wave 1 runtime implementation: not started
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
@@ -45,6 +45,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/SAFETY_INTERLOCKS.md`
   - `docs/specs/SCOPE_GUARD.md`
   - `docs/specs/SESSION_BRIEF.md`
+  - `docs/specs/SESSION_RECEIPT.md`
 
 ## Canon And Reference Boundary
 

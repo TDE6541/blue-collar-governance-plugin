@@ -24,6 +24,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/SAFETY_INTERLOCKS.md` for dangerous-action categories, hard stops, and authorization gates.
 - Change `docs/specs/SCOPE_GUARD.md` for asked-vs-done comparison and approve/reject/extend routing.
 - Change `docs/specs/SESSION_BRIEF.md` for startup scope, hazards, off-limits areas, constraints, and risk mode.
+- Change `docs/specs/SESSION_RECEIPT.md` for planned-vs-actual closeout truth, holds, exclusions, and approved drift.
 
 ## Contract And Migration Truth
 
