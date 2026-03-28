@@ -57,7 +57,7 @@ Wave 1 includes these six systems only:
 
 ### `HoldEngine`
 
-Defines the core Hold object, lifecycle, and state-handling expectations.
+Defines the core Hold object, lifecycle, and state-handling expectations. The promoted contract baseline for this system is `docs/specs/HOLD_ENGINE.md`.
 
 ### `ConstraintsRegistry`
 
@@ -98,7 +98,7 @@ Wave 1 does not include:
 
 Wave 1 should be built in this order:
 
-1. `HoldEngine`
+1. `HoldEngine` - contract baseline established in `docs/specs/HOLD_ENGINE.md`
 2. `ConstraintsRegistry`
 3. `SafetyInterlocks`
 4. `ScopeGuard`
@@ -123,8 +123,9 @@ Wave 1 is complete only if:
 
 ## Current Implementation Status
 
-At the time this spec was created:
+Current promoted state:
 
-- Wave 0 bootstrap is in place
-- Wave 1 runtime implementation has not started
-- the six systems are not implemented yet
+- Wave 0 bootstrap is in place and committed.
+- `HoldEngine` has a promoted contract baseline in `docs/specs/HOLD_ENGINE.md`.
+- `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt` contract specs are not documented yet.
+- No Wave 1 runtime implementation has started.

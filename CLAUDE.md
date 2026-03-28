@@ -27,12 +27,16 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 ## Current Repo Truth
 
 - Status: early private bootstrap
-- Git: initialized on `main`, no commits yet, no remote configured
+- Git: initialized on `main`, Wave 0 bootstrap committed, no remote configured
 - Runtime implementation: not started
-- Wave 1 system implementation: not started
+- HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
+- Other Wave 1 system contracts: not started
+- Wave 1 runtime implementation: not started
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
-- Canon spec for current scope: `docs/specs/WAVE1_TRUST_KERNEL.md`
+- Canon specs for current scope:
+  - `docs/specs/WAVE1_TRUST_KERNEL.md`
+  - `docs/specs/HOLD_ENGINE.md`
 
 ## Canon And Reference Boundary
 
@@ -80,4 +84,4 @@ Also confirm sync status for:
 
 - Do not claim runtime behavior that does not exist.
 - Do not treat reference material as implementation authority.
-- Do not start feature work for `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, or `SessionReceipt` without an approved governed plan.
+- Do not start runtime implementation for `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, or `SessionReceipt` without an approved governed plan.

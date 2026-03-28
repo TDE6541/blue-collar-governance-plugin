@@ -19,6 +19,7 @@ Use this index to find the right canon surface before making a change.
 ## Wave 1 Product Truth
 
 - Change `docs/specs/WAVE1_TRUST_KERNEL.md` for Wave 1 mission, scope, non-goals, naming freeze, build order, and acceptance criteria.
+- Change `docs/specs/HOLD_ENGINE.md` for the Hold object contract, status lifecycle, and lifecycle invariants.
 
 ## Contract And Migration Truth
 
