@@ -66,7 +66,7 @@ This spec does not define:
 - Every brief must be readable by a non-technical operator.
 - `goal`, `inScope`, and `expectedOutputs` must align with the approved wave.
 - `outOfScope` must remain visible throughout the session.
-- A brief must not imply that runtime implementation already exists.
+- A brief must not imply runtime behavior beyond what is implemented.
 - SessionBrief provides startup truth only; it does not replace the end-of-session receipt.
 
 ## Example SessionBrief
@@ -74,13 +74,13 @@ This spec does not define:
 ```json
 {
   "briefId": "brief_wave1_001",
-  "goal": "Define the SessionBrief contract without starting runtime implementation.",
+  "goal": "Run a governed Wave 1 session with runtime truth synchronized.",
   "inScope": [
     "Add the SessionBrief contract spec.",
     "Update the required navigation and sync surfaces."
   ],
   "outOfScope": [
-    "Runtime implementation in src/",
+    "Wave 2 behavior implementation.",
     "Package publishing surfaces",
     "SessionReceipt contract work"
   ],
@@ -90,7 +90,7 @@ This spec does not define:
     "docs/specs/WAVE1_TRUST_KERNEL.md"
   ],
   "activeConstraints": [
-    "No runtime implementation in Wave 1 spec waves.",
+    "No Wave 2 behavior implementation in this session.",
     "No widening beyond the six locked systems."
   ],
   "hazards": [

@@ -1,6 +1,6 @@
 # Blue Collar Governance Plugin
 
-**Status:** Early private bootstrap with a complete Wave 1 spec baseline  
+**Status:** Wave 1 runtime implemented and verified; final Architect signoff pending
 **Repo type:** Private runtime/control layer  
 **Implementation state:** All six Wave 1 systems now have runtime implementations (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 
@@ -15,6 +15,10 @@ Governed Workflow is the methodology spine behind the work. This repository is n
 - Wave 0 bootstrap is committed.
 - All six Wave 1 systems now exist as promoted contract/spec objects under `docs/specs/`.
 - Wave 1 runtime now includes all six systems (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`).
+- Golden proof exists for each Wave 1 system under `tests/golden/`.
+- Live proof exists at `tests/live/wave1.operator-flow.live.test.js`.
+- Full Wave 1 verification passed (40 tests passed, 0 failed).
+- No Wave 2 behavior is implemented or implied.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No skins, marketplace packaging, or public-product polish work is in scope for Wave 1.
 

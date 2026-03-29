@@ -1,5 +1,5 @@
 # WAVE1_TRUST_KERNEL.md
-**Status:** Active planning baseline  
+**Status:** Wave 1 runtime implemented and verified; final Architect signoff pending
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -22,7 +22,7 @@ Wave 1 is successful only if a non-technical operator can:
 
 - This repository is a private runtime/control layer.
 - Governed Workflow is the methodology spine behind the work.
-- This document defines planned scope and contract direction, not completed runtime behavior.
+- This document defines locked Wave 1 scope and contract direction and reflects current implemented runtime truth for the six systems.
 - Runtime implementation is currently claimed for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.
 - No hook/runtime compatibility path is claimed yet.
 - No package publishing, marketplace compatibility, or public release maturity is claimed yet.
@@ -133,3 +133,6 @@ Current promoted state:
 - `SessionBrief` has a promoted contract baseline in `docs/specs/SESSION_BRIEF.md`.
 - `SessionReceipt` has a promoted contract baseline in `docs/specs/SESSION_RECEIPT.md`.
 - Runtime implementation now exists for all six Wave 1 systems (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`); live integration proof and closeout evidence now exist (`tests/live/wave1.operator-flow.live.test.js`, `docs/WAVE1_CLOSEOUT.md`).
+- Golden proof exists for each Wave 1 system under `tests/golden/`.
+- Full Wave 1 verification passed (40 tests passed, 0 failed).
+- No Wave 2 behavior is implemented or implied.

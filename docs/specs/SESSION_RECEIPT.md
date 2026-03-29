@@ -77,18 +77,18 @@ This spec does not define:
   "receiptId": "receipt_wave1_001",
   "briefRef": "brief_wave1_001",
   "plannedWork": [
-    "Define the HoldEngine contract.",
-    "Update the required sync surfaces."
+    "Run full Wave 1 verification.",
+    "Truth-sync stale canon surfaces."
   ],
   "completedWork": [
-    "Defined the HoldEngine contract.",
-    "Updated the required sync surfaces."
+    "Ran full Wave 1 verification.",
+    "Truth-synced stale canon surfaces."
   ],
   "untouchedWork": [],
   "holdsRaised": [],
   "approvedDrift": [],
   "excludedWork": [
-    "Runtime implementation in src/"
+    "Wave 2 behavior implementation."
   ],
   "artifactsChanged": [
     "docs/specs/HOLD_ENGINE.md",
@@ -100,7 +100,7 @@ This spec does not define:
   ],
   "outcome": "complete",
   "signoffRequired": true,
-  "summary": "The HoldEngine contract wave completed without runtime implementation.",
+  "summary": "Wave 1 runtime truth sync completed; final Architect signoff remains pending.",
   "createdBy": "ai",
   "createdAt": "2026-03-28T00:00:00Z"
 }
