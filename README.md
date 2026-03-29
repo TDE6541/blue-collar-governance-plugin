@@ -85,7 +85,7 @@ Read these in order:
 
 ## Working In This Repo
 
-There is no end-to-end runtime setup sequence yet. Runtime code exists for all six Wave 1 systems; integration/proof flow and compatibility surfaces are not implemented.
+There is no end-to-end runtime setup sequence yet. Runtime code exists for all six Wave 1 systems, live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and closeout evidence is captured in `docs/WAVE1_CLOSEOUT.md`; compatibility surfaces are not implemented.
 
 ## Contributing
 

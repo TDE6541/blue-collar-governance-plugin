@@ -25,6 +25,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/SCOPE_GUARD.md` for asked-vs-done comparison and approve/reject/extend routing.
 - Change `docs/specs/SESSION_BRIEF.md` for startup scope, hazards, off-limits areas, constraints, and risk mode.
 - Change `docs/specs/SESSION_RECEIPT.md` for planned-vs-actual closeout truth, holds, exclusions, and approved drift.
+- Change `docs/WAVE1_CLOSEOUT.md` for durable Wave 1 system-by-system evidence and final closeout signoff state.
 
 ## Contract And Migration Truth
 

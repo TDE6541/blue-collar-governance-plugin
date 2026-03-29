@@ -14,6 +14,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/SESSION_BRIEF.md` - authoritative SessionBrief contract baseline for the startup session surface
 - `docs/specs/SESSION_RECEIPT.md` - authoritative SessionReceipt contract baseline for the as-built session record
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
+- `docs/WAVE1_CLOSEOUT.md` - durable Wave 1 integration/proof closeout evidence map
 
 ## Current State
 

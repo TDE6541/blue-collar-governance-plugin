@@ -45,6 +45,6 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - The repo is in bootstrap state with Wave 0 committed.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
-- Block A/B runtime systems are implemented: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, and `ScopeGuard`.
+- Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.
 - No remote is configured yet.
-- The repo remains governed/spec-led; all six Wave 1 systems now have runtime implementations, while integration/proof flow remains pending.
+- The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.

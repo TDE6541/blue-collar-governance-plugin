@@ -35,7 +35,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - ScopeGuard contract spec: `docs/specs/SCOPE_GUARD.md`
 - SessionBrief contract spec: `docs/specs/SESSION_BRIEF.md`
 - SessionReceipt contract spec: `docs/specs/SESSION_RECEIPT.md`
-- Wave 1 runtime implementation: system runtime present for all six Wave 1 systems; integration/proof pass not implemented
+- Wave 1 runtime implementation: system runtime present for all six Wave 1 systems; integration/proof artifacts implemented (`tests/live/wave1.operator-flow.live.test.js`, `docs/WAVE1_CLOSEOUT.md`)
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
 - Canon specs for current scope:

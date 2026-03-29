@@ -132,4 +132,4 @@ Current promoted state:
 - `ScopeGuard` has a promoted contract baseline in `docs/specs/SCOPE_GUARD.md`.
 - `SessionBrief` has a promoted contract baseline in `docs/specs/SESSION_BRIEF.md`.
 - `SessionReceipt` has a promoted contract baseline in `docs/specs/SESSION_RECEIPT.md`.
-- Runtime implementation now exists for all six Wave 1 systems (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`); integration/proof flow remains pending.
+- Runtime implementation now exists for all six Wave 1 systems (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`); live integration proof and closeout evidence now exist (`tests/live/wave1.operator-flow.live.test.js`, `docs/WAVE1_CLOSEOUT.md`).
