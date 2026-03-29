@@ -135,4 +135,4 @@ Current promoted state:
 - Runtime implementation now exists for all six Wave 1 systems (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`); live integration proof and closeout evidence now exist (`tests/live/wave1.operator-flow.live.test.js`, `docs/WAVE1_CLOSEOUT.md`).
 - Golden proof exists for each Wave 1 system under `tests/golden/`.
 - Full Wave 1 verification passed (40 tests passed, 0 failed).
-- No Wave 2 behavior is implemented or implied.
+- No Wave 2 behavior was implemented as part of Wave 1 closeout.

@@ -27,6 +27,11 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/SESSION_RECEIPT.md` for planned-vs-actual closeout truth, holds, exclusions, and approved drift.
 - Change `docs/WAVE1_CLOSEOUT.md` for durable Wave 1 system-by-system evidence and final closeout signoff state.
 
+
+## Wave 2 Continuity Truth
+
+- Change `docs/specs/WAVE2_CONTINUITY_LAYER.md` for Wave 2 continuity-first sequencing and Block A boundaries.
+- Change `docs/specs/CONTINUITY_LEDGER.md` for qualifying continuity entry rules, exclusions, and aging/outcome contracts.
 ## Contract And Migration Truth
 
 - Change `MIGRATIONS.md` when a real shared contract changes.
@@ -35,6 +40,8 @@ Use this index to find the right canon surface before making a change.
 ## Runtime And Tests
 
 - Change `src/` for runtime implementation after a governed execution wave is approved.
+- Change `src/ContinuityLedger.js` for Wave 2 Block A continuity persistence behavior.
+- Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add golden references under `tests/golden/`.
 - Add live or integration verification under `tests/live/`.
 

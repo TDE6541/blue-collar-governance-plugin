@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: early private bootstrap
+- Status: private runtime trust layer with Wave 1 implemented and Wave 2 Block A continuity baseline implemented
 - Git: initialized on `main`, Wave 0 bootstrap committed, no remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -36,6 +36,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - SessionBrief contract spec: `docs/specs/SESSION_BRIEF.md`
 - SessionReceipt contract spec: `docs/specs/SESSION_RECEIPT.md`
 - Wave 1 runtime implementation: system runtime present for all six Wave 1 systems; integration/proof artifacts implemented (`tests/live/wave1.operator-flow.live.test.js`, `docs/WAVE1_CLOSEOUT.md`)
+- Wave 2 Block A continuity baseline: implemented (`docs/specs/WAVE2_CONTINUITY_LAYER.md`, `docs/specs/CONTINUITY_LEDGER.md`, `src/ContinuityLedger.js`, `tests/golden/ContinuityLedger.golden.test.js`)
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
 - Canon specs for current scope:
@@ -46,6 +47,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/SCOPE_GUARD.md`
   - `docs/specs/SESSION_BRIEF.md`
   - `docs/specs/SESSION_RECEIPT.md`
+  - `docs/specs/WAVE2_CONTINUITY_LAYER.md`
+  - `docs/specs/CONTINUITY_LEDGER.md`
 
 ## Canon And Reference Boundary
 

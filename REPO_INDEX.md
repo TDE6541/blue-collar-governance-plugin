@@ -37,6 +37,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/SCOPE_GUARD.md` — asked-vs-done comparison contract and unauthorized-change routing
 - `docs/specs/SESSION_BRIEF.md` — startup session-surface contract for scope, hazards, and constraints
 - `docs/specs/SESSION_RECEIPT.md` — end-of-session as-built contract for planned vs actual work
+- `docs/specs/WAVE2_CONTINUITY_LAYER.md` — Wave 2 continuity-first umbrella baseline for Block A
+- `docs/specs/CONTINUITY_LEDGER.md` — Continuity Ledger v0 contract baseline for qualifying carry-forward persistence
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -46,5 +48,6 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.
+- Wave 2 Block A runtime baseline is implemented for `ContinuityLedger` at `src/ContinuityLedger.js` with golden proof at `tests/golden/ContinuityLedger.golden.test.js`.
 - No remote is configured yet.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.
