@@ -107,5 +107,5 @@ This spec does not define:
 ## Current Implementation Truth
 
 - This is a contract/spec artifact only.
-- No `ConstraintsRegistry` runtime implementation exists yet.
+- `ConstraintsRegistry` runtime implementation now exists at `src/ConstraintsRegistry.js` with golden coverage in `tests/golden/ConstraintsRegistry.golden.test.js`.
 - Persistence, transport, and UI surfaces remain undefined at this stage.

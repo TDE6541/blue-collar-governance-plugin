@@ -23,7 +23,7 @@ Wave 1 is successful only if a non-technical operator can:
 - This repository is a private runtime/control layer.
 - Governed Workflow is the methodology spine behind the work.
 - This document defines planned scope and contract direction, not completed runtime behavior.
-- No runtime implementation is claimed yet.
+- Runtime implementation is currently claimed only for Block A: `HoldEngine` and `ConstraintsRegistry`.
 - No hook/runtime compatibility path is claimed yet.
 - No package publishing, marketplace compatibility, or public release maturity is claimed yet.
 
@@ -132,4 +132,4 @@ Current promoted state:
 - `ScopeGuard` has a promoted contract baseline in `docs/specs/SCOPE_GUARD.md`.
 - `SessionBrief` has a promoted contract baseline in `docs/specs/SESSION_BRIEF.md`.
 - `SessionReceipt` has a promoted contract baseline in `docs/specs/SESSION_RECEIPT.md`.
-- No Wave 1 runtime implementation has started.
+- Block A runtime implementation has started (`HoldEngine`, `ConstraintsRegistry`); Block B/C systems remain unimplemented.

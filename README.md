@@ -2,7 +2,7 @@
 
 **Status:** Early private bootstrap with a complete Wave 1 spec baseline  
 **Repo type:** Private runtime/control layer  
-**Implementation state:** No Wave 1 runtime systems implemented yet
+**Implementation state:** Block A runtime started (`HoldEngine`, `ConstraintsRegistry`); Block B/C systems not implemented yet
 
 ## What This Repo Is
 
@@ -14,7 +14,7 @@ Governed Workflow is the methodology spine behind the work. This repository is n
 
 - Wave 0 bootstrap is committed.
 - All six Wave 1 systems now exist as promoted contract/spec objects under `docs/specs/`.
-- Wave 1 is still spec-first; no runtime implementation has started.
+- Wave 1 runtime has started for Block A (`HoldEngine`, `ConstraintsRegistry`); Block B/C systems are not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No skins, marketplace packaging, or public-product polish work is in scope for Wave 1.
 
@@ -55,7 +55,7 @@ Read these in order:
 
 ```text
 .
-├── src/                           # Runtime implementation area (currently empty)
+├── src/                           # Runtime implementation area (Block A started)
 ├── tests/
 │   ├── golden/                    # Golden cases for trust-kernel behavior
 │   └── live/                      # Live or integration verification
@@ -85,7 +85,7 @@ Read these in order:
 
 ## Working In This Repo
 
-There is no runtime setup sequence yet because runtime code has not been implemented. Current work should stay inside governed specification, contract, verification, and repo-truth alignment until a runtime implementation wave is explicitly approved.
+There is no end-to-end runtime setup sequence yet. Block A runtime code exists for `HoldEngine` and `ConstraintsRegistry`; remaining Wave 1 systems and compatibility surfaces are not implemented.
 
 ## Contributing
 
