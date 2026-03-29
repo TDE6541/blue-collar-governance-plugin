@@ -1,5 +1,5 @@
 # WAVE2_CONTINUITY_LAYER.md
-**Status:** Block A and Block B1 baselines implemented; Architect signoff pending
+**Status:** Block A, Block B1, and Block C1 baselines implemented; Architect signoff pending
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -17,7 +17,7 @@ Wave 2 ships four things only:
 3. Omission & Coverage Engine v1
 4. Open Items Board v1
 
-Block A delivers Continuity Ledger v0. Block B1 delivers Standing Risk Engine v1 derived baseline (spec + logic + golden proof).
+Block A delivers Continuity Ledger v0. Block B1 delivers Standing Risk Engine v1 derived baseline (spec + logic + golden proof). Block C1 delivers Omission & Coverage Engine v1 bounded baseline (spec + logic + golden proof).
 
 ## Continuity-First Posture
 
@@ -56,6 +56,22 @@ Block B1 excludes:
 - omission/coverage runtime
 - board runtime
 
+## Block C1 Scope
+
+Block C1 includes:
+
+- explicit required `profilePack` selection for omission evaluation
+- bounded checks for exactly three profile packs
+- deterministic omission findings with fixed `missingItemCode` vocabulary
+- evaluation-scoped output with plain-language operator-facing summaries
+
+Block C1 excludes:
+
+- omission finding persistence or continuity writes
+- board/grouping runtime
+- score/confidence/rank/prediction/anomaly logic
+- universal coverage-model behavior
+
 ## Carry-Forward Eligibility
 
 Continuity may include only unresolved, still-relevant items in these classes:
@@ -89,3 +105,5 @@ Block A is complete only if:
 - Block A golden proof exists at `tests/golden/ContinuityLedger.golden.test.js`.
 - Block B1 standing-risk baseline is implemented as derived logic (`docs/specs/STANDING_RISK_ENGINE.md`, `src/StandingRiskEngine.js`, `tests/golden/StandingRiskEngine.golden.test.js`).
 - Omission/Coverage and Open Items Board are not implemented in Block B1.
+- Block C1 omission/coverage baseline is implemented as bounded evaluation logic (`docs/specs/OMISSION_COVERAGE_ENGINE.md`, `src/OmissionCoverageEngine.js`, `tests/golden/OmissionCoverageEngine.golden.test.js`).
+- Open Items Board is not implemented in Block C1.
