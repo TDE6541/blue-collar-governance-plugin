@@ -1,6 +1,6 @@
 # Blue Collar Governance Plugin
 
-**Status:** Wave 1 runtime implemented and verified; Wave 2 Block A + Block B1 baselines implemented
+**Status:** Wave 1 runtime implemented and verified; Wave 2 Block A + Block B1 + Block C1 baselines implemented
 **Repo type:** Private runtime/control layer  
 **Implementation state:** All six Wave 1 systems now have runtime implementations (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 
@@ -21,8 +21,12 @@ Governed Workflow is the methodology spine behind the work. This repository is n
 - Wave 2 Block A baseline is implemented: Continuity Ledger v0 (`docs/specs/WAVE2_CONTINUITY_LAYER.md`, `docs/specs/CONTINUITY_LEDGER.md`, `src/ContinuityLedger.js`, `tests/golden/ContinuityLedger.golden.test.js`).
 - Wave 2 Block B1 baseline is implemented: Standing Risk Engine v1 derived baseline (`docs/specs/STANDING_RISK_ENGINE.md`, `src/StandingRiskEngine.js`, `tests/golden/StandingRiskEngine.golden.test.js`).
 - Standing Risk remains derived from Continuity Ledger truth with explicit `continuationSignals`; no second standing-risk persistence substrate is implemented.
-- Block C and Block D are not implemented yet.
-- No scoring, ranking, prediction, anomaly, watcher/buddy, board, or adaptive-trust logic is shipped in Block B1.
+- Wave 2 Block C1 baseline is implemented: Omission & Coverage Engine v1 bounded baseline (`docs/specs/OMISSION_COVERAGE_ENGINE.md`, `src/OmissionCoverageEngine.js`, `tests/golden/OmissionCoverageEngine.golden.test.js`).
+- Block C1 requires explicit `profilePack` selection and is bounded to exactly three first-proof packs: `pricing_quote_change`, `form_customer_data_flow`, and `protected_destructive_operation`.
+- Block C1 findings are deterministic, use a fixed `missingItemCode` vocabulary, and remain evaluation-scoped.
+- Block C1 does not persist omission findings and does not implement continuity-promotion workflow runtime yet.
+- Block D is not implemented yet.
+- No board/grouping logic and no score/confidence/ranking/anomaly/prediction logic are shipped in Block C1.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No skins, marketplace packaging, or public-product polish work is in scope for Wave 1.
 
@@ -93,7 +97,7 @@ Read these in order:
 
 ## Working In This Repo
 
-There is no end-to-end runtime setup sequence yet. Runtime code exists for all six Wave 1 systems, live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and closeout evidence is captured in `docs/WAVE1_CLOSEOUT.md`. Wave 2 Block A continuity runtime exists at `src/ContinuityLedger.js` with golden proof at `tests/golden/ContinuityLedger.golden.test.js`, and Wave 2 Block B1 derived standing-risk runtime exists at `src/StandingRiskEngine.js` with golden proof at `tests/golden/StandingRiskEngine.golden.test.js`; compatibility surfaces are not implemented.
+There is no end-to-end runtime setup sequence yet. Runtime code exists for all six Wave 1 systems, live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and closeout evidence is captured in `docs/WAVE1_CLOSEOUT.md`. Wave 2 Block A continuity runtime exists at `src/ContinuityLedger.js` with golden proof at `tests/golden/ContinuityLedger.golden.test.js`, Wave 2 Block B1 derived standing-risk runtime exists at `src/StandingRiskEngine.js` with golden proof at `tests/golden/StandingRiskEngine.golden.test.js`, and Wave 2 Block C1 bounded omission runtime exists at `src/OmissionCoverageEngine.js` with golden proof at `tests/golden/OmissionCoverageEngine.golden.test.js`; continuity-promotion workflow runtime and compatibility surfaces are not implemented.
 
 ## Contributing
 

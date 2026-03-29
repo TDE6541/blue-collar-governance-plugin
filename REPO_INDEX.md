@@ -40,6 +40,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/WAVE2_CONTINUITY_LAYER.md` — Wave 2 continuity-first umbrella baseline for Block A
 - `docs/specs/CONTINUITY_LEDGER.md` — Continuity Ledger v0 contract baseline for qualifying carry-forward persistence
 - `docs/specs/STANDING_RISK_ENGINE.md` — Standing Risk Engine v1 derived escalation contract baseline
+- `docs/specs/OMISSION_COVERAGE_ENGINE.md` — Omission & Coverage Engine v1 bounded omission-evaluation contract baseline
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -52,7 +53,10 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 2 Block A runtime baseline is implemented for `ContinuityLedger` at `src/ContinuityLedger.js` with golden proof at `tests/golden/ContinuityLedger.golden.test.js`.
 - Wave 2 Block B1 derived standing-risk baseline is implemented for `StandingRiskEngine` at `src/StandingRiskEngine.js` with golden proof at `tests/golden/StandingRiskEngine.golden.test.js`.
 - Standing Risk remains derived from continuity with explicit `continuationSignals`; no second standing-risk persistence layer is implemented.
-- Block C and Block D are not implemented yet.
-- No scoring, ranking, prediction, anomaly, watcher/buddy, board, or adaptive-trust logic is implemented in Block B1.
+- Wave 2 Block C1 bounded omission baseline is implemented for `OmissionCoverageEngine` at `src/OmissionCoverageEngine.js` with golden proof at `tests/golden/OmissionCoverageEngine.golden.test.js`.
+- Block C1 requires explicit `profilePack` selection, is bounded to exactly three first-proof packs (`pricing_quote_change`, `form_customer_data_flow`, `protected_destructive_operation`), and emits deterministic findings with fixed `missingItemCode` vocabulary.
+- Block C1 remains evaluation-scoped only, with no omission-finding persistence/write behavior and no continuity-promotion workflow runtime yet.
+- Block D is not implemented yet.
+- No board/grouping logic and no score/confidence/ranking/anomaly/prediction logic are implemented in Block C1.
 - No remote is configured yet.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.
