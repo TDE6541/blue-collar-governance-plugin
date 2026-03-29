@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer with Wave 1 implemented and Wave 2 Block A continuity baseline implemented
+- Status: private runtime trust layer with Wave 1 implemented and Wave 2 Block A + Block B1 baselines implemented
 - Git: initialized on `main`, Wave 0 bootstrap committed, no remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -37,6 +37,10 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - SessionReceipt contract spec: `docs/specs/SESSION_RECEIPT.md`
 - Wave 1 runtime implementation: system runtime present for all six Wave 1 systems; integration/proof artifacts implemented (`tests/live/wave1.operator-flow.live.test.js`, `docs/WAVE1_CLOSEOUT.md`)
 - Wave 2 Block A continuity baseline: implemented (`docs/specs/WAVE2_CONTINUITY_LAYER.md`, `docs/specs/CONTINUITY_LEDGER.md`, `src/ContinuityLedger.js`, `tests/golden/ContinuityLedger.golden.test.js`)
+- Wave 2 Block B1 standing-risk baseline: implemented as derived logic (`docs/specs/STANDING_RISK_ENGINE.md`, `src/StandingRiskEngine.js`, `tests/golden/StandingRiskEngine.golden.test.js`)
+- Standing Risk derivation uses explicit `continuationSignals`; no second standing-risk persistence substrate is implemented.
+- Block C and Block D runtime behavior is not implemented yet.
+- No scoring, ranking, prediction, anomaly, watcher/buddy, board, or adaptive-trust logic is implemented in Block B1.
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
 - Canon specs for current scope:
@@ -49,6 +53,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/SESSION_RECEIPT.md`
   - `docs/specs/WAVE2_CONTINUITY_LAYER.md`
   - `docs/specs/CONTINUITY_LEDGER.md`
+  - `docs/specs/STANDING_RISK_ENGINE.md`
 
 ## Canon And Reference Boundary
 

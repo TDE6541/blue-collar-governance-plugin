@@ -32,6 +32,7 @@ Use this index to find the right canon surface before making a change.
 
 - Change `docs/specs/WAVE2_CONTINUITY_LAYER.md` for Wave 2 continuity-first sequencing and Block A boundaries.
 - Change `docs/specs/CONTINUITY_LEDGER.md` for qualifying continuity entry rules, exclusions, and aging/outcome contracts.
+- Change `docs/specs/STANDING_RISK_ENGINE.md` for derived standing-risk progression and continuation-signal derivation rules.
 ## Contract And Migration Truth
 
 - Change `MIGRATIONS.md` when a real shared contract changes.
@@ -41,7 +42,9 @@ Use this index to find the right canon surface before making a change.
 
 - Change `src/` for runtime implementation after a governed execution wave is approved.
 - Change `src/ContinuityLedger.js` for Wave 2 Block A continuity persistence behavior.
+- Change `src/StandingRiskEngine.js` for Wave 2 Block B1 derived standing-risk behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
+- Add `tests/golden/StandingRiskEngine.golden.test.js` for Standing Risk Engine golden verification.
 - Add golden references under `tests/golden/`.
 - Add live or integration verification under `tests/live/`.
 
