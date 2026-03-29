@@ -45,6 +45,6 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - The repo is in bootstrap state with Wave 0 committed.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
-- Block A runtime systems are implemented: `HoldEngine` and `ConstraintsRegistry`.
+- Block A/B runtime systems are implemented: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, and `ScopeGuard`.
 - No remote is configured yet.
-- The repo remains governed/spec-led while runtime proceeds by wave; Block B/C systems are not implemented yet.
+- The repo remains governed/spec-led while runtime proceeds by wave; Block C systems are not implemented yet.

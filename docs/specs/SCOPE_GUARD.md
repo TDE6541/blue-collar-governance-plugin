@@ -106,5 +106,5 @@ This spec does not define:
 ## Current Implementation Truth
 
 - This is a contract/spec artifact only.
-- No `ScopeGuard` runtime implementation exists yet.
+- `ScopeGuard` runtime implementation now exists at `src/ScopeGuard.js` with golden coverage in `tests/golden/ScopeGuard.golden.test.js`.
 - Persistence, transport, and UI surfaces remain undefined at this stage.

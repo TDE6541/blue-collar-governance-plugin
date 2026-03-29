@@ -101,5 +101,5 @@ This spec does not define:
 ## Current Implementation Truth
 
 - This is a contract/spec artifact only.
-- No `SafetyInterlocks` runtime implementation exists yet.
+- `SafetyInterlocks` runtime implementation now exists at `src/SafetyInterlocks.js` with golden coverage in `tests/golden/SafetyInterlocks.golden.test.js`.
 - Persistence, transport, and UI surfaces remain undefined at this stage.
