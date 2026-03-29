@@ -1,5 +1,5 @@
 # WAVE2_CONTINUITY_LAYER.md
-**Status:** Block A baseline implemented; Architect signoff pending  
+**Status:** Block A and Block B1 baselines implemented; Architect signoff pending
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -17,13 +17,13 @@ Wave 2 ships four things only:
 3. Omission & Coverage Engine v1
 4. Open Items Board v1
 
-Block A in this wave delivers Continuity Ledger v0 only.
+Block A delivers Continuity Ledger v0. Block B1 delivers Standing Risk Engine v1 derived baseline (spec + logic + golden proof).
 
 ## Continuity-First Posture
 
 Continuity Ledger is the persisted substrate.
 
-Standing Risk, Omission/Coverage, and Open Items Board are later derived or review layers and are not part of Block A runtime behavior.
+Standing Risk, Omission/Coverage, and Open Items Board are later derived or review layers.
 
 ## Block A Scope
 
@@ -40,6 +40,21 @@ Block A excludes:
 - omission-coverage analysis logic
 - board aggregation or board rendering logic
 - watcher, anomaly, adaptive trust, rights, and warranty layers
+
+## Block B1 Scope
+
+Block B1 includes:
+
+- derived standing-risk contract and state progression (`OPEN`, `CARRIED`, `STANDING`)
+- terminal state mapping from continuity operator outcomes (`RESOLVED`, `DISMISSED`, `EXPLICITLY_ACCEPTED`)
+- explicit `continuationSignals` input contract for deterministic triad evaluation
+
+Block B1 excludes:
+
+- standing-risk persistence substrate
+- score/rank/prediction logic
+- omission/coverage runtime
+- board runtime
 
 ## Carry-Forward Eligibility
 
@@ -72,4 +87,5 @@ Block A is complete only if:
 - Block A continuity baseline spec exists at `docs/specs/CONTINUITY_LEDGER.md`.
 - Block A runtime exists at `src/ContinuityLedger.js`.
 - Block A golden proof exists at `tests/golden/ContinuityLedger.golden.test.js`.
-- Derived Wave 2 layers (Standing Risk, Omission/Coverage, Open Items Board) are not implemented in Block A.
+- Block B1 standing-risk baseline is implemented as derived logic (`docs/specs/STANDING_RISK_ENGINE.md`, `src/StandingRiskEngine.js`, `tests/golden/StandingRiskEngine.golden.test.js`).
+- Omission/Coverage and Open Items Board are not implemented in Block B1.
