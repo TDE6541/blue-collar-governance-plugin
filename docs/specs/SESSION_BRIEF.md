@@ -115,5 +115,5 @@ This spec does not define:
 ## Current Implementation Truth
 
 - This is a contract/spec artifact only.
-- No `SessionBrief` runtime implementation exists yet.
+- `SessionBrief` runtime implementation now exists at `src/SessionBrief.js` with golden coverage in `tests/golden/SessionBrief.golden.test.js`.
 - Persistence, transport, and UI surfaces remain undefined at this stage.

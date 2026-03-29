@@ -109,5 +109,5 @@ This spec does not define:
 ## Current Implementation Truth
 
 - This is a contract/spec artifact only.
-- No `SessionReceipt` runtime implementation exists yet.
+- `SessionReceipt` runtime implementation now exists at `src/SessionReceipt.js` with golden coverage in `tests/golden/SessionReceipt.golden.test.js`.
 - Persistence, transport, and UI surfaces remain undefined at this stage.
