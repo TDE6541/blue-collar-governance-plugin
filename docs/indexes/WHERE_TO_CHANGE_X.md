@@ -52,8 +52,12 @@ Use this index to find the right canon surface before making a change.
 - Change `src/OmissionCoverageEngine.js` for Wave 2 Block C1 bounded omission-evaluation behavior.
 - Change `src/OpenItemsBoard.js` for Wave 2 Block D1 one-board projection behavior.
 - Change `src/ForensicChain.js` for Wave 3 Block A1 append-only forensic evidence behavior.
+- Change `src/ControlRodMode.js` for Wave 3 Block B1 static profile-resolution and normalization behavior.
+- Change `src/SessionBrief.js` for Block B1 controlRodProfile normalized snapshot adoption behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add `tests/golden/ForensicChain.golden.test.js` for Forensic Chain golden verification.
+- Add `tests/golden/ControlRodMode.golden.test.js` for Control Rod Mode golden verification.
+- Change `tests/golden/SessionBrief.golden.test.js` for Block B1 controlRodProfile adoption golden verification.
 - Add `tests/golden/StandingRiskEngine.golden.test.js` for Standing Risk Engine golden verification.
 - Add `tests/golden/OmissionCoverageEngine.golden.test.js` for Omission & Coverage Engine golden verification.
 - Add `tests/golden/OpenItemsBoard.golden.test.js` for Open Items Board golden verification.

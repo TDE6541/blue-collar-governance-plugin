@@ -43,6 +43,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/OMISSION_COVERAGE_ENGINE.md` — Omission & Coverage Engine v1 bounded omission-evaluation contract baseline
 - `docs/specs/OPEN_ITEMS_BOARD.md` — Open Items Board v1 one-board projection contract baseline
 - `docs/specs/FORENSIC_CHAIN.md` — Forensic Chain v1 append-only evidence-substrate contract baseline
+- `docs/specs/CONTROL_ROD_MODE.md` — Control Rod Mode v1 static pre-session posture contract baseline
 - `docs/WAVE2_CLOSEOUT.md` — durable Wave 2 closeout evidence map
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
@@ -67,6 +68,9 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Wave 3 Block A1 Forensic Chain baseline is implemented at `src/ForensicChain.js` with golden proof at `tests/golden/ForensicChain.golden.test.js` and canon spec at `docs/specs/FORENSIC_CHAIN.md`.
 - Forensic Chain is evidence-substrate only and does not create a second continuity or standing-risk operational substrate.
-- Wave 3 Block B Control Rod runtime and Wave 3 Block C Foreman's Walk runtime are not implemented yet.
+- Wave 3 Block B1 Control Rod Mode baseline is implemented at `src/ControlRodMode.js` with golden proof at `tests/golden/ControlRodMode.golden.test.js` and canon spec at `docs/specs/CONTROL_ROD_MODE.md`.
+- Block B1 starter profiles are `conservative`, `balanced`, and `velocity`; SessionBrief stores `controlRodProfile` as a normalized snapshot object with no second authorization field.
+- Control Rod Mode v1 is static posture only and does not implement adaptive learning, mid-session intervention, or live enforcement behavior.
+- Wave 3 Block C Foreman's Walk runtime is not implemented yet.
 - No remote is configured yet.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.
