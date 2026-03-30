@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer with Wave 1 implemented and Wave 2 Block A + Block B1 + Block C1 baselines implemented
+- Status: private runtime trust layer with Wave 1 implemented and Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented
 - Git: initialized on `main`, Wave 0 bootstrap committed, no remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -43,8 +43,12 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Block C1 requires explicit `profilePack` selection and is bounded to exactly three first-proof packs: `pricing_quote_change`, `form_customer_data_flow`, and `protected_destructive_operation`.
 - Block C1 findings use fixed deterministic `missingItemCode` vocabulary and remain evaluation-scoped only.
 - Block C1 does not persist omission findings and does not implement continuity-promotion workflow runtime yet.
-- Block D runtime behavior is not implemented yet.
-- No board/grouping logic and no score/confidence/ranking/anomaly/prediction logic are implemented in Block C1.
+- Wave 2 Block D1 open-items-board baseline: implemented as one-board projection logic (`docs/specs/OPEN_ITEMS_BOARD.md`, `src/OpenItemsBoard.js`, `tests/golden/OpenItemsBoard.golden.test.js`)
+- Block D1 has exactly four fixed groups: `Missing now`, `Still unresolved`, `Aging into risk`, `Resolved this session`.
+- Block D1 is projection-only, uses explicit current-session resolved-outcomes input for `Resolved this session`, and enforces precedence+dedupe.
+- Block D1 does not persist a board store and does not implement continuity-promotion runtime.
+- No score/confidence/rank/priority/anomaly/prediction logic is implemented in Block D1.
+- Block E / full Wave 2 closeout execution is not implemented yet.
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
 - Canon specs for current scope:
@@ -59,6 +63,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/CONTINUITY_LEDGER.md`
   - `docs/specs/STANDING_RISK_ENGINE.md`
   - `docs/specs/OMISSION_COVERAGE_ENGINE.md`
+  - `docs/specs/OPEN_ITEMS_BOARD.md`
 
 ## Canon And Reference Boundary
 

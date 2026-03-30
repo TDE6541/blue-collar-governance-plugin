@@ -30,10 +30,11 @@ Use this index to find the right canon surface before making a change.
 
 ## Wave 2 Continuity Truth
 
-- Change `docs/specs/WAVE2_CONTINUITY_LAYER.md` for Wave 2 continuity-first sequencing and Block A/B/C baseline boundaries.
+- Change `docs/specs/WAVE2_CONTINUITY_LAYER.md` for Wave 2 continuity-first sequencing and Block A/B/C/D baseline boundaries.
 - Change `docs/specs/CONTINUITY_LEDGER.md` for qualifying continuity entry rules, exclusions, and aging/outcome contracts.
 - Change `docs/specs/STANDING_RISK_ENGINE.md` for derived standing-risk progression and continuation-signal derivation rules.
 - Change `docs/specs/OMISSION_COVERAGE_ENGINE.md` for bounded omission-evaluation profile-pack rules and deterministic finding-shape contracts.
+- Change `docs/specs/OPEN_ITEMS_BOARD.md` for one-board/four-group projection rules, explicit source mapping, and precedence+dedupe behavior.
 ## Contract And Migration Truth
 
 - Change `MIGRATIONS.md` when a real shared contract changes.
@@ -45,9 +46,11 @@ Use this index to find the right canon surface before making a change.
 - Change `src/ContinuityLedger.js` for Wave 2 Block A continuity persistence behavior.
 - Change `src/StandingRiskEngine.js` for Wave 2 Block B1 derived standing-risk behavior.
 - Change `src/OmissionCoverageEngine.js` for Wave 2 Block C1 bounded omission-evaluation behavior.
+- Change `src/OpenItemsBoard.js` for Wave 2 Block D1 one-board projection behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add `tests/golden/StandingRiskEngine.golden.test.js` for Standing Risk Engine golden verification.
 - Add `tests/golden/OmissionCoverageEngine.golden.test.js` for Omission & Coverage Engine golden verification.
+- Add `tests/golden/OpenItemsBoard.golden.test.js` for Open Items Board golden verification.
 - Add golden references under `tests/golden/`.
 - Add live or integration verification under `tests/live/`.
 

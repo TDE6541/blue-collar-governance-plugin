@@ -41,6 +41,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/CONTINUITY_LEDGER.md` — Continuity Ledger v0 contract baseline for qualifying carry-forward persistence
 - `docs/specs/STANDING_RISK_ENGINE.md` — Standing Risk Engine v1 derived escalation contract baseline
 - `docs/specs/OMISSION_COVERAGE_ENGINE.md` — Omission & Coverage Engine v1 bounded omission-evaluation contract baseline
+- `docs/specs/OPEN_ITEMS_BOARD.md` — Open Items Board v1 one-board projection contract baseline
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -56,7 +57,11 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 2 Block C1 bounded omission baseline is implemented for `OmissionCoverageEngine` at `src/OmissionCoverageEngine.js` with golden proof at `tests/golden/OmissionCoverageEngine.golden.test.js`.
 - Block C1 requires explicit `profilePack` selection, is bounded to exactly three first-proof packs (`pricing_quote_change`, `form_customer_data_flow`, `protected_destructive_operation`), and emits deterministic findings with fixed `missingItemCode` vocabulary.
 - Block C1 remains evaluation-scoped only, with no omission-finding persistence/write behavior and no continuity-promotion workflow runtime yet.
-- Block D is not implemented yet.
-- No board/grouping logic and no score/confidence/ranking/anomaly/prediction logic are implemented in Block C1.
+- Wave 2 Block D1 open-items-board baseline is implemented for `OpenItemsBoard` at `src/OpenItemsBoard.js` with golden proof at `tests/golden/OpenItemsBoard.golden.test.js`.
+- Block D1 is one board only with exactly four fixed groups (`Missing now`, `Still unresolved`, `Aging into risk`, `Resolved this session`).
+- Block D1 is projection-only over existing A/B/C truth, uses explicit current-session resolved-outcomes input, and enforces precedence+dedupe.
+- Block D1 has no persisted board store and no continuity-promotion runtime behavior.
+- No score/confidence/rank/priority/anomaly/prediction logic is implemented in Block D1.
+- Block E / full Wave 2 closeout execution is not implemented yet.
 - No remote is configured yet.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.
