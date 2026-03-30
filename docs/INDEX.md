@@ -20,11 +20,12 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/OPEN_ITEMS_BOARD.md` - authoritative Open Items Board v1 one-board projection contract baseline
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/WAVE1_CLOSEOUT.md` - durable Wave 1 integration/proof closeout evidence map
+- `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 integration/proof closeout evidence map
 
 ## Current State
 
 - `docs/specs/` contains the Wave 1 umbrella spec, promoted contract specs for all six Wave 1 systems, the Wave 2 Block A continuity baseline specs, the Wave 2 Block B1 standing-risk derived baseline spec, the Wave 2 Block C1 bounded omission-evaluation baseline spec, and the Wave 2 Block D1 one-board projection baseline spec.
-- Wave 2 Block D1 spec is implemented; Wave 2 Block E / full closeout work is not implemented yet.
+- Wave 2 Block E closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
 - `docs/learning-notes/` is not present because no exploration lane is needed for the current repo state.
