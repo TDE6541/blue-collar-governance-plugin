@@ -45,6 +45,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/FORENSIC_CHAIN.md` — Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` — Control Rod Mode v2 deterministic HARD_STOP LOTO + Permit contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` — Foreman's Walk Engine v1 post-session verification contract baseline
+- `docs/specs/CHANGE_ORDER_ENGINE.md` — Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/WAVE2_CLOSEOUT.md` — durable Wave 2 closeout evidence map
 - `docs/WAVE3_CLOSEOUT.md` — durable Wave 3 closeout evidence map
 - `CLAUDE.md` — current session posture and closeout expectations
@@ -75,13 +76,15 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Control Rod Mode v2 preserves the same three autonomy levels (`FULL_AUTO`, `SUPERVISED`, `HARD_STOP`) and upgrades HARD_STOP behavior with deterministic LOTO + Permit semantics.
 - Permit gating applies only to HARD_STOP domains.
 - No adaptive learning and no rod suggestions are implemented.
+- Wave 4 Block B1 Change Order Engine baseline is implemented at `src/ChangeOrderEngine.js` with golden proof at `tests/golden/ChangeOrderEngine.golden.test.js` and canon spec at `docs/specs/CHANGE_ORDER_ENGINE.md`.
+- Change Orders support deterministic `APPROVED`, `REJECTED`, and `DEFERRED` outcomes with deferred promotion through existing continuity paths.
 - Wave 3 Block C1 Foreman's Walk baseline is implemented at `src/ForemansWalk.js` with golden proof at `tests/golden/ForemansWalk.golden.test.js` and canon spec at `docs/specs/FOREMANS_WALK_ENGINE.md`.
 - Foreman's Walk is post-session verification only; it emits deterministic findings plus As-Built accountability delta while SessionReceipt remains session-of-record.
 - Foreman's Walk does not implement live intervention, watcher/buddy behavior, or adaptive intelligence.
 - Wave 3 Block D1 live integration proof is implemented at `tests/live/wave3.active-governance.live.test.js`.
 - Wave 3 Block D2 closeout and front-door/index truth sync are implemented at `docs/WAVE3_CLOSEOUT.md`.
 - Wave 3 is shipped.
-- Wave 4 currently ships Block A1 only; Buddy and Change Order are not implemented yet.
+- Wave 4 currently ships Block A1 + Block B1; Buddy is not implemented yet.
 - Wave 5 behavior is not implemented.
 - No remote is configured yet.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.

@@ -44,6 +44,10 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/CONTROL_ROD_MODE.md` for Wave 4 Block A1 Control Rod v2 contract rules (HARD_STOP LOTO + Permit semantics with unchanged autonomy enum).
 - Change `docs/specs/SESSION_BRIEF.md` when Block B1 `controlRodProfile` adoption wording requires clarification.
 
+## Wave 4 Change Order Truth
+
+- Change `docs/specs/CHANGE_ORDER_ENGINE.md` for Wave 4 Block B1 Change Order statuses, decision mapping, and deferred continuity-promotion contract rules.
+
 ## Wave 3 Verification Truth
 
 - Change `docs/specs/FOREMANS_WALK_ENGINE.md` for Wave 3 Block C1 post-session verification passes, finding model, precedence, and As-Built accountability rules.
@@ -67,11 +71,13 @@ Use this index to find the right canon surface before making a change.
 - Change `src/ForensicChain.js` for Wave 3 Block A1 append-only forensic evidence behavior.
 - Change `src/ControlRodMode.js` for Wave 4 Block A1 Control Rod v2 behavior, including deterministic HARD_STOP LOTO + Permit gate evaluation.
 - Change `src/SessionBrief.js` for Block B1 `controlRodProfile` normalized snapshot adoption behavior.
+- Change `src/ChangeOrderEngine.js` for Wave 4 Block B1 formal drift-governance decision behavior.
 - Change `src/ForemansWalk.js` for Wave 3 Block C1 post-session verification findings and As-Built accountability behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add `tests/golden/ForensicChain.golden.test.js` for Forensic Chain golden verification.
 - Add `tests/golden/ControlRodMode.golden.test.js` for Control Rod Mode v2 golden verification.
 - Change `tests/golden/SessionBrief.golden.test.js` for Block B1 `controlRodProfile` adoption golden verification.
+- Add `tests/golden/ChangeOrderEngine.golden.test.js` for Change Order Engine v1 golden verification.
 - Add `tests/golden/ForemansWalk.golden.test.js` for Foreman's Walk golden verification.
 - Add `tests/golden/StandingRiskEngine.golden.test.js` for Standing Risk Engine golden verification.
 - Add `tests/golden/OmissionCoverageEngine.golden.test.js` for Omission & Coverage Engine golden verification.
