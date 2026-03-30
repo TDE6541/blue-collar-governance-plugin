@@ -41,6 +41,7 @@ This spec does not define:
 | `truthSources` | string[] | Yes | Canon sources the session should treat as authoritative. |
 | `approvalsNeeded` | string[] | No | Extra approvals required before specific work may proceed. |
 | `controlRodProfile` | string or object | No | Optional control-rod posture input. Input may be preset id (`conservative`, `balanced`, `velocity`) or explicit profile object; stored session truth is a normalized snapshot object. This remains the only approved additive field in Wave 3 Block 0. |
+| `toolboxTalk` | object | No | Optional Wave 4 summary object for next-session startup context. Must contain summary/counts/refs/currentHazards/activeDeferredChangeOrderSummary/permitLockoutSummary/continuityStandingRiskSummary and must not duplicate full payloads. |
 | `createdBy` | enum | Yes | Actor that created the brief. Initial values: `architect` or `ai`. |
 | `createdAt` | string | Yes | Timestamp in ISO 8601 format. |
 | `updatedAt` | string | No | Latest brief-change timestamp in ISO 8601 format. |
@@ -75,6 +76,21 @@ This spec does not define:
 - No second authorization field is introduced in Block B1.
 
 
+
+## Wave 4 Block D1 Toolbox Talk Clarifier
+
+- `toolboxTalk` is one optional object on SessionBrief.
+- It is a summary/enrichment surface for next-session startup context.
+- It must include:
+  - `summary`
+  - `counts` (non-negative integer map)
+  - `refs` (string refs)
+  - `currentHazards`
+  - `activeDeferredChangeOrderSummary`
+  - `permitLockoutSummary`
+  - `continuityStandingRiskSummary`
+- It must not include duplicated full findings/change-order/permit/lockout payloads.
+- Dead Man's Switch configuration remains Buddy/session policy and is not stored on Control Rod profile.
 ## Contract Invariants
 
 - Every brief must be readable by a non-technical operator.

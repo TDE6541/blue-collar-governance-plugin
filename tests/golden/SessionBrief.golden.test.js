@@ -235,3 +235,79 @@ test("SessionBrief.evaluateSessionStartReadiness returns ready for explicit brie
     "Session brief is explicit and ready for governed start."
   );
 });
+
+test("SessionBrief stores toolboxTalk enrichment object when provided", () => {
+  const briefs = new SessionBrief();
+  const brief = briefs.createBrief(
+    buildBrief({
+      briefId: "brief_wave4_toolbox_001",
+      toolboxTalk: {
+        summary: "Carry-forward review before session start.",
+        counts: {
+          activeCallouts: 2,
+          deferredChangeOrders: 1,
+          unresolvedContinuityEntries: 1,
+        },
+        refs: ["co_wave4_003", "buddy_callout_wave4_live_ops_002"],
+        currentHazards: ["Pricing lockout remains constrained."],
+        activeDeferredChangeOrderSummary:
+          "One deferred change order remains active for operator review.",
+        permitLockoutSummary: "One denied permit and one conditional permit.",
+        continuityStandingRiskSummary: "One unresolved deferred continuity entry.",
+      },
+    })
+  );
+
+  assert.ok(brief.toolboxTalk);
+  assert.equal(brief.toolboxTalk.summary, "Carry-forward review before session start.");
+  assert.equal(brief.toolboxTalk.counts.deferredChangeOrders, 1);
+
+  const readA = briefs.getBrief("brief_wave4_toolbox_001");
+  readA.toolboxTalk.counts.deferredChangeOrders = 99;
+  const readB = briefs.getBrief("brief_wave4_toolbox_001");
+  assert.equal(readB.toolboxTalk.counts.deferredChangeOrders, 1);
+});
+
+test("SessionBrief rejects malformed toolboxTalk or duplicated full payload fields", () => {
+  const briefs = new SessionBrief();
+
+  expectValidationError(
+    () =>
+      briefs.createBrief(
+        buildBrief({
+          briefId: "brief_wave4_toolbox_002",
+          toolboxTalk: {
+            counts: { activeCallouts: 1 },
+            refs: ["ref_001"],
+            currentHazards: [],
+            activeDeferredChangeOrderSummary: "summary",
+            permitLockoutSummary: "summary",
+            continuityStandingRiskSummary: "summary",
+          },
+        })
+      ),
+    "INVALID_FIELD",
+    "'summary' must be a non-empty string"
+  );
+
+  expectValidationError(
+    () =>
+      briefs.createBrief(
+        buildBrief({
+          briefId: "brief_wave4_toolbox_003",
+          toolboxTalk: {
+            summary: "bad payload",
+            counts: { activeCallouts: 1 },
+            refs: ["ref_001"],
+            currentHazards: [],
+            activeDeferredChangeOrderSummary: "summary",
+            permitLockoutSummary: "summary",
+            continuityStandingRiskSummary: "summary",
+            findings: [{ id: "full_payload_not_allowed" }],
+          },
+        })
+      ),
+    "INVALID_FIELD",
+    "'toolboxTalk.findings' is not allowed; use summaries and refs only"
+  );
+});

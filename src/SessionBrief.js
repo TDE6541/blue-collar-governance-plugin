@@ -7,6 +7,13 @@ const ACTORS = new Set(["architect", "ai"]);
 const ISO_8601_PATTERN =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
+const TOOLBOX_TALK_FORBIDDEN_FIELDS = new Set([
+  "findings",
+  "changeOrders",
+  "permits",
+  "lockouts",
+]);
+
 function makeValidationError(code, message) {
   const error = new Error(`${code}: ${message}`);
   error.name = "ValidationError";
@@ -68,6 +75,22 @@ function assertOptionalStringArray(input, fieldName) {
   }
 }
 
+function assertStringArrayValue(value, fieldName, { nonEmpty = false } = {}) {
+  if (!Array.isArray(value) || value.some((entry) => typeof entry !== "string")) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      `'${fieldName}' must be an array of strings`
+    );
+  }
+
+  if (nonEmpty && value.length === 0) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      `'${fieldName}' must include at least one item`
+    );
+  }
+}
+
 function isReferenceOnlyPath(value) {
   const normalized = value.replace(/\\/g, "/").toLowerCase();
   const segments = normalized.split("/").filter((segment) => segment.length > 0);
@@ -89,6 +112,71 @@ function deepClone(value) {
   }
 
   return value;
+}
+
+function normalizeToolboxTalk(toolboxTalk) {
+  if (toolboxTalk === undefined) {
+    return undefined;
+  }
+
+  if (!isPlainObject(toolboxTalk)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'toolboxTalk' must be an object when provided"
+    );
+  }
+
+  for (const forbiddenField of TOOLBOX_TALK_FORBIDDEN_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(toolboxTalk, forbiddenField)) {
+      throw makeValidationError(
+        "INVALID_FIELD",
+        `'toolboxTalk.${forbiddenField}' is not allowed; use summaries and refs only`
+      );
+    }
+  }
+
+  assertRequiredString(toolboxTalk, "summary");
+  assertRequiredString(toolboxTalk, "activeDeferredChangeOrderSummary");
+  assertRequiredString(toolboxTalk, "permitLockoutSummary");
+  assertRequiredString(toolboxTalk, "continuityStandingRiskSummary");
+
+  if (!isPlainObject(toolboxTalk.counts)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'toolboxTalk.counts' must be an object"
+    );
+  }
+
+  const countKeys = Object.keys(toolboxTalk.counts);
+  if (countKeys.length === 0) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'toolboxTalk.counts' must contain at least one count"
+    );
+  }
+
+  for (const key of countKeys) {
+    const value = toolboxTalk.counts[key];
+    if (!Number.isInteger(value) || value < 0) {
+      throw makeValidationError(
+        "INVALID_FIELD",
+        `'toolboxTalk.counts.${key}' must be a non-negative integer`
+      );
+    }
+  }
+
+  assertStringArrayValue(toolboxTalk.refs, "toolboxTalk.refs", { nonEmpty: true });
+  assertStringArrayValue(toolboxTalk.currentHazards, "toolboxTalk.currentHazards");
+
+  return {
+    summary: toolboxTalk.summary,
+    counts: { ...toolboxTalk.counts },
+    refs: [...toolboxTalk.refs],
+    currentHazards: [...toolboxTalk.currentHazards],
+    activeDeferredChangeOrderSummary: toolboxTalk.activeDeferredChangeOrderSummary,
+    permitLockoutSummary: toolboxTalk.permitLockoutSummary,
+    continuityStandingRiskSummary: toolboxTalk.continuityStandingRiskSummary,
+  };
 }
 
 function normalizeBrief(input) {
@@ -151,6 +239,7 @@ function normalizeBrief(input) {
   }
 
   const controlRodProfile = normalizeControlRodProfileInput(input.controlRodProfile);
+  const toolboxTalk = normalizeToolboxTalk(input.toolboxTalk);
 
   return {
     briefId: input.briefId,
@@ -165,6 +254,7 @@ function normalizeBrief(input) {
     truthSources: [...input.truthSources],
     approvalsNeeded: input.approvalsNeeded ? [...input.approvalsNeeded] : undefined,
     controlRodProfile,
+    toolboxTalk,
     createdBy: input.createdBy,
     createdAt: input.createdAt,
     updatedAt: input.updatedAt,
@@ -186,6 +276,7 @@ function cloneBrief(brief) {
     controlRodProfile: brief.controlRodProfile
       ? deepClone(brief.controlRodProfile)
       : undefined,
+    toolboxTalk: brief.toolboxTalk ? deepClone(brief.toolboxTalk) : undefined,
   };
 }
 
