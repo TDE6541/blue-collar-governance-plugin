@@ -48,6 +48,10 @@ Use this index to find the right canon surface before making a change.
 
 - Change `docs/specs/FOREMANS_WALK_ENGINE.md` for Wave 3 Block C1 post-session verification passes, finding model, precedence, and As-Built accountability rules.
 
+## Wave 3 Closeout Truth
+
+- Change `docs/WAVE3_CLOSEOUT.md` for Wave 3 Block D integration-proof evidence map, closeout verification snapshot, and final signoff state.
+
 ## Contract And Migration Truth
 
 - Change `MIGRATIONS.md` when a real shared contract changes.
@@ -73,6 +77,7 @@ Use this index to find the right canon surface before making a change.
 - Add `tests/golden/OmissionCoverageEngine.golden.test.js` for Omission & Coverage Engine golden verification.
 - Add `tests/golden/OpenItemsBoard.golden.test.js` for Open Items Board golden verification.
 - Add golden references under `tests/golden/`.
+- Add `tests/live/wave3.active-governance.live.test.js` for Wave 3 Block D integration proof.
 - Add live or integration verification under `tests/live/`.
 
 ## Reference Inputs

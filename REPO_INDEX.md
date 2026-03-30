@@ -46,6 +46,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/CONTROL_ROD_MODE.md` — Control Rod Mode v1 static pre-session posture contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` — Foreman's Walk Engine v1 post-session verification contract baseline
 - `docs/WAVE2_CLOSEOUT.md` — durable Wave 2 closeout evidence map
+- `docs/WAVE3_CLOSEOUT.md` — durable Wave 3 closeout evidence map
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -75,6 +76,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 3 Block C1 Foreman's Walk baseline is implemented at `src/ForemansWalk.js` with golden proof at `tests/golden/ForemansWalk.golden.test.js` and canon spec at `docs/specs/FOREMANS_WALK_ENGINE.md`.
 - Foreman's Walk is post-session verification only; it emits deterministic findings plus As-Built accountability delta while SessionReceipt remains session-of-record.
 - Foreman's Walk does not implement live intervention, watcher/buddy behavior, or adaptive intelligence.
-- Wave 3 Block D integration proof and closeout are not implemented yet.
+- Wave 3 Block D1 live integration proof is implemented at `tests/live/wave3.active-governance.live.test.js`.
+- Wave 3 Block D2 closeout and front-door/index truth sync are implemented at `docs/WAVE3_CLOSEOUT.md`.
+- Wave 3 is shipped; Wave 4/5 behavior is not implemented.
 - No remote is configured yet.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.

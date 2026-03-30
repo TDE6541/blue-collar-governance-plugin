@@ -24,6 +24,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/WAVE1_CLOSEOUT.md` - durable Wave 1 integration/proof closeout evidence map
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 integration/proof closeout evidence map
+- `docs/WAVE3_CLOSEOUT.md` - durable Wave 3 integration/proof closeout evidence map
 
 ## Current State
 
@@ -31,7 +32,8 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 2 Block E closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Wave 3 Block B1 Control Rod Mode is shipped in current docs/runtime truth as static posture only (`conservative`, `balanced`, `velocity`) with normalized `controlRodProfile` snapshots on SessionBrief.
 - Wave 3 Block C1 Foreman's Walk is shipped in current docs/runtime truth as post-session verification only and produces findings plus As-Built accountability delta without live intervention.
-- Wave 3 Block D integration proof and closeout are not shipped in current docs/runtime truth.
+- Wave 3 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave3.active-governance.live.test.js` and closeout evidence exists at `docs/WAVE3_CLOSEOUT.md`.
+- Wave 4/5 behavior is not shipped in current docs/runtime truth.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
 - `docs/learning-notes/` is not present because no exploration lane is needed for the current repo state.
