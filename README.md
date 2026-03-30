@@ -1,6 +1,6 @@
 # Blue Collar Governance Plugin
 
-**Status:** Wave 1 runtime implemented and verified; Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented; Wave 3 Block A1 + Block B1 + Block C1 baselines implemented; Wave 3 Block D integration proof and closeout shipped; Wave 4 Block A1 Control Rod Mode v2 shipped; Wave 4 Block B1 Change Order Engine v1 shipped
+**Status:** Wave 1 runtime implemented and verified; Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented; Wave 3 Block A1 + Block B1 + Block C1 baselines implemented; Wave 3 Block D integration proof and closeout shipped; Wave 4 Block A1 Control Rod Mode v2 shipped; Wave 4 Block B1 Change Order Engine v1 shipped; Wave 4 Block C1 Buddy System v1 shipped
 **Repo type:** Private runtime/control layer  
 **Implementation state:** All six Wave 1 systems now have runtime implementations (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 
@@ -42,14 +42,17 @@ Governed Workflow is the methodology spine behind the work. This repository is n
 - No adaptive learning and no rod suggestions are shipped.
 - Wave 4 Block B1 baseline is implemented: Change Order Engine v1 (`docs/specs/CHANGE_ORDER_ENGINE.md`, `src/ChangeOrderEngine.js`, `tests/golden/ChangeOrderEngine.golden.test.js`).
 - Change Orders are formal drift-governance documents with deterministic `APPROVED`, `REJECTED`, and `DEFERRED` outcomes.
-- Wave 3 Block C1 baseline is implemented: Foreman's Walk Engine v1 post-session verification (`docs/specs/FOREMANS_WALK_ENGINE.md`, `src/ForemansWalk.js`, `tests/golden/ForemansWalk.golden.test.js`).
+- Wave 4 Block C1 baseline is implemented: Buddy System v1 live watcher (docs/specs/BUDDY_SYSTEM.md, src/BuddySystem.js, tests/golden/BuddySystem.golden.test.js).
+- Buddy is watcher-only live oversight and writes callout events directly to existing Forensic Chain.
+- Buddy does not build, fix, revert, or suggest fixes.
+- Wave 3 Block C1 baseline is implemented: Foreman's Walk Engine v1 post-session verification (docs/specs/FOREMANS_WALK_ENGINE.md, src/ForemansWalk.js, tests/golden/ForemansWalk.golden.test.js).
 - Foreman's Walk v1 evaluates scope compliance, constraint posture, completeness, truthfulness, and evidence integrity.
 - Foreman's Walk v1 produces deterministic findings and an As-Built accountability delta-of-record while SessionReceipt remains session-of-record.
 - Foreman's Walk v1 is post-session only and does not implement buddy behavior or live intervention.
 - Wave 3 Block D1 live integration proof is implemented at `tests/live/wave3.active-governance.live.test.js`.
 - Wave 3 Block D2 closeout and truth sync are implemented at `docs/WAVE3_CLOSEOUT.md`.
 - Wave 3 is shipped.
-- Wave 4 currently ships Block A1 + Block B1; Buddy is not shipped yet.
+- Wave 4 currently ships Block A1 + Block B1 + Block C1.
 - Wave 5 behavior is not implemented.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No skins, marketplace packaging, or public-product polish work is in scope for Wave 1.
@@ -121,7 +124,7 @@ Read these in order:
 
 ## Working In This Repo
 
-There is no end-to-end runtime setup sequence yet. Runtime code exists for all six Wave 1 systems, live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and closeout evidence is captured in `docs/WAVE1_CLOSEOUT.md`. Wave 2 Block A continuity runtime exists at `src/ContinuityLedger.js` with golden proof at `tests/golden/ContinuityLedger.golden.test.js`, Wave 2 Block B1 derived standing-risk runtime exists at `src/StandingRiskEngine.js` with golden proof at `tests/golden/StandingRiskEngine.golden.test.js`, Wave 2 Block C1 bounded omission runtime exists at `src/OmissionCoverageEngine.js` with golden proof at `tests/golden/OmissionCoverageEngine.golden.test.js`, Wave 2 Block D1 projection board runtime exists at `src/OpenItemsBoard.js` with golden proof at `tests/golden/OpenItemsBoard.golden.test.js`, Wave 3 Block A1 forensic evidence runtime exists at `src/ForensicChain.js` with golden proof at `tests/golden/ForensicChain.golden.test.js`, Wave 4 Block A1 control-rod v2 runtime exists at `src/ControlRodMode.js` with golden proof at `tests/golden/ControlRodMode.golden.test.js`, Wave 3 Block C1 foreman's-walk runtime exists at `src/ForemansWalk.js` with golden proof at `tests/golden/ForemansWalk.golden.test.js`, and Wave 3 Block D live integration proof exists at `tests/live/wave3.active-governance.live.test.js` with closeout evidence in `docs/WAVE3_CLOSEOUT.md`; continuity-promotion runtime, Wave 4 Buddy behavior, Wave 5 behavior, and compatibility surfaces are not implemented.
+There is no end-to-end runtime setup sequence yet. Runtime code exists for all six Wave 1 systems, live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and closeout evidence is captured in `docs/WAVE1_CLOSEOUT.md`. Wave 2 Block A continuity runtime exists at `src/ContinuityLedger.js` with golden proof at `tests/golden/ContinuityLedger.golden.test.js`, Wave 2 Block B1 derived standing-risk runtime exists at `src/StandingRiskEngine.js` with golden proof at `tests/golden/StandingRiskEngine.golden.test.js`, Wave 2 Block C1 bounded omission runtime exists at `src/OmissionCoverageEngine.js` with golden proof at `tests/golden/OmissionCoverageEngine.golden.test.js`, Wave 2 Block D1 projection board runtime exists at `src/OpenItemsBoard.js` with golden proof at `tests/golden/OpenItemsBoard.golden.test.js`, Wave 3 Block A1 forensic evidence runtime exists at `src/ForensicChain.js` with golden proof at `tests/golden/ForensicChain.golden.test.js`, Wave 4 Block A1 control-rod v2 runtime exists at `src/ControlRodMode.js` with golden proof at `tests/golden/ControlRodMode.golden.test.js`, Wave 4 Block B1 change-order runtime exists at `src/ChangeOrderEngine.js` with golden proof at `tests/golden/ChangeOrderEngine.golden.test.js`, Wave 4 Block C1 buddy runtime exists at `src/BuddySystem.js` with golden proof at `tests/golden/BuddySystem.golden.test.js`, Wave 3 Block C1 foreman's-walk runtime exists at `src/ForemansWalk.js` with golden proof at `tests/golden/ForemansWalk.golden.test.js`, and Wave 3 Block D live integration proof exists at `tests/live/wave3.active-governance.live.test.js` with closeout evidence in `docs/WAVE3_CLOSEOUT.md`; continuity-promotion runtime, Wave 5 behavior, and compatibility surfaces are not implemented.
 
 ## Contributing
 
