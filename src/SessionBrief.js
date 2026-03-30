@@ -1,5 +1,7 @@
 "use strict";
 
+const { normalizeControlRodProfileInput } = require("./ControlRodMode");
+
 const RISK_MODES = new Set(["strict", "guarded", "permitted"]);
 const ACTORS = new Set(["architect", "ai"]);
 const ISO_8601_PATTERN =
@@ -72,6 +74,23 @@ function isReferenceOnlyPath(value) {
   return segments.includes("raw");
 }
 
+function deepClone(value) {
+  if (Array.isArray(value)) {
+    return value.map(deepClone);
+  }
+
+  if (isPlainObject(value)) {
+    const clone = {};
+    for (const [key, entryValue] of Object.entries(value)) {
+      clone[key] = deepClone(entryValue);
+    }
+
+    return clone;
+  }
+
+  return value;
+}
+
 function normalizeBrief(input) {
   if (!isPlainObject(input)) {
     throw makeValidationError("INVALID_BRIEF", "brief input must be an object");
@@ -131,6 +150,8 @@ function normalizeBrief(input) {
     );
   }
 
+  const controlRodProfile = normalizeControlRodProfileInput(input.controlRodProfile);
+
   return {
     briefId: input.briefId,
     goal: input.goal,
@@ -143,6 +164,7 @@ function normalizeBrief(input) {
     expectedOutputs: [...input.expectedOutputs],
     truthSources: [...input.truthSources],
     approvalsNeeded: input.approvalsNeeded ? [...input.approvalsNeeded] : undefined,
+    controlRodProfile,
     createdBy: input.createdBy,
     createdAt: input.createdAt,
     updatedAt: input.updatedAt,
@@ -161,6 +183,9 @@ function cloneBrief(brief) {
     expectedOutputs: [...brief.expectedOutputs],
     truthSources: [...brief.truthSources],
     approvalsNeeded: brief.approvalsNeeded ? [...brief.approvalsNeeded] : undefined,
+    controlRodProfile: brief.controlRodProfile
+      ? deepClone(brief.controlRodProfile)
+      : undefined,
   };
 }
 
