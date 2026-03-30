@@ -1,33 +1,38 @@
 # CONTROL_ROD_MODE.md
-**Status:** Proposed contract baseline  
+**Status:** Wave 4 Block A1 contract baseline (v2)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
 
-This document defines the Wave 3 Block B1 contract baseline for `ControlRodMode`.
+This document defines the Wave 4 Block A1 contract baseline for `ControlRodMode`.
 
-`ControlRodMode` is a static pre-session profile-resolution and normalization surface for per-domain supervision posture.
+`ControlRodMode` is a deterministic control surface for:
+
+- static profile resolution and normalization
+- HARD_STOP LOTO authorization validation
+- HARD_STOP permit-gate decisioning
 
 ## Boundary
 
-`ControlRodMode` defines autonomy levels, starter profiles, starter domains, and normalized profile snapshot shape.
+`ControlRodMode` defines autonomy levels, starter profiles, starter domains, normalized profile shape, and deterministic HARD_STOP gating semantics.
 
 This spec does not define:
 
-- mid-session intervention or live enforcement behavior
 - adaptive learning, history analysis, or profile auto-tuning
-- override workflows or temporary autonomy upgrades
-- Foreman's Walk violation determination behavior
-- Continuity or Open Items Board widening
-- a second cross-session operational substrate
-- LOTO v2 semantics
+- rod suggestions or recommendation logic
+- buddy behavior or live watcher behavior
+- Foreman's Walk finding determination behavior
+- continuity redesign or board redesign
 - storage backend, transport layer, or UI presentation
 
 ## Public And Internal Names
 
 - Public/operator-facing label: `Control Rod Mode`
 - Internal build name: `ControlRodMode`
-- Core contract object: `ControlRodProfileSnapshot`
+- Core contract objects:
+  - `ControlRodProfileSnapshot`
+  - `LotoAuthorization`
+  - `PermitDecision`
 
 ## Autonomy Levels
 
@@ -37,9 +42,11 @@ This spec does not define:
 - `SUPERVISED`
 - `HARD_STOP`
 
+No fourth autonomy level is allowed.
+
 ## Starter Profiles
 
-Built-in starter profiles for v1:
+Built-in starter profiles:
 
 - `conservative`
 - `balanced`
@@ -47,18 +54,18 @@ Built-in starter profiles for v1:
 
 ## Starter Domain Baseline
 
-Starter domains for v1:
+Starter domains:
 
-- `pricing_quote_logic` (Pricing / quote logic)
-- `customer_data_pii` (Customer data / PII)
-- `database_schema` (Database schema)
-- `protected_destructive_ops` (Protected / destructive ops)
-- `auth_security_surfaces` (Auth / security surfaces)
-- `existing_file_modification` (Existing file modification)
-- `new_file_creation` (New file creation)
-- `ui_styling_content` (UI / styling / content)
-- `documentation_comments` (Documentation / comments)
-- `test_files` (Test files)
+- `pricing_quote_logic`
+- `customer_data_pii`
+- `database_schema`
+- `protected_destructive_ops`
+- `auth_security_surfaces`
+- `existing_file_modification`
+- `new_file_creation`
+- `ui_styling_content`
+- `documentation_comments`
+- `test_files`
 
 ## Domain Rule Contract
 
@@ -68,8 +75,8 @@ Starter domains for v1:
 | `label` | string | Yes | Operator-readable domain label. |
 | `filePatterns` | string[] | Yes | File-pattern set for the domain. |
 | `operationTypes` | string[] | Yes | Operation-type set for the domain. |
-| `autonomyLevel` | enum | Yes | Must be one of `FULL_AUTO`, `SUPERVISED`, or `HARD_STOP`. |
-| `justification` | string | Yes | Plain-language reason for the selected posture. |
+| `autonomyLevel` | enum | Yes | One of `FULL_AUTO`, `SUPERVISED`, or `HARD_STOP`. |
+| `justification` | string | Yes | Plain-language reason for selected posture. |
 
 ## ControlRodProfileSnapshot Contract
 
@@ -77,47 +84,78 @@ Starter domains for v1:
 |---|---|---|---|
 | `profileId` | string | Yes | Stable profile identifier. |
 | `profileLabel` | string | Yes | Operator-readable profile label. |
-| `domainRules` | DomainRule[] | Yes | Normalized, deterministic set of domain rules for this session snapshot. |
+| `domainRules` | DomainRule[] | Yes | Normalized deterministic domain-rule set. |
 
 ## Profile Resolution Rules
 
-- Input may be a preset profile id (`conservative`, `balanced`, `velocity`) or an explicit profile object.
-- Stored session truth must be a normalized snapshot object.
-- String preset input must resolve to the same deterministic normalized snapshot each time.
-- Explicit profile input must validate against v1 domain and autonomy constraints before storing.
-- `overrideAllowed` is intentionally cut from v1.
-- No second authorization field is introduced in SessionBrief.
-- `HARD_STOP` authorization remains derived from explicit inclusion in session scope.
+- Input may be a preset id (`conservative`, `balanced`, `velocity`) or explicit profile object.
+- Stored session truth remains a normalized snapshot object.
+- Preset resolution is deterministic.
+- Explicit profile input must validate against v2 domain and autonomy constraints.
+
+## HARD_STOP Upgrade: LOTO Authorization
+
+`LotoAuthorization` required fields:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `authorizationId` | string | Yes | Stable authorization id. |
+| `domainId` | string | Yes | HARD_STOP domain this authorization applies to. |
+| `authorizedBy` | string | Yes | Operator identity for authorization. |
+| `authorizedAt` | string | Yes | ISO 8601 authorization timestamp. |
+| `reason` | string | Yes | Plain-language authorization reason. |
+| `scope` | object | Yes | Session-bound or expiry-bound scope object. |
+| `conditions` | string[] | No | Optional constraints. |
+| `chainRef` | string | Yes | Forensic reference for this authorization event. |
+
+`scope.scopeType` must be one of:
+
+- `SESSION` (requires `scope.sessionId`)
+- `EXPIRY` (requires `scope.expiresAt` ISO 8601)
+
+## HARD_STOP Upgrade: Permit Process
+
+`PermitDecision` required fields:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `permitId` | string | Yes | Stable permit id. |
+| `sessionId` | string | Yes | Session id for permit decision context. |
+| `requestedDomains` | string[] | Yes | Requested HARD_STOP domains. |
+| `scopeJustification` | string | Yes | Why this scoped work is requested. |
+| `riskAssessment` | string | Yes | Operator-readable risk assessment. |
+| `rollbackPlan` | string | Yes | Rollback plan before action proceeds. |
+| `operatorDecision` | enum | Yes | `GRANTED`, `DENIED`, or `CONDITIONAL`. |
+| `conditions` | string[] | Conditional | Required and non-empty when `operatorDecision=CONDITIONAL`. |
+| `chainRef` | string | Yes | Forensic reference for permit decision. |
+
+Permit-gate outcomes are deterministic:
+
+- `GRANTED` -> proceed
+- `DENIED` -> do not proceed
+- `CONDITIONAL` -> proceed under explicit conditions
+
+Permit process applies only to HARD_STOP domains.
+
+## Gate Decision Invariants
+
+- Non-HARD_STOP domains do not require permit or LOTO.
+- HARD_STOP domains require valid LOTO authorization and permit objects.
+- Authorization domain and permit requested domains must match gate domain.
+- Session-bound authorization must match gate session id.
+- Expiry-bound authorization must not be expired at evaluation time.
 
 ## Contract Invariants
 
-- Control Rod Mode v1 is static and pre-session only.
-- No live enforcement routing is implemented in this block.
-- No continuity-promotion behavior is implemented in this block.
+- Autonomy enum remains exactly three levels.
+- No adaptive learning behavior is introduced.
+- No rod suggestion behavior is introduced.
+- No buddy behavior is introduced.
 - Continuity remains the only cross-session operational substrate.
 - Forensic Chain remains evidence substrate only.
 
-## Example ControlRodProfileSnapshot
-
-```json
-{
-  "profileId": "conservative",
-  "profileLabel": "Conservative",
-  "domainRules": [
-    {
-      "domainId": "pricing_quote_logic",
-      "label": "Pricing / quote logic",
-      "filePatterns": ["**/*pricing*.*", "**/*quote*.*"],
-      "operationTypes": ["modify_logic", "change_rules"],
-      "autonomyLevel": "HARD_STOP",
-      "justification": "Revenue-impacting logic requires explicit operator scope approval."
-    }
-  ]
-}
-```
-
 ## Current Implementation Truth
 
-- This is a Block B1 spec baseline.
+- This is a Block A1 v2 spec baseline.
 - Runtime implementation exists at `src/ControlRodMode.js`.
 - Golden proof exists at `tests/golden/ControlRodMode.golden.test.js`.

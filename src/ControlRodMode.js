@@ -123,6 +123,15 @@ const STARTER_PROFILE_LEVELS = Object.freeze({
   }),
 });
 
+const PERMIT_DECISIONS = Object.freeze(["GRANTED", "DENIED", "CONDITIONAL"]);
+const PERMIT_DECISION_SET = new Set(PERMIT_DECISIONS);
+
+const LOTO_SCOPE_TYPES = Object.freeze(["SESSION", "EXPIRY"]);
+const LOTO_SCOPE_TYPE_SET = new Set(LOTO_SCOPE_TYPES);
+
+const ISO_8601_PATTERN =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
+
 function makeValidationError(code, message) {
   const error = new Error(`${code}: ${message}`);
   error.name = "ValidationError";
@@ -132,6 +141,14 @@ function makeValidationError(code, message) {
 
 function isPlainObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function isIso8601Timestamp(value) {
+  if (typeof value !== "string" || !ISO_8601_PATTERN.test(value)) {
+    return false;
+  }
+
+  return !Number.isNaN(Date.parse(value));
 }
 
 function assertRequiredString(input, fieldName) {
@@ -160,6 +177,22 @@ function assertRequiredStringArray(input, fieldName) {
   }
 }
 
+function assertOptionalStringArray(input, fieldName) {
+  if (input[fieldName] === undefined) {
+    return;
+  }
+
+  if (
+    !Array.isArray(input[fieldName]) ||
+    input[fieldName].some((entry) => typeof entry !== "string" || entry.trim() === "")
+  ) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      `'${fieldName}' must be an array of non-empty strings when provided`
+    );
+  }
+}
+
 function assertAutonomyLevel(level) {
   if (!AUTONOMY_LEVEL_SET.has(level)) {
     throw makeValidationError(
@@ -167,6 +200,10 @@ function assertAutonomyLevel(level) {
       `'autonomyLevel' must be one of: ${AUTONOMY_LEVELS.join(", ")}`
     );
   }
+}
+
+function uniqueStrings(values) {
+  return [...new Set(values)];
 }
 
 function normalizeDomainRule(input) {
@@ -195,8 +232,8 @@ function normalizeDomainRule(input) {
   return {
     domainId: input.domainId,
     label: input.label,
-    filePatterns: [...new Set(input.filePatterns)],
-    operationTypes: [...new Set(input.operationTypes)],
+    filePatterns: uniqueStrings(input.filePatterns),
+    operationTypes: uniqueStrings(input.operationTypes),
     autonomyLevel: input.autonomyLevel,
     justification: input.justification,
   };
@@ -308,6 +345,304 @@ function normalizeControlRodProfileInput(controlRodProfile) {
   );
 }
 
+function normalizeLotoAuthorizationInput(input) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'authorization' must be an object"
+    );
+  }
+
+  assertRequiredString(input, "authorizationId");
+  assertRequiredString(input, "domainId");
+  assertRequiredString(input, "authorizedBy");
+  assertRequiredString(input, "authorizedAt");
+  assertRequiredString(input, "reason");
+  assertRequiredString(input, "chainRef");
+
+  if (!isIso8601Timestamp(input.authorizedAt)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'authorizedAt' must be an ISO 8601 timestamp"
+    );
+  }
+
+  if (!isPlainObject(input.scope)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'scope' must be an object"
+    );
+  }
+
+  assertRequiredString(input.scope, "scopeType");
+
+  if (!LOTO_SCOPE_TYPE_SET.has(input.scope.scopeType)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      `'scope.scopeType' must be one of: ${LOTO_SCOPE_TYPES.join(", ")}`
+    );
+  }
+
+  if (input.scope.scopeType === "SESSION") {
+    assertRequiredString(input.scope, "sessionId");
+  }
+
+  if (input.scope.scopeType === "EXPIRY") {
+    assertRequiredString(input.scope, "expiresAt");
+    if (!isIso8601Timestamp(input.scope.expiresAt)) {
+      throw makeValidationError(
+        "INVALID_FIELD",
+        "'scope.expiresAt' must be an ISO 8601 timestamp"
+      );
+    }
+  }
+
+  assertOptionalStringArray(input, "conditions");
+
+  return {
+    authorizationId: input.authorizationId,
+    domainId: input.domainId,
+    authorizedBy: input.authorizedBy,
+    authorizedAt: input.authorizedAt,
+    reason: input.reason,
+    scope:
+      input.scope.scopeType === "SESSION"
+        ? {
+            scopeType: "SESSION",
+            sessionId: input.scope.sessionId,
+          }
+        : {
+            scopeType: "EXPIRY",
+            expiresAt: input.scope.expiresAt,
+          },
+    conditions: uniqueStrings([...(input.conditions || [])]),
+    chainRef: input.chainRef,
+  };
+}
+
+function normalizePermitInput(input) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'permit' must be an object"
+    );
+  }
+
+  assertRequiredString(input, "permitId");
+  assertRequiredString(input, "sessionId");
+  assertRequiredStringArray(input, "requestedDomains");
+  assertRequiredString(input, "scopeJustification");
+  assertRequiredString(input, "riskAssessment");
+  assertRequiredString(input, "rollbackPlan");
+  assertRequiredString(input, "operatorDecision");
+  assertRequiredString(input, "chainRef");
+
+  if (!PERMIT_DECISION_SET.has(input.operatorDecision)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      `'operatorDecision' must be one of: ${PERMIT_DECISIONS.join(", ")}`
+    );
+  }
+
+  assertOptionalStringArray(input, "conditions");
+
+  if (input.operatorDecision === "CONDITIONAL") {
+    if (!Array.isArray(input.conditions) || input.conditions.length === 0) {
+      throw makeValidationError(
+        "INVALID_FIELD",
+        "'conditions' must be a non-empty array for CONDITIONAL permits"
+      );
+    }
+  }
+
+  return {
+    permitId: input.permitId,
+    sessionId: input.sessionId,
+    requestedDomains: uniqueStrings(input.requestedDomains),
+    scopeJustification: input.scopeJustification,
+    riskAssessment: input.riskAssessment,
+    rollbackPlan: input.rollbackPlan,
+    operatorDecision: input.operatorDecision,
+    conditions: uniqueStrings([...(input.conditions || [])]),
+    chainRef: input.chainRef,
+  };
+}
+
+function resolveDomainRule(profile, domainId) {
+  if (!isPlainObject(profile) || !Array.isArray(profile.domainRules)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'profile' must be a normalized control-rod profile with domainRules"
+    );
+  }
+
+  const domainRule = profile.domainRules.find(
+    (rule) => isPlainObject(rule) && rule.domainId === domainId
+  );
+
+  if (!domainRule) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      `'domainId' '${domainId}' was not found in the supplied profile`
+    );
+  }
+
+  return domainRule;
+}
+
+function evaluateHardStopGateInput(input) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "hard-stop gate input must be an object"
+    );
+  }
+
+  assertRequiredString(input, "domainId");
+  assertRequiredString(input, "sessionId");
+  assertRequiredString(input, "evaluatedAt");
+
+  if (!isIso8601Timestamp(input.evaluatedAt)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'evaluatedAt' must be an ISO 8601 timestamp"
+    );
+  }
+
+  const domainRule = resolveDomainRule(input.profile, input.domainId);
+
+  if (domainRule.autonomyLevel !== "HARD_STOP") {
+    return {
+      domainId: input.domainId,
+      autonomyLevel: domainRule.autonomyLevel,
+      requiresLoto: false,
+      requiresPermit: false,
+      mayProceed: true,
+      constrained: false,
+      statusCode: "NOT_HARD_STOP",
+      summary: "Permit and LOTO semantics apply only to HARD_STOP domains.",
+      chainRefs: [],
+      conditions: [],
+    };
+  }
+
+  if (input.authorization === undefined) {
+    throw makeValidationError(
+      "LOTO_REQUIRED",
+      "HARD_STOP domains require a LOTO authorization object"
+    );
+  }
+
+  const authorization = normalizeLotoAuthorizationInput(input.authorization);
+
+  if (authorization.domainId !== input.domainId) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'authorization.domainId' must match the gate 'domainId'"
+    );
+  }
+
+  if (authorization.scope.scopeType === "SESSION") {
+    if (authorization.scope.sessionId !== input.sessionId) {
+      throw makeValidationError(
+        "INVALID_FIELD",
+        "session-bound authorization must match the gate 'sessionId'"
+      );
+    }
+  } else if (Date.parse(input.evaluatedAt) > Date.parse(authorization.scope.expiresAt)) {
+    return {
+      domainId: input.domainId,
+      autonomyLevel: domainRule.autonomyLevel,
+      requiresLoto: true,
+      requiresPermit: true,
+      mayProceed: false,
+      constrained: false,
+      statusCode: "AUTH_EXPIRED",
+      summary: "LOTO authorization has expired for this HARD_STOP domain.",
+      authorizationRef: authorization.authorizationId,
+      permitRef: undefined,
+      permitDecision: undefined,
+      chainRefs: [authorization.chainRef],
+      conditions: [...authorization.conditions],
+    };
+  }
+
+  if (input.permit === undefined) {
+    throw makeValidationError(
+      "PERMIT_REQUIRED",
+      "HARD_STOP domains require a permit object"
+    );
+  }
+
+  const permit = normalizePermitInput(input.permit);
+
+  if (permit.sessionId !== input.sessionId) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'permit.sessionId' must match the gate 'sessionId'"
+    );
+  }
+
+  if (!permit.requestedDomains.includes(input.domainId)) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      "'permit.requestedDomains' must include the gate 'domainId'"
+    );
+  }
+
+  if (permit.operatorDecision === "GRANTED") {
+    return {
+      domainId: input.domainId,
+      autonomyLevel: domainRule.autonomyLevel,
+      requiresLoto: true,
+      requiresPermit: true,
+      mayProceed: true,
+      constrained: false,
+      statusCode: "PERMIT_GRANTED",
+      summary: "HARD_STOP gate passed with valid LOTO authorization and granted permit.",
+      authorizationRef: authorization.authorizationId,
+      permitRef: permit.permitId,
+      permitDecision: permit.operatorDecision,
+      chainRefs: [authorization.chainRef, permit.chainRef],
+      conditions: [...permit.conditions],
+    };
+  }
+
+  if (permit.operatorDecision === "CONDITIONAL") {
+    return {
+      domainId: input.domainId,
+      autonomyLevel: domainRule.autonomyLevel,
+      requiresLoto: true,
+      requiresPermit: true,
+      mayProceed: true,
+      constrained: true,
+      statusCode: "PERMIT_CONDITIONAL",
+      summary: "HARD_STOP gate passed with conditional permit constraints.",
+      authorizationRef: authorization.authorizationId,
+      permitRef: permit.permitId,
+      permitDecision: permit.operatorDecision,
+      chainRefs: [authorization.chainRef, permit.chainRef],
+      conditions: [...permit.conditions],
+    };
+  }
+
+  return {
+    domainId: input.domainId,
+    autonomyLevel: domainRule.autonomyLevel,
+    requiresLoto: true,
+    requiresPermit: true,
+    mayProceed: false,
+    constrained: false,
+    statusCode: "PERMIT_DENIED",
+    summary: "HARD_STOP gate denied by permit decision.",
+    authorizationRef: authorization.authorizationId,
+    permitRef: permit.permitId,
+    permitDecision: permit.operatorDecision,
+    chainRefs: [authorization.chainRef, permit.chainRef],
+    conditions: [...permit.conditions],
+  };
+}
+
 class ControlRodMode {
   listStarterProfileIds() {
     return [...STARTER_PROFILE_IDS];
@@ -316,6 +651,18 @@ class ControlRodMode {
   resolveProfile(controlRodProfile) {
     return normalizeControlRodProfileInput(controlRodProfile);
   }
+
+  validateLotoAuthorization(authorization) {
+    return normalizeLotoAuthorizationInput(authorization);
+  }
+
+  validatePermit(permit) {
+    return normalizePermitInput(permit);
+  }
+
+  evaluateHardStopGate(input) {
+    return evaluateHardStopGateInput(input);
+  }
 }
 
 module.exports = {
@@ -323,5 +670,9 @@ module.exports = {
   AUTONOMY_LEVELS,
   STARTER_PROFILE_IDS,
   STARTER_DOMAIN_IDS,
+  PERMIT_DECISIONS,
+  LOTO_SCOPE_TYPES,
   normalizeControlRodProfileInput,
+  normalizeLotoAuthorizationInput,
+  normalizePermitInput,
 };
