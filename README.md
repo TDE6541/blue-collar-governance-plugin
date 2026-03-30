@@ -1,6 +1,6 @@
 # Blue Collar Governance Plugin
 
-**Status:** Wave 1 runtime implemented and verified; Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented; Wave 3 Block A1 + Block B1 + Block C1 baselines implemented; Wave 3 Block D integration proof and closeout shipped
+**Status:** Wave 1 runtime implemented and verified; Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented; Wave 3 Block A1 + Block B1 + Block C1 baselines implemented; Wave 3 Block D integration proof and closeout shipped; Wave 4 Block A1 Control Rod Mode v2 shipped
 **Repo type:** Private runtime/control layer  
 **Implementation state:** All six Wave 1 systems now have runtime implementations (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 
@@ -34,17 +34,21 @@ Governed Workflow is the methodology spine behind the work. This repository is n
 - Wave 3 Block A1 baseline is implemented: Forensic Chain v1 evidence substrate (`docs/specs/FORENSIC_CHAIN.md`, `src/ForensicChain.js`, `tests/golden/ForensicChain.golden.test.js`).
 - Forensic Chain is append-only evidence linkage and does not introduce a second continuity or standing-risk operational substrate.
 - Forensic Chain linkage remains string-reference based and does not widen Continuity, Open Items Board, SessionBrief, or SessionReceipt contracts beyond approved Block 0 truth.
-- Wave 3 Block B1 baseline is implemented: Control Rod Mode v1 static pre-session posture (`docs/specs/CONTROL_ROD_MODE.md`, `src/ControlRodMode.js`, `tests/golden/ControlRodMode.golden.test.js`).
+- Wave 4 Block A1 baseline is implemented: Control Rod Mode v2 (`docs/specs/CONTROL_ROD_MODE.md`, `src/ControlRodMode.js`, `tests/golden/ControlRodMode.golden.test.js`).
 - Block B1 ships exactly three built-in starter profiles: `conservative`, `balanced`, `velocity`.
 - SessionBrief now stores `controlRodProfile` as a normalized snapshot object (`src/SessionBrief.js`, `tests/golden/SessionBrief.golden.test.js`) with no second authorization field.
-- Control Rod Mode v1 is static posture only; no adaptive learning, no mid-session intervention, and no live enforcement behavior is shipped.
+- Control Rod Mode v2 preserves the same three autonomy levels (`FULL_AUTO`, `SUPERVISED`, `HARD_STOP`) and upgrades HARD_STOP behavior with deterministic LOTO + Permit semantics.
+- Permit gating applies only to HARD_STOP domains.
+- No adaptive learning and no rod suggestions are shipped.
 - Wave 3 Block C1 baseline is implemented: Foreman's Walk Engine v1 post-session verification (`docs/specs/FOREMANS_WALK_ENGINE.md`, `src/ForemansWalk.js`, `tests/golden/ForemansWalk.golden.test.js`).
 - Foreman's Walk v1 evaluates scope compliance, constraint posture, completeness, truthfulness, and evidence integrity.
 - Foreman's Walk v1 produces deterministic findings and an As-Built accountability delta-of-record while SessionReceipt remains session-of-record.
 - Foreman's Walk v1 is post-session only and does not implement buddy behavior or live intervention.
 - Wave 3 Block D1 live integration proof is implemented at `tests/live/wave3.active-governance.live.test.js`.
 - Wave 3 Block D2 closeout and truth sync are implemented at `docs/WAVE3_CLOSEOUT.md`.
-- Wave 3 is shipped; Wave 4/5 behavior is not implemented.
+- Wave 3 is shipped.
+- Wave 4 currently ships Block A1 only; Buddy and Change Order are not shipped yet.
+- Wave 5 behavior is not implemented.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No skins, marketplace packaging, or public-product polish work is in scope for Wave 1.
 
@@ -115,7 +119,7 @@ Read these in order:
 
 ## Working In This Repo
 
-There is no end-to-end runtime setup sequence yet. Runtime code exists for all six Wave 1 systems, live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and closeout evidence is captured in `docs/WAVE1_CLOSEOUT.md`. Wave 2 Block A continuity runtime exists at `src/ContinuityLedger.js` with golden proof at `tests/golden/ContinuityLedger.golden.test.js`, Wave 2 Block B1 derived standing-risk runtime exists at `src/StandingRiskEngine.js` with golden proof at `tests/golden/StandingRiskEngine.golden.test.js`, Wave 2 Block C1 bounded omission runtime exists at `src/OmissionCoverageEngine.js` with golden proof at `tests/golden/OmissionCoverageEngine.golden.test.js`, Wave 2 Block D1 projection board runtime exists at `src/OpenItemsBoard.js` with golden proof at `tests/golden/OpenItemsBoard.golden.test.js`, Wave 3 Block A1 forensic evidence runtime exists at `src/ForensicChain.js` with golden proof at `tests/golden/ForensicChain.golden.test.js`, Wave 3 Block B1 control-rod posture runtime exists at `src/ControlRodMode.js` with golden proof at `tests/golden/ControlRodMode.golden.test.js`, Wave 3 Block C1 foreman's-walk runtime exists at `src/ForemansWalk.js` with golden proof at `tests/golden/ForemansWalk.golden.test.js`, and Wave 3 Block D live integration proof exists at `tests/live/wave3.active-governance.live.test.js` with closeout evidence in `docs/WAVE3_CLOSEOUT.md`; continuity-promotion runtime, Wave 4/5 behavior, and compatibility surfaces are not implemented.
+There is no end-to-end runtime setup sequence yet. Runtime code exists for all six Wave 1 systems, live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and closeout evidence is captured in `docs/WAVE1_CLOSEOUT.md`. Wave 2 Block A continuity runtime exists at `src/ContinuityLedger.js` with golden proof at `tests/golden/ContinuityLedger.golden.test.js`, Wave 2 Block B1 derived standing-risk runtime exists at `src/StandingRiskEngine.js` with golden proof at `tests/golden/StandingRiskEngine.golden.test.js`, Wave 2 Block C1 bounded omission runtime exists at `src/OmissionCoverageEngine.js` with golden proof at `tests/golden/OmissionCoverageEngine.golden.test.js`, Wave 2 Block D1 projection board runtime exists at `src/OpenItemsBoard.js` with golden proof at `tests/golden/OpenItemsBoard.golden.test.js`, Wave 3 Block A1 forensic evidence runtime exists at `src/ForensicChain.js` with golden proof at `tests/golden/ForensicChain.golden.test.js`, Wave 4 Block A1 control-rod v2 runtime exists at `src/ControlRodMode.js` with golden proof at `tests/golden/ControlRodMode.golden.test.js`, Wave 3 Block C1 foreman's-walk runtime exists at `src/ForemansWalk.js` with golden proof at `tests/golden/ForemansWalk.golden.test.js`, and Wave 3 Block D live integration proof exists at `tests/live/wave3.active-governance.live.test.js` with closeout evidence in `docs/WAVE3_CLOSEOUT.md`; continuity-promotion runtime, Wave 4 Buddy/Change Order behavior, Wave 5 behavior, and compatibility surfaces are not implemented.
 
 ## Contributing
 

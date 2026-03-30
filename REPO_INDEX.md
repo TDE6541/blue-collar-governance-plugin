@@ -43,7 +43,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/OMISSION_COVERAGE_ENGINE.md` — Omission & Coverage Engine v1 bounded omission-evaluation contract baseline
 - `docs/specs/OPEN_ITEMS_BOARD.md` — Open Items Board v1 one-board projection contract baseline
 - `docs/specs/FORENSIC_CHAIN.md` — Forensic Chain v1 append-only evidence-substrate contract baseline
-- `docs/specs/CONTROL_ROD_MODE.md` — Control Rod Mode v1 static pre-session posture contract baseline
+- `docs/specs/CONTROL_ROD_MODE.md` — Control Rod Mode v2 deterministic HARD_STOP LOTO + Permit contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` — Foreman's Walk Engine v1 post-session verification contract baseline
 - `docs/WAVE2_CLOSEOUT.md` — durable Wave 2 closeout evidence map
 - `docs/WAVE3_CLOSEOUT.md` — durable Wave 3 closeout evidence map
@@ -70,14 +70,18 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Wave 3 Block A1 Forensic Chain baseline is implemented at `src/ForensicChain.js` with golden proof at `tests/golden/ForensicChain.golden.test.js` and canon spec at `docs/specs/FORENSIC_CHAIN.md`.
 - Forensic Chain is evidence-substrate only and does not create a second continuity or standing-risk operational substrate.
-- Wave 3 Block B1 Control Rod Mode baseline is implemented at `src/ControlRodMode.js` with golden proof at `tests/golden/ControlRodMode.golden.test.js` and canon spec at `docs/specs/CONTROL_ROD_MODE.md`.
+- Wave 4 Block A1 Control Rod Mode baseline is implemented at `src/ControlRodMode.js` with golden proof at `tests/golden/ControlRodMode.golden.test.js` and canon spec at `docs/specs/CONTROL_ROD_MODE.md`.
 - Block B1 starter profiles are `conservative`, `balanced`, and `velocity`; SessionBrief stores `controlRodProfile` as a normalized snapshot object with no second authorization field.
-- Control Rod Mode v1 is static posture only and does not implement adaptive learning, mid-session intervention, or live enforcement behavior.
+- Control Rod Mode v2 preserves the same three autonomy levels (`FULL_AUTO`, `SUPERVISED`, `HARD_STOP`) and upgrades HARD_STOP behavior with deterministic LOTO + Permit semantics.
+- Permit gating applies only to HARD_STOP domains.
+- No adaptive learning and no rod suggestions are implemented.
 - Wave 3 Block C1 Foreman's Walk baseline is implemented at `src/ForemansWalk.js` with golden proof at `tests/golden/ForemansWalk.golden.test.js` and canon spec at `docs/specs/FOREMANS_WALK_ENGINE.md`.
 - Foreman's Walk is post-session verification only; it emits deterministic findings plus As-Built accountability delta while SessionReceipt remains session-of-record.
 - Foreman's Walk does not implement live intervention, watcher/buddy behavior, or adaptive intelligence.
 - Wave 3 Block D1 live integration proof is implemented at `tests/live/wave3.active-governance.live.test.js`.
 - Wave 3 Block D2 closeout and front-door/index truth sync are implemented at `docs/WAVE3_CLOSEOUT.md`.
-- Wave 3 is shipped; Wave 4/5 behavior is not implemented.
+- Wave 3 is shipped.
+- Wave 4 currently ships Block A1 only; Buddy and Change Order are not implemented yet.
+- Wave 5 behavior is not implemented.
 - No remote is configured yet.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.
