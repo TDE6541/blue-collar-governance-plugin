@@ -40,6 +40,7 @@ This spec does not define:
 | `expectedOutputs` | string[] | Yes | Artifacts the operator expects by closeout. |
 | `truthSources` | string[] | Yes | Canon sources the session should treat as authoritative. |
 | `approvalsNeeded` | string[] | No | Extra approvals required before specific work may proceed. |
+| `controlRodProfile` | string | No | Optional control-rod profile label for session posture. This is the only approved additive field in Wave 3 Block 0. |
 | `createdBy` | enum | Yes | Actor that created the brief. Initial values: `architect` or `ai`. |
 | `createdAt` | string | Yes | Timestamp in ISO 8601 format. |
 | `updatedAt` | string | No | Latest brief-change timestamp in ISO 8601 format. |
@@ -60,6 +61,12 @@ This spec does not define:
 - `protectedAssets`, `activeConstraints`, and `hazards` must be visible at session start rather than discovered silently later.
 - `riskMode` must be stated in plain language terms the operator can understand.
 - `truthSources` must point to canon, not reference-only material.
+
+## Wave 3 Block 0 Contract Clarifier
+
+- controlRodProfile is the only approved additive field in Block 0.
+- No second authorization field is introduced in SessionBrief.
+- HARD_STOP authorization derives from explicit inclusion in inScope for the current session.
 
 ## Contract Invariants
 

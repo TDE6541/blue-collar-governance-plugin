@@ -109,6 +109,13 @@ Group sourcing is fixed:
 - `Aging into risk` uses continuity items whose derived standing state is `STANDING`.
 - `Resolved this session` uses explicit `currentSessionResolvedOutcomes` input only.
 
+## Wave 3 Block 0 Non-Goal Guard
+
+- Wave 3 evidence and findings do not introduce new board groups in Block 0.
+- Wave 3 evidence and findings do not introduce new mapping paths in Block 0.
+- Wave 3 evidence and findings do not introduce a new board source in Block 0.
+- Block D1 remains projection-only over the existing fixed inputs and four fixed groups.
+
 ## Group Precedence And Dedupe
 
 If the same logical item could appear in multiple groups, only one placement is allowed.

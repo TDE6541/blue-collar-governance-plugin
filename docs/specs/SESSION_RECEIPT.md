@@ -4,7 +4,7 @@
 
 ## Purpose
 
-This document defines the Wave 1 contract baseline for `SessionReceipt`. It covers the end-of-session as-built record for planned versus actual work, holds, exclusions, and approved drift.
+This document defines the Wave 1 contract baseline for `SessionReceipt`. It covers the end-of-session session-of-record for planned versus actual work, holds, exclusions, and approved drift.
 
 ## Boundary
 
@@ -24,6 +24,12 @@ This spec does not define:
 - Public/operator-facing label: `As-Built`
 - Internal build name: `SessionReceipt`
 - Core contract object: `SessionReceipt`
+
+## Record Boundary
+
+- SessionReceipt is the session-of-record.
+- As-Built is the accountability delta-of-record derived from SessionReceipt fields.
+- As-Built does not replace SessionReceipt authority.
 
 ## SessionReceipt Contract
 

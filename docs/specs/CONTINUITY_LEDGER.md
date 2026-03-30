@@ -93,6 +93,13 @@ When a terminal outcome is recorded, the entry is no longer carry-forward eligib
 3. Non-qualifying exclusions must be rejected and not persisted.
 4. Junk-drawer fields from other layers (for example standing-risk scores or board-grouping metadata) must be rejected.
 
+## Wave 3 Block 0 Linkage Clarifier
+
+- Forensic Chain references are allowed through existing string-reference linkage in sourceRefs and evidenceRefs.
+- Block 0 introduces no new ContinuityEntry field for forensic linkage.
+- Continuity remains the only cross-session operational substrate.
+- Forensic Chain is an evidence substrate only and does not create a second continuity or standing-risk substrate.
+
 ## Contract Invariants
 
 - Continuity persistence remains bounded to unresolved, still-relevant entries only.

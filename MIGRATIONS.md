@@ -5,12 +5,13 @@
 
 This log records changes to shared contracts in this repository: schemas, interfaces, data shapes, export formats, or other structures that downstream behavior depends on.
 
-Wave 1 established the first proposed contract baselines for the six trust-kernel systems. No migration entries exist yet because there is no earlier contract version to migrate from.
+Wave 1 established the first proposed contract baselines for the six trust-kernel systems. Wave 3 Block 0 introduces the first approved shared-contract widening entry.
 
 ## Log
 
 | Date | Change | Migration Path | Sign-off |
 |------|--------|----------------|----------|
+| 2026-03-30 | SessionBrief additive field controlRodProfile (first approved widening of a Wave 1 shared contract) | Spec baseline widened in Wave 3 Block 0; runtime adoption deferred to Block B1; no data rewrite yet; no other Block 0 contract widening approved | Architect sign-off pending |
 
 ## Entry Rules
 

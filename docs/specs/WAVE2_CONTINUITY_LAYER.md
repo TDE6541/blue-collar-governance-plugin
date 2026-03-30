@@ -22,6 +22,7 @@ Block A delivers Continuity Ledger v0. Block B1 delivers Standing Risk Engine v1
 ## Continuity-First Posture
 
 Continuity Ledger is the persisted substrate.
+Continuity = only cross-session operational substrate; Forensic Chain = evidence substrate only.
 
 Standing Risk, Omission/Coverage, and Open Items Board are later derived or review layers.
 
