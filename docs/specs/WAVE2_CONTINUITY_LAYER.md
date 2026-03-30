@@ -1,5 +1,5 @@
 # WAVE2_CONTINUITY_LAYER.md
-**Status:** Block A, Block B1, and Block C1 baselines implemented; Architect signoff pending
+**Status:** Block A, Block B1, Block C1, and Block D1 baselines implemented; Architect signoff pending
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -17,7 +17,7 @@ Wave 2 ships four things only:
 3. Omission & Coverage Engine v1
 4. Open Items Board v1
 
-Block A delivers Continuity Ledger v0. Block B1 delivers Standing Risk Engine v1 derived baseline (spec + logic + golden proof). Block C1 delivers Omission & Coverage Engine v1 bounded baseline (spec + logic + golden proof).
+Block A delivers Continuity Ledger v0. Block B1 delivers Standing Risk Engine v1 derived baseline (spec + logic + golden proof). Block C1 delivers Omission & Coverage Engine v1 bounded baseline (spec + logic + golden proof). Block D1 delivers Open Items Board v1 projection baseline (spec + logic + golden proof).
 
 ## Continuity-First Posture
 
@@ -72,6 +72,23 @@ Block C1 excludes:
 - score/confidence/rank/prediction/anomaly logic
 - universal coverage-model behavior
 
+## Block D1 Scope
+
+Block D1 includes:
+
+- one-board projection contract with exactly four fixed groups
+- explicit source-truth mapping for Missing now / Still unresolved / Aging into risk / Resolved this session
+- explicit precedence + dedupe behavior to prevent double placement
+- plain operator-legible board items with deterministic ids/codes and refs
+
+Block D1 excludes:
+
+- board persistence store or grouped-state persistence
+- hidden board cache substrate
+- continuity-promotion runtime wiring
+- score/confidence/rank/priority/prediction/anomaly logic
+- Block E closeout behavior
+
 ## Carry-Forward Eligibility
 
 Continuity may include only unresolved, still-relevant items in these classes:
@@ -107,3 +124,4 @@ Block A is complete only if:
 - Omission/Coverage and Open Items Board are not implemented in Block B1.
 - Block C1 omission/coverage baseline is implemented as bounded evaluation logic (`docs/specs/OMISSION_COVERAGE_ENGINE.md`, `src/OmissionCoverageEngine.js`, `tests/golden/OmissionCoverageEngine.golden.test.js`).
 - Open Items Board is not implemented in Block C1.
+- Block D1 open-items board baseline is implemented as projection logic (`docs/specs/OPEN_ITEMS_BOARD.md`, `src/OpenItemsBoard.js`, `tests/golden/OpenItemsBoard.golden.test.js`).
