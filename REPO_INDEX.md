@@ -42,6 +42,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/STANDING_RISK_ENGINE.md` — Standing Risk Engine v1 derived escalation contract baseline
 - `docs/specs/OMISSION_COVERAGE_ENGINE.md` — Omission & Coverage Engine v1 bounded omission-evaluation contract baseline
 - `docs/specs/OPEN_ITEMS_BOARD.md` — Open Items Board v1 one-board projection contract baseline
+- `docs/specs/FORENSIC_CHAIN.md` — Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/WAVE2_CLOSEOUT.md` — durable Wave 2 closeout evidence map
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
@@ -64,5 +65,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Block D1 has no persisted board store and no continuity-promotion runtime behavior.
 - No score/confidence/rank/priority/anomaly/prediction logic is implemented in Block D1.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
+- Wave 3 Block A1 Forensic Chain baseline is implemented at `src/ForensicChain.js` with golden proof at `tests/golden/ForensicChain.golden.test.js` and canon spec at `docs/specs/FORENSIC_CHAIN.md`.
+- Forensic Chain is evidence-substrate only and does not create a second continuity or standing-risk operational substrate.
+- Wave 3 Block B Control Rod runtime and Wave 3 Block C Foreman's Walk runtime are not implemented yet.
 - No remote is configured yet.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.

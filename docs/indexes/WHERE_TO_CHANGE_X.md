@@ -35,6 +35,10 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/STANDING_RISK_ENGINE.md` for derived standing-risk progression and continuation-signal derivation rules.
 - Change `docs/specs/OMISSION_COVERAGE_ENGINE.md` for bounded omission-evaluation profile-pack rules and deterministic finding-shape contracts.
 - Change `docs/specs/OPEN_ITEMS_BOARD.md` for one-board/four-group projection rules, explicit source mapping, and precedence+dedupe behavior.
+## Wave 3 Evidence Truth
+
+- Change `docs/specs/FORENSIC_CHAIN.md` for Wave 3 Block A1 append-only evidence-chain contract rules and linkage invariants.
+
 ## Contract And Migration Truth
 
 - Change `MIGRATIONS.md` when a real shared contract changes.
@@ -47,7 +51,9 @@ Use this index to find the right canon surface before making a change.
 - Change `src/StandingRiskEngine.js` for Wave 2 Block B1 derived standing-risk behavior.
 - Change `src/OmissionCoverageEngine.js` for Wave 2 Block C1 bounded omission-evaluation behavior.
 - Change `src/OpenItemsBoard.js` for Wave 2 Block D1 one-board projection behavior.
+- Change `src/ForensicChain.js` for Wave 3 Block A1 append-only forensic evidence behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
+- Add `tests/golden/ForensicChain.golden.test.js` for Forensic Chain golden verification.
 - Add `tests/golden/StandingRiskEngine.golden.test.js` for Standing Risk Engine golden verification.
 - Add `tests/golden/OmissionCoverageEngine.golden.test.js` for Omission & Coverage Engine golden verification.
 - Add `tests/golden/OpenItemsBoard.golden.test.js` for Open Items Board golden verification.

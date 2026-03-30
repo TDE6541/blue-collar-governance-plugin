@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer with Wave 1 implemented and Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented
+- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, and Wave 3 Block A1 Forensic Chain baseline implemented
 - Git: initialized on `main`, Wave 0 bootstrap committed, no remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -48,6 +48,10 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Block D1 is projection-only, uses explicit current-session resolved-outcomes input for `Resolved this session`, and enforces precedence+dedupe.
 - Block D1 does not persist a board store and does not implement continuity-promotion runtime.
 - No score/confidence/rank/priority/anomaly/prediction logic is implemented in Block D1.
+- Wave 3 Block A1 Forensic Chain baseline: implemented as append-only evidence substrate (`docs/specs/FORENSIC_CHAIN.md`, `src/ForensicChain.js`, `tests/golden/ForensicChain.golden.test.js`).
+- Forensic Chain linkage remains string-reference based, does not introduce a second continuity or standing-risk substrate, and does not widen continuity/board/session contracts beyond approved Block 0 truth.
+- Wave 3 Block B Control Rod runtime: not implemented yet.
+- Wave 3 Block C Foreman's Walk runtime: not implemented yet.
 - Block E / full Wave 2 closeout execution is not implemented yet.
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
@@ -64,6 +68,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/STANDING_RISK_ENGINE.md`
   - `docs/specs/OMISSION_COVERAGE_ENGINE.md`
   - `docs/specs/OPEN_ITEMS_BOARD.md`
+  - `docs/specs/FORENSIC_CHAIN.md`
 
 ## Canon And Reference Boundary
 
