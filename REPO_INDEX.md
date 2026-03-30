@@ -49,6 +49,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/BUDDY_SYSTEM.md` — Buddy System v1 watcher-only live oversight contract baseline
 - `docs/WAVE2_CLOSEOUT.md` — durable Wave 2 closeout evidence map
 - `docs/WAVE3_CLOSEOUT.md` — durable Wave 3 closeout evidence map
+- `docs/specs/WAVE4_LIVE_OVERSIGHT.md` — Wave 4 umbrella contract and load-bearing decisions
+- `docs/WAVE4_CLOSEOUT.md` — durable Wave 4 closeout evidence map
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -79,15 +81,18 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - No adaptive learning and no rod suggestions are implemented.
 - Wave 4 Block B1 Change Order Engine baseline is implemented at `src/ChangeOrderEngine.js` with golden proof at `tests/golden/ChangeOrderEngine.golden.test.js` and canon spec at `docs/specs/CHANGE_ORDER_ENGINE.md`.
 - Change Orders support deterministic `APPROVED`, `REJECTED`, and `DEFERRED` outcomes with deferred promotion through existing continuity paths.
-- Wave 4 Block C1 Buddy System baseline is implemented at src/BuddySystem.js with golden proof at tests/golden/BuddySystem.golden.test.js and canon spec at docs/specs/BUDDY_SYSTEM.md.
+- Wave 4 Block C1 Buddy System baseline is implemented at `src/BuddySystem.js` with golden proof at `tests/golden/BuddySystem.golden.test.js` and canon spec at `docs/specs/BUDDY_SYSTEM.md`.
 - Buddy is watcher-only live oversight, writes callouts to existing Forensic Chain, and does not build/fix/revert.
-- Wave 3 Block C1 Foreman's Walk baseline is implemented at src/ForemansWalk.js with golden proof at tests/golden/ForemansWalk.golden.test.js and canon spec at docs/specs/FOREMANS_WALK_ENGINE.md.
+- SessionBrief supports one optional `toolboxTalk` enrichment object for startup summaries; no duplicated full payload fields are introduced.
+- Wave 3 Block C1 Foreman's Walk baseline is implemented at `src/ForemansWalk.js` with golden proof at `tests/golden/ForemansWalk.golden.test.js` and canon spec at `docs/specs/FOREMANS_WALK_ENGINE.md`.
 - Foreman's Walk is post-session verification only; it emits deterministic findings plus As-Built accountability delta while SessionReceipt remains session-of-record.
 - Foreman's Walk does not implement live intervention, watcher/buddy behavior, or adaptive intelligence.
 - Wave 3 Block D1 live integration proof is implemented at `tests/live/wave3.active-governance.live.test.js`.
 - Wave 3 Block D2 closeout and front-door/index truth sync are implemented at `docs/WAVE3_CLOSEOUT.md`.
 - Wave 3 is shipped.
-- Wave 4 currently ships Block A1 + Block B1 + Block C1.
+- Wave 4 is shipped: Blocks A1 + B1 + C1 + D1 + D2 are complete.
+- Wave 4 Block D1 live integration proof is implemented at `tests/live/wave4.live-oversight.live.test.js`.
+- Wave 4 Block D2 closeout and front-door/index truth sync are implemented at `docs/WAVE4_CLOSEOUT.md`.
 - Wave 5 behavior is not implemented.
 - No multi-agent control room behavior is implemented.
 - No remote is configured yet.

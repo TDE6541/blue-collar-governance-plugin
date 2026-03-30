@@ -42,7 +42,7 @@ Use this index to find the right canon surface before making a change.
 ## Wave 4 Control Rod Truth
 
 - Change `docs/specs/CONTROL_ROD_MODE.md` for Wave 4 Block A1 Control Rod v2 contract rules (HARD_STOP LOTO + Permit semantics with unchanged autonomy enum).
-- Change `docs/specs/SESSION_BRIEF.md` when Block B1 `controlRodProfile` adoption wording requires clarification.
+- Change `docs/specs/SESSION_BRIEF.md` when Block B1 `controlRodProfile` adoption wording or Block D1 `toolboxTalk` wording requires clarification.
 
 ## Wave 4 Change Order Truth
 
@@ -55,6 +55,10 @@ Use this index to find the right canon surface before making a change.
 ## Wave 3 Verification Truth
 
 - Change `docs/specs/FOREMANS_WALK_ENGINE.md` for Wave 3 Block C1 post-session verification passes, finding model, precedence, and As-Built accountability rules.
+
+## Wave 4 Closeout Truth
+
+- Change `docs/WAVE4_CLOSEOUT.md` for Wave 4 Block D evidence map, no-leakage confirmation, and final signoff state.
 
 ## Wave 3 Closeout Truth
 
@@ -90,6 +94,7 @@ Use this index to find the right canon surface before making a change.
 - Add `tests/golden/OpenItemsBoard.golden.test.js` for Open Items Board golden verification.
 - Add golden references under `tests/golden/`.
 - Add `tests/live/wave3.active-governance.live.test.js` for Wave 3 Block D integration proof.
+- Add `tests/live/wave4.live-oversight.live.test.js` for Wave 4 Block D integration proof.
 - Add live or integration verification under `tests/live/`.
 
 ## Reference Inputs

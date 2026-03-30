@@ -27,17 +27,20 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/WAVE1_CLOSEOUT.md` - durable Wave 1 integration/proof closeout evidence map
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 integration/proof closeout evidence map
 - `docs/WAVE3_CLOSEOUT.md` - durable Wave 3 integration/proof closeout evidence map
+- `docs/specs/WAVE4_LIVE_OVERSIGHT.md` - authoritative Wave 4 umbrella contract baseline
+- `docs/WAVE4_CLOSEOUT.md` - durable Wave 4 integration/proof closeout evidence map
 
 ## Current State
 
 - `docs/specs/` contains the Wave 1 umbrella spec, promoted contract specs for all six Wave 1 systems, the Wave 2 Block A/B/C/D baseline specs, and the Wave 3 Block A1 Forensic Chain + Block B1 Control Rod Mode + Block C1 Foreman's Walk baseline specs.
-- Wave 2 Block E closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
+- Wave 2 Block D closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Wave 4 Block A1 Control Rod Mode is shipped in current docs/runtime truth with deterministic HARD_STOP LOTO + Permit semantics while preserving the same three-level autonomy enum.
 - Wave 4 Block B1 Change Order Engine is shipped in current docs/runtime truth with deterministic `APPROVED`, `REJECTED`, and `DEFERRED` outcomes for live drift governance.
 - Wave 4 Block C1 Buddy System is shipped in current docs/runtime truth as watcher-only live oversight that writes callouts to existing Forensic Chain.
 - Wave 3 Block C1 Foreman's Walk is shipped in current docs/runtime truth as post-session verification only and produces findings plus As-Built accountability delta without live intervention.
 - Wave 3 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave3.active-governance.live.test.js` and closeout evidence exists at `docs/WAVE3_CLOSEOUT.md`.
 - Wave 4 Buddy behavior is shipped as watcher-only; multi-agent control-room behavior is not shipped.
+- Wave 4 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave4.live-oversight.live.test.js` and closeout evidence exists at `docs/WAVE4_CLOSEOUT.md`.
 - Wave 5 behavior is not shipped in current docs/runtime truth.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.

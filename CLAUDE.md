@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 + Block B1 + Block C1 baselines implemented, Wave 3 Block D integration proof + closeout shipped, and Wave 4 Block A1 + Block B1 + Block C1 baselines shipped
+- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 + Block B1 + Block C1 baselines implemented, Wave 3 Block D integration proof + closeout shipped, and Wave 4 live oversight shipped
 - Git: initialized on `main`, Wave 0 bootstrap committed, no remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -53,12 +53,13 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Wave 4 Block A1 Control Rod Mode baseline: implemented as v2 deterministic posture + HARD_STOP gate contract (`docs/specs/CONTROL_ROD_MODE.md`, `src/ControlRodMode.js`, `tests/golden/ControlRodMode.golden.test.js`).
 - Block B1 starter profiles are `conservative`, `balanced`, and `velocity`.
 - SessionBrief stores `controlRodProfile` as a normalized snapshot object in Block B1 (`src/SessionBrief.js`, `tests/golden/SessionBrief.golden.test.js`) with no second authorization field.
+- SessionBrief now also supports one optional `toolboxTalk` enrichment object for startup summaries (no duplicated full payloads).
 - Control Rod Mode v2 preserves the same three autonomy levels (`FULL_AUTO`, `SUPERVISED`, `HARD_STOP`) and upgrades HARD_STOP behavior with deterministic LOTO + Permit semantics.
 - Permit gating applies only to HARD_STOP domains.
 - No adaptive learning and no rod suggestions are implemented.
 - Wave 4 Block B1 Change Order Engine baseline: implemented as formal live drift governance (`docs/specs/CHANGE_ORDER_ENGINE.md`, `src/ChangeOrderEngine.js`, `tests/golden/ChangeOrderEngine.golden.test.js`).
 - Change Orders support deterministic `APPROVED`, `REJECTED`, and `DEFERRED` outcomes with deferred promotion through existing continuity paths.
-- Wave 4 Block C1 Buddy System baseline: implemented as watcher-only live oversight (docs/specs/BUDDY_SYSTEM.md, src/BuddySystem.js, tests/golden/BuddySystem.golden.test.js).
+- Wave 4 Block C1 Buddy System baseline: implemented as watcher-only live oversight (`docs/specs/BUDDY_SYSTEM.md`, `src/BuddySystem.js`, `tests/golden/BuddySystem.golden.test.js`).
 - Buddy writes live callout events to existing Forensic Chain and does not build/fix/revert/suggest.
 - Wave 3 Block C1 Foreman's Walk baseline: implemented as post-session verification runtime (docs/specs/FOREMANS_WALK_ENGINE.md, src/ForemansWalk.js, tests/golden/ForemansWalk.golden.test.js).
 - Foreman's Walk v1 evaluates scope, constraint posture, completeness, truthfulness, and evidence integrity, then outputs findings plus As-Built accountability delta while SessionReceipt remains the session-of-record.
@@ -66,7 +67,9 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Wave 3 Block D1 integration proof is implemented (`tests/live/wave3.active-governance.live.test.js`) and validates clean bounded, governed intervention, and truthfulness/evidence-integrity paths.
 - Wave 3 Block D2 closeout and front-door/index truth sync are implemented (`docs/WAVE3_CLOSEOUT.md`, `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, `docs/INDEX.md`, `docs/indexes/WHERE_TO_CHANGE_X.md`).
 - Wave 3 is shipped.
-- Wave 4 currently ships Block A1 + Block B1 + Block C1.
+- Wave 4 is shipped: Blocks A1 + B1 + C1 + D1 + D2 are complete.
+- Wave 4 Block D1 live integration proof is implemented (`tests/live/wave4.live-oversight.live.test.js`) and validates cross-system live oversight behavior.
+- Wave 4 Block D2 closeout and front-door/index truth sync are implemented (`docs/WAVE4_CLOSEOUT.md`, `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, `docs/INDEX.md`, `docs/indexes/WHERE_TO_CHANGE_X.md`).
 - Wave 5 behavior is not implemented.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Hook/runtime compatibility paths: not implemented yet
