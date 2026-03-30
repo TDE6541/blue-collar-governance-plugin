@@ -44,6 +44,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/OPEN_ITEMS_BOARD.md` — Open Items Board v1 one-board projection contract baseline
 - `docs/specs/FORENSIC_CHAIN.md` — Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` — Control Rod Mode v1 static pre-session posture contract baseline
+- `docs/specs/FOREMANS_WALK_ENGINE.md` — Foreman's Walk Engine v1 post-session verification contract baseline
 - `docs/WAVE2_CLOSEOUT.md` — durable Wave 2 closeout evidence map
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
@@ -71,6 +72,9 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 3 Block B1 Control Rod Mode baseline is implemented at `src/ControlRodMode.js` with golden proof at `tests/golden/ControlRodMode.golden.test.js` and canon spec at `docs/specs/CONTROL_ROD_MODE.md`.
 - Block B1 starter profiles are `conservative`, `balanced`, and `velocity`; SessionBrief stores `controlRodProfile` as a normalized snapshot object with no second authorization field.
 - Control Rod Mode v1 is static posture only and does not implement adaptive learning, mid-session intervention, or live enforcement behavior.
-- Wave 3 Block C Foreman's Walk runtime is not implemented yet.
+- Wave 3 Block C1 Foreman's Walk baseline is implemented at `src/ForemansWalk.js` with golden proof at `tests/golden/ForemansWalk.golden.test.js` and canon spec at `docs/specs/FOREMANS_WALK_ENGINE.md`.
+- Foreman's Walk is post-session verification only; it emits deterministic findings plus As-Built accountability delta while SessionReceipt remains session-of-record.
+- Foreman's Walk does not implement live intervention, watcher/buddy behavior, or adaptive intelligence.
+- Wave 3 Block D integration proof and closeout are not implemented yet.
 - No remote is configured yet.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.

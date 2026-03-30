@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 Forensic Chain baseline implemented, and Wave 3 Block B1 Control Rod Mode baseline implemented
+- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 Forensic Chain baseline implemented, Wave 3 Block B1 Control Rod Mode baseline implemented, and Wave 3 Block C1 Foreman's Walk baseline implemented
 - Git: initialized on `main`, Wave 0 bootstrap committed, no remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -54,7 +54,10 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Block B1 starter profiles are `conservative`, `balanced`, and `velocity`.
 - SessionBrief stores `controlRodProfile` as a normalized snapshot object in Block B1 (`src/SessionBrief.js`, `tests/golden/SessionBrief.golden.test.js`) with no second authorization field.
 - Control Rod Mode v1 is static only: no adaptive learning, no mid-session intervention, and no live enforcement behavior.
-- Wave 3 Block C Foreman's Walk runtime: not implemented yet.
+- Wave 3 Block C1 Foreman's Walk baseline: implemented as post-session verification runtime (`docs/specs/FOREMANS_WALK_ENGINE.md`, `src/ForemansWalk.js`, `tests/golden/ForemansWalk.golden.test.js`).
+- Foreman's Walk v1 evaluates scope, constraint posture, completeness, truthfulness, and evidence integrity, then outputs findings plus As-Built accountability delta while SessionReceipt remains the session-of-record.
+- Foreman's Walk v1 is post-session only and does not implement buddy behavior or live intervention.
+- Wave 3 Block D integration proof and closeout execution are not implemented yet.
 - Block E / full Wave 2 closeout execution is not implemented yet.
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
@@ -73,6 +76,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/OPEN_ITEMS_BOARD.md`
   - `docs/specs/FORENSIC_CHAIN.md`
   - `docs/specs/CONTROL_ROD_MODE.md`
+  - `docs/specs/FOREMANS_WALK_ENGINE.md`
 
 ## Canon And Reference Boundary
 

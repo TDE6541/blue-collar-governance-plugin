@@ -27,7 +27,6 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/SESSION_RECEIPT.md` for planned-vs-actual closeout truth, holds, exclusions, and approved drift.
 - Change `docs/WAVE1_CLOSEOUT.md` for durable Wave 1 system-by-system evidence and final closeout signoff state.
 
-
 ## Wave 2 Continuity Truth
 
 - Change `docs/specs/WAVE2_CONTINUITY_LAYER.md` for Wave 2 continuity-first sequencing and Block A/B/C/D baseline boundaries.
@@ -35,9 +34,19 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/STANDING_RISK_ENGINE.md` for derived standing-risk progression and continuation-signal derivation rules.
 - Change `docs/specs/OMISSION_COVERAGE_ENGINE.md` for bounded omission-evaluation profile-pack rules and deterministic finding-shape contracts.
 - Change `docs/specs/OPEN_ITEMS_BOARD.md` for one-board/four-group projection rules, explicit source mapping, and precedence+dedupe behavior.
+
 ## Wave 3 Evidence Truth
 
 - Change `docs/specs/FORENSIC_CHAIN.md` for Wave 3 Block A1 append-only evidence-chain contract rules and linkage invariants.
+
+## Wave 3 Control Rod Truth
+
+- Change `docs/specs/CONTROL_ROD_MODE.md` for Wave 3 Block B1 static profile-resolution and normalization contract rules.
+- Change `docs/specs/SESSION_BRIEF.md` when Block B1 `controlRodProfile` adoption wording requires clarification.
+
+## Wave 3 Verification Truth
+
+- Change `docs/specs/FOREMANS_WALK_ENGINE.md` for Wave 3 Block C1 post-session verification passes, finding model, precedence, and As-Built accountability rules.
 
 ## Contract And Migration Truth
 
@@ -53,11 +62,13 @@ Use this index to find the right canon surface before making a change.
 - Change `src/OpenItemsBoard.js` for Wave 2 Block D1 one-board projection behavior.
 - Change `src/ForensicChain.js` for Wave 3 Block A1 append-only forensic evidence behavior.
 - Change `src/ControlRodMode.js` for Wave 3 Block B1 static profile-resolution and normalization behavior.
-- Change `src/SessionBrief.js` for Block B1 controlRodProfile normalized snapshot adoption behavior.
+- Change `src/SessionBrief.js` for Block B1 `controlRodProfile` normalized snapshot adoption behavior.
+- Change `src/ForemansWalk.js` for Wave 3 Block C1 post-session verification findings and As-Built accountability behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add `tests/golden/ForensicChain.golden.test.js` for Forensic Chain golden verification.
 - Add `tests/golden/ControlRodMode.golden.test.js` for Control Rod Mode golden verification.
-- Change `tests/golden/SessionBrief.golden.test.js` for Block B1 controlRodProfile adoption golden verification.
+- Change `tests/golden/SessionBrief.golden.test.js` for Block B1 `controlRodProfile` adoption golden verification.
+- Add `tests/golden/ForemansWalk.golden.test.js` for Foreman's Walk golden verification.
 - Add `tests/golden/StandingRiskEngine.golden.test.js` for Standing Risk Engine golden verification.
 - Add `tests/golden/OmissionCoverageEngine.golden.test.js` for Omission & Coverage Engine golden verification.
 - Add `tests/golden/OpenItemsBoard.golden.test.js` for Open Items Board golden verification.

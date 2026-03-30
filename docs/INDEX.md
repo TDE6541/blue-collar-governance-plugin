@@ -20,16 +20,18 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/OPEN_ITEMS_BOARD.md` - authoritative Open Items Board v1 one-board projection contract baseline
 - `docs/specs/FORENSIC_CHAIN.md` - authoritative Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` - authoritative Control Rod Mode v1 static pre-session posture contract baseline
+- `docs/specs/FOREMANS_WALK_ENGINE.md` - authoritative Foreman's Walk Engine v1 post-session verification contract baseline
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/WAVE1_CLOSEOUT.md` - durable Wave 1 integration/proof closeout evidence map
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 integration/proof closeout evidence map
 
 ## Current State
 
-- `docs/specs/` contains the Wave 1 umbrella spec, promoted contract specs for all six Wave 1 systems, the Wave 2 Block A/B/C/D baseline specs, and the Wave 3 Block A1 Forensic Chain + Block B1 Control Rod Mode baseline specs.
+- `docs/specs/` contains the Wave 1 umbrella spec, promoted contract specs for all six Wave 1 systems, the Wave 2 Block A/B/C/D baseline specs, and the Wave 3 Block A1 Forensic Chain + Block B1 Control Rod Mode + Block C1 Foreman's Walk baseline specs.
 - Wave 2 Block E closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Wave 3 Block B1 Control Rod Mode is shipped in current docs/runtime truth as static posture only (`conservative`, `balanced`, `velocity`) with normalized `controlRodProfile` snapshots on SessionBrief.
-- Wave 3 Block C Foreman's Walk is not shipped in current docs/runtime truth.
+- Wave 3 Block C1 Foreman's Walk is shipped in current docs/runtime truth as post-session verification only and produces findings plus As-Built accountability delta without live intervention.
+- Wave 3 Block D integration proof and closeout are not shipped in current docs/runtime truth.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
 - `docs/learning-notes/` is not present because no exploration lane is needed for the current repo state.
