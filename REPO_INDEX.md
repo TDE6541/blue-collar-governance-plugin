@@ -65,6 +65,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md` — Wave 5B Block E1 Compressed Governance Health skill micro-slice read/query/render-only contract baseline
 - `docs/specs/CONTROL_ROD_POSTURE_SKILL.md` — Wave 5B post-E1 read-only `/control-rods` posture skill slice contract baseline
 - `docs/specs/FIRE_BREAK_SKILL.md` — Wave 5B post-control-rods read-only `/fire-break` audit skill slice contract baseline
+- `docs/specs/CENSUS_SKILL.md` — Wave 5B post-fire-break read-only `/census` repo snapshot skill slice contract baseline
 - `skills/toolbox-talk-SKILL.md` — Wave 5B Block A `/toolbox-talk` skill artifact
 - `skills/receipt-SKILL.md` — Wave 5B Block A `/receipt` skill artifact
 - `skills/as-built-SKILL.md` — Wave 5B Block A `/as-built` skill artifact
@@ -81,6 +82,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `skills/rights-SKILL.md` — Wave 5B Block E1 `/rights` skill artifact
 - `skills/control-rods-SKILL.md` — Wave 5B read-only `/control-rods` posture skill artifact
 - `skills/fire-break-SKILL.md` — Wave 5B read-only `/fire-break` audit skill artifact
+- `skills/census-SKILL.md` — Wave 5B read-only `/census` repo snapshot skill artifact
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -139,14 +141,15 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 5B Block E1 baseline is implemented at `docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md`, `skills/prevention-record-SKILL.md`, `skills/rights-SKILL.md`, `src/CompressedGovernanceHealthSkills.js`, and `tests/golden/CompressedGovernanceHealthSkills.golden.test.js`.
 - A Wave 5B read-only `/control-rods` posture slice is implemented at `docs/specs/CONTROL_ROD_POSTURE_SKILL.md`, `skills/control-rods-SKILL.md`, `src/ControlRodPostureSkill.js`, and `tests/golden/ControlRodPostureSkill.golden.test.js`.
 - A Wave 5B read-only `/fire-break` audit slice is implemented at `docs/specs/FIRE_BREAK_SKILL.md`, `skills/fire-break-SKILL.md`, `src/FireBreakSkill.js`, and `tests/golden/FireBreakSkill.golden.test.js`.
+- A Wave 5B read-only `/census` repo snapshot slice is implemented at `docs/specs/CENSUS_SKILL.md`, `skills/census-SKILL.md`, `src/CensusSkill.js`, and `tests/golden/CensusSkill.golden.test.js`.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
 - Wave 5 skill topology is now 32 skills across 10 groups.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, and the read-only `/fire-break` audit slice is not implemented.
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, and Fire Break Audit, plus skins, onboarding, and package surfaces are not implemented yet.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, and the read-only `/census` repo snapshot slice is not implemented.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, and Census Snapshot, plus skins, onboarding, and package surfaces are not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No multi-agent control room behavior is implemented.
 - No remote is configured yet.
