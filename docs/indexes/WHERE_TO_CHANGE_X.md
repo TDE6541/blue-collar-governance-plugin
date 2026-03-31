@@ -70,6 +70,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md` for Wave 5B Block D Compressed Safety posture micro-slice contract boundaries and invariants.
 - Change `docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md` for Wave 5B Block E1 Compressed Governance Health micro-slice contract boundaries and invariants.
 - Change `docs/specs/CONTROL_ROD_POSTURE_SKILL.md` for the Wave 5B read-only `/control-rods` posture slice contract boundaries and invariants.
+- Change `docs/specs/FIRE_BREAK_SKILL.md` for the Wave 5B read-only `/fire-break` audit slice contract boundaries and invariants.
 
 ## Wave 4 Closeout Truth
 
@@ -107,6 +108,7 @@ Use this index to find the right canon surface before making a change.
 - Change `src/CompressedSafetyPostureSkills.js` for Wave 5B Block D deterministic Compressed Safety posture skill adapter behavior.
 - Change `src/CompressedGovernanceHealthSkills.js` for Wave 5B Block E1 deterministic Compressed Governance Health skill adapter behavior.
 - Change `src/ControlRodPostureSkill.js` for deterministic read/query/render-only `/control-rods` posture rendering behavior.
+- Change `src/FireBreakSkill.js` for deterministic read/query/render-only `/fire-break` audit snapshot rendering behavior.
 - Change `skills/toolbox-talk-SKILL.md` for Wave 5B Block A `/toolbox-talk` operator-facing skill behavior.
 - Change `skills/receipt-SKILL.md` for Wave 5B Block A `/receipt` operator-facing skill behavior.
 - Change `skills/as-built-SKILL.md` for Wave 5B Block A `/as-built` operator-facing skill behavior.
@@ -122,6 +124,7 @@ Use this index to find the right canon surface before making a change.
 - Change `skills/prevention-record-SKILL.md` for Wave 5B Block E1 `/prevention-record` operator-facing skill behavior.
 - Change `skills/rights-SKILL.md` for Wave 5B Block E1 `/rights` operator-facing skill behavior.
 - Change `skills/control-rods-SKILL.md` for the Wave 5B read-only `/control-rods` operator-facing skill behavior.
+- Change `skills/fire-break-SKILL.md` for the Wave 5B read-only `/fire-break` operator-facing skill behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add `tests/golden/ForensicChain.golden.test.js` for Forensic Chain golden verification.
 - Add `tests/golden/ControlRodMode.golden.test.js` for Control Rod Mode v2 golden verification.
@@ -142,6 +145,7 @@ Use this index to find the right canon surface before making a change.
 - Add `tests/golden/CompressedSafetyPostureSkills.golden.test.js` for Wave 5B Block D Compressed Safety posture skill adapter golden verification.
 - Add `tests/golden/CompressedGovernanceHealthSkills.golden.test.js` for Wave 5B Block E1 Compressed Governance Health skill adapter golden verification.
 - Add `tests/golden/ControlRodPostureSkill.golden.test.js` for read-only `/control-rods` posture skill adapter golden verification.
+- Add `tests/golden/FireBreakSkill.golden.test.js` for read-only `/fire-break` audit skill adapter golden verification.
 - Add golden references under `tests/golden/`.
 - Add `tests/live/wave3.active-governance.live.test.js` for Wave 3 Block D integration proof.
 - Add `tests/live/wave4.live-oversight.live.test.js` for Wave 4 Block D integration proof.

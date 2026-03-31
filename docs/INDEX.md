@@ -41,6 +41,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md` - authoritative Wave 5B Block D Compressed Safety posture skill micro-slice read/query/render-only contract baseline
 - `docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md` - authoritative Wave 5B Block E1 Compressed Governance Health skill micro-slice read/query/render-only contract baseline
 - `docs/specs/CONTROL_ROD_POSTURE_SKILL.md` - authoritative Wave 5B read-only `/control-rods` posture skill slice contract baseline
+- `docs/specs/FIRE_BREAK_SKILL.md` - authoritative Wave 5B read-only `/fire-break` audit skill slice contract baseline
 
 ## Current State
 
@@ -56,7 +57,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 5 is one narrative wave executed as 5A / 5B.
 - Wave 5A Block 0 docs-only truth-sync/substrate-gate/naming-scrub is shipped at `docs/specs/WAVE5_OPERATOR_PRODUCT.md` and `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`.
 - Wave 5A Block A baselines are shipped at `docs/specs/OPERATOR_TRUST_LEDGER.md`, `docs/specs/JOURNEYMAN_TRUST_ENGINE.md`, `src/OperatorTrustLedger.js`, `src/JourneymanTrustEngine.js`, `tests/golden/OperatorTrustLedger.golden.test.js`, and `tests/golden/JourneymanTrustEngine.golden.test.js`.
-- Wave 5 now includes 31 skills across 9 groups and keeps SessionBrief no-widening (`journeymanLevel` is not introduced).
+- Wave 5 now includes 32 skills across 10 groups and keeps SessionBrief no-widening (`journeymanLevel` is not introduced).
 - Operator Trust Ledger is approved on engineering merit and implemented as the Wave 5A Block A substrate baseline.
 - Wave 5A Block B baseline is shipped at `docs/specs/WARRANTY_MONITOR.md`, `src/WarrantyMonitor.js`, and `tests/golden/WarrantyMonitor.golden.test.js`.
 - Warranty remains derived-first in Wave 5 and is implemented as derived-only monitoring in Block B.
@@ -69,12 +70,13 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Compressed Safety posture skills are read/query/render-only surfaces over existing ConstraintsRegistry truth, SafetyInterlocks truth, and ControlRodMode posture/status views; no standalone `/control-rods` skill is shipped in Block D.
 - Wave 5B Block E1 baseline is shipped at `docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md`, `skills/prevention-record-SKILL.md`, `skills/rights-SKILL.md`, `src/CompressedGovernanceHealthSkills.js`, and `tests/golden/CompressedGovernanceHealthSkills.golden.test.js`.
 - A Wave 5B read-only `/control-rods` posture slice is shipped at `docs/specs/CONTROL_ROD_POSTURE_SKILL.md`, `skills/control-rods-SKILL.md`, `src/ControlRodPostureSkill.js`, and `tests/golden/ControlRodPostureSkill.golden.test.js`.
+- A Wave 5B read-only `/fire-break` audit slice is shipped at `docs/specs/FIRE_BREAK_SKILL.md`, `skills/fire-break-SKILL.md`, `src/FireBreakSkill.js`, and `tests/golden/FireBreakSkill.golden.test.js`.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, and the read-only `/control-rods` posture slice is not shipped in current docs/runtime truth.
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, and Control Rod Posture, plus skins, onboarding, and package surfaces are not implemented yet.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, and the read-only `/fire-break` audit slice is not shipped in current docs/runtime truth.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, and Fire Break Audit, plus skins, onboarding, and package surfaces are not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
