@@ -34,6 +34,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/OPERATOR_TRUST_LEDGER.md` - authoritative Wave 5A Block A Operator Trust Ledger v1 contract baseline
 - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` - authoritative Wave 5A Block A Journeyman Trust Engine v1 contract baseline
 - `docs/specs/WARRANTY_MONITOR.md` - authoritative Wave 5A Block B Warranty Monitor v1 derived-only contract baseline
+- `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md` - authoritative Wave 5A Block C HoldEngine Scarcity Signal v1 derived-only contract baseline
 
 ## Current State
 
@@ -53,9 +54,10 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Operator Trust Ledger is approved on engineering merit and implemented as the Wave 5A Block A substrate baseline.
 - Wave 5A Block B baseline is shipped at `docs/specs/WARRANTY_MONITOR.md`, `src/WarrantyMonitor.js`, and `tests/golden/WarrantyMonitor.golden.test.js`.
 - Warranty remains derived-first in Wave 5 and is implemented as derived-only monitoring in Block B.
-- HoldEngine Scarcity Signal remains approved additive direction and is not implemented in Block B.
+- Wave 5A Block C baseline is shipped at `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md`, `src/HoldEngineScarcitySignal.js`, and `tests/golden/HoldEngineScarcitySignal.golden.test.js`.
+- HoldEngine Scarcity Signal remains additive direction and is implemented as derived-only enrichment in Block C.
 - Wave 5B runtime behavior is not shipped in current docs/runtime truth.
-- Skills/skins/onboarding/package surfaces are not implemented in Block B.
+- Skills/skins/onboarding/package surfaces are not implemented in Block C.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.

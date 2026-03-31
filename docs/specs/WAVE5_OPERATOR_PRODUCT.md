@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5B runtime behavior not implemented
+**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B runtime behavior not implemented
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -42,7 +42,7 @@ Wave 5 starts with a governance-first gate:
 - Block A implements Operator Trust Ledger v1 and Journeyman Trust Engine v1 with SessionBrief no-widening preserved.
 - Block B implements Warranty Monitor v1 as derived-only monitoring with no new persisted substrate.
 - Warranty remains derived-first by default and is not a standalone substrate in Block 0.
-- HoldEngine Scarcity Signal is approved as additive enrichment direction only.
+- HoldEngine Scarcity Signal is approved as additive enrichment direction and is implemented in Block C as derived-only enrichment (no substrate widening).
 - SessionBrief no-widening is hard-locked for Wave 5 (`journeymanLevel` is not added).
 - Journeyman trust reads state at query/render time.
 - Skill topology is locked to exactly 28 skills across 7 groups.
@@ -66,7 +66,11 @@ Wave 5 starts with a governance-first gate:
   - `docs/specs/WARRANTY_MONITOR.md`
   - `src/WarrantyMonitor.js`
   - `tests/golden/WarrantyMonitor.golden.test.js`
-- HoldEngine Scarcity Signal and skills/skins/onboarding/package surfaces remain unimplemented in Block B.
+- Wave 5A Block C derived-only scarcity baseline is now implemented at:
+  - `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md`
+  - `src/HoldEngineScarcitySignal.js`
+  - `tests/golden/HoldEngineScarcitySignal.golden.test.js`
+- Skills/skins/onboarding/package surfaces remain unimplemented in Block C.
 - Wave 5B runtime behavior is not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 
@@ -89,6 +93,7 @@ Wave 5A:
 - Block 0 truth sync, substrate gate, naming scrub, no-leakage fence refresh
 - Block A runtime/spec/test baseline for Operator Trust Ledger v1 and Journeyman Trust Engine v1
 - Block B runtime/spec/test baseline for Warranty Monitor v1 (derived-only)
+- Block C runtime/spec/test baseline for HoldEngine Scarcity Signal v1 (derived-only)
 - later 5A blocks only by explicit approval
 
 Wave 5B:

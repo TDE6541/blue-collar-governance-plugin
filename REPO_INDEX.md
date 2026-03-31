@@ -56,6 +56,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/OPERATOR_TRUST_LEDGER.md` — Wave 5A Block A Operator Trust Ledger v1 contract baseline
 - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` — Wave 5A Block A Journeyman Trust Engine v1 contract baseline
 - `docs/specs/WARRANTY_MONITOR.md` — Wave 5A Block B Warranty Monitor v1 derived-only contract baseline
+- `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md` — Wave 5A Block C HoldEngine Scarcity Signal v1 derived-only contract baseline
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -104,11 +105,12 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Operator Trust Ledger is approved on engineering merit and implemented as the Wave 5A Block A substrate baseline.
 - Wave 5A Block B baseline is implemented at `docs/specs/WARRANTY_MONITOR.md`, `src/WarrantyMonitor.js`, and `tests/golden/WarrantyMonitor.golden.test.js`.
 - Warranty remains derived-first in Wave 5 and is implemented as derived-only monitoring in Block B.
-- HoldEngine Scarcity Signal remains approved additive direction and is not implemented in Block B.
+- Wave 5A Block C baseline is implemented at `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md`, `src/HoldEngineScarcitySignal.js`, and `tests/golden/HoldEngineScarcitySignal.golden.test.js`.
+- HoldEngine Scarcity Signal remains additive direction and is implemented as derived-only enrichment in Block C.
 - Wave 5 skill topology is locked at 28 skills across 7 groups.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
 - Wave 5B runtime behavior is not implemented.
-- Skills/skins/onboarding/package surfaces are not implemented in Block B.
+- Skills/skins/onboarding/package surfaces are not implemented in Block C.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No multi-agent control room behavior is implemented.
 - No remote is configured yet.
