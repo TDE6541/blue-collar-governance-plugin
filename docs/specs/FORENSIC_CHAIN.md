@@ -1,5 +1,5 @@
 # FORENSIC_CHAIN.md
-**Status:** Proposed contract baseline  
+**Status:** Wave 3 Block A1 contract baseline (v1)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose

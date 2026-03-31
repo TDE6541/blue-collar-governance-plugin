@@ -66,6 +66,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md` for Wave 5A Block C derived-only scarcity signal contract shape and invariants.
 - Change `docs/specs/SESSION_LIFECYCLE_SKILLS.md` for Wave 5B Block A Session Lifecycle skill tranche contract boundaries and invariants.
 - Change `docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md` for Wave 5B Block B Compressed Intelligence micro-slice contract boundaries and invariants.
+- Change `docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md` for Wave 5B Block C Compressed History & Trust micro-slice contract boundaries and invariants.
 
 ## Wave 4 Closeout Truth
 
@@ -99,6 +100,7 @@ Use this index to find the right canon surface before making a change.
 - Change `src/HoldEngineScarcitySignal.js` for Wave 5A Block C derived-only scarcity signal behavior.
 - Change `src/SessionLifecycleSkills.js` for Wave 5B Block A deterministic Session Lifecycle skill adapter behavior.
 - Change `src/CompressedIntelligenceSkills.js` for Wave 5B Block B deterministic Compressed Intelligence skill adapter behavior.
+- Change `src/CompressedHistoryTrustSkills.js` for Wave 5B Block C deterministic Compressed History & Trust skill adapter behavior.
 - Change `skills/toolbox-talk-SKILL.md` for Wave 5B Block A `/toolbox-talk` operator-facing skill behavior.
 - Change `skills/receipt-SKILL.md` for Wave 5B Block A `/receipt` operator-facing skill behavior.
 - Change `skills/as-built-SKILL.md` for Wave 5B Block A `/as-built` operator-facing skill behavior.
@@ -106,6 +108,9 @@ Use this index to find the right canon surface before making a change.
 - Change `skills/phantoms-SKILL.md` for Wave 5B Block B `/phantoms` operator-facing skill behavior.
 - Change `skills/ufo-SKILL.md` for Wave 5B Block B `/ufo` operator-facing skill behavior.
 - Change `skills/gaps-SKILL.md` for Wave 5B Block B `/gaps` operator-facing skill behavior.
+- Change `skills/chain-SKILL.md` for Wave 5B Block C `/chain` operator-facing skill behavior.
+- Change `skills/warranty-SKILL.md` for Wave 5B Block C `/warranty` operator-facing skill behavior.
+- Change `skills/journeyman-SKILL.md` for Wave 5B Block C `/journeyman` operator-facing skill behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add `tests/golden/ForensicChain.golden.test.js` for Forensic Chain golden verification.
 - Add `tests/golden/ControlRodMode.golden.test.js` for Control Rod Mode v2 golden verification.
@@ -122,6 +127,7 @@ Use this index to find the right canon surface before making a change.
 - Add `tests/golden/HoldEngineScarcitySignal.golden.test.js` for Wave 5A Block C derived-only scarcity signal golden verification.
 - Add `tests/golden/SessionLifecycleSkills.golden.test.js` for Wave 5B Block A Session Lifecycle skill adapter golden verification.
 - Add `tests/golden/CompressedIntelligenceSkills.golden.test.js` for Wave 5B Block B Compressed Intelligence skill adapter golden verification.
+- Add `tests/golden/CompressedHistoryTrustSkills.golden.test.js` for Wave 5B Block C Compressed History & Trust skill adapter golden verification.
 - Add golden references under `tests/golden/`.
 - Add `tests/live/wave3.active-governance.live.test.js` for Wave 3 Block D integration proof.
 - Add `tests/live/wave4.live-oversight.live.test.js` for Wave 4 Block D integration proof.
