@@ -59,10 +59,14 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/WARRANTY_MONITOR.md` — Wave 5A Block B Warranty Monitor v1 derived-only contract baseline
 - `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md` — Wave 5A Block C HoldEngine Scarcity Signal v1 derived-only contract baseline
 - `docs/specs/SESSION_LIFECYCLE_SKILLS.md` — Wave 5B Block A Session Lifecycle skill tranche read/query/render-only contract baseline
+- `docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md` — Wave 5B Block B Compressed Intelligence skill micro-slice read/query/render-only contract baseline
 - `skills/toolbox-talk-SKILL.md` — Wave 5B Block A `/toolbox-talk` skill artifact
 - `skills/receipt-SKILL.md` — Wave 5B Block A `/receipt` skill artifact
 - `skills/as-built-SKILL.md` — Wave 5B Block A `/as-built` skill artifact
 - `skills/walk-SKILL.md` — Wave 5B Block A `/walk` skill artifact
+- `skills/phantoms-SKILL.md` — Wave 5B Block B `/phantoms` skill artifact
+- `skills/ufo-SKILL.md` — Wave 5B Block B `/ufo` skill artifact
+- `skills/gaps-SKILL.md` — Wave 5B Block B `/gaps` skill artifact
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -114,11 +118,13 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 5A Block C baseline is implemented at `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md`, `src/HoldEngineScarcitySignal.js`, and `tests/golden/HoldEngineScarcitySignal.golden.test.js`.
 - HoldEngine Scarcity Signal remains additive direction and is implemented as derived-only enrichment in Block C.
 - Wave 5B Block A baseline is implemented at `docs/specs/SESSION_LIFECYCLE_SKILLS.md`, `skills/toolbox-talk-SKILL.md`, `skills/receipt-SKILL.md`, `skills/as-built-SKILL.md`, `skills/walk-SKILL.md`, `src/SessionLifecycleSkills.js`, and `tests/golden/SessionLifecycleSkills.golden.test.js`.
+- Wave 5B Block B baseline is implemented at `docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md`, `skills/phantoms-SKILL.md`, `skills/ufo-SKILL.md`, `skills/gaps-SKILL.md`, `src/CompressedIntelligenceSkills.js`, and `tests/golden/CompressedIntelligenceSkills.golden.test.js`.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
+- Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Wave 5 skill topology is locked at 28 skills across 7 groups.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
-- Remaining Wave 5B runtime behavior is not implemented.
-- Skills outside Session Lifecycle, skins, onboarding, and package surfaces are not implemented yet.
+- Remaining Wave 5B runtime behavior outside Blocks A and B is not implemented.
+- Skills outside Session Lifecycle and Compressed Intelligence, skins, onboarding, and package surfaces are not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No multi-agent control room behavior is implemented.
 - No remote is configured yet.

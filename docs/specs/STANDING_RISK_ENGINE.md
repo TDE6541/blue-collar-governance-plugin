@@ -129,5 +129,5 @@ If explicit continuation signal evidence is absent, derived state remains `OPEN`
 ## Current Implementation Truth
 
 - This is a Block B1 spec baseline.
-- Runtime implementation is planned at `src/StandingRiskEngine.js`.
-- Golden proof is planned at `tests/golden/StandingRiskEngine.golden.test.js`.
+- Runtime implementation exists at `src/StandingRiskEngine.js`.
+- Golden proof exists at `tests/golden/StandingRiskEngine.golden.test.js`.

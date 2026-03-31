@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); remaining Wave 5B runtime behavior not implemented
+**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only); remaining Wave 5B runtime behavior outside Blocks A and B not implemented
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -44,6 +44,7 @@ Wave 5 starts with a governance-first gate:
 - Warranty remains derived-first by default and is not a standalone substrate in Block 0.
 - HoldEngine Scarcity Signal is approved as additive enrichment direction and is implemented in Block C as derived-only enrichment (no substrate widening).
 - Wave 5B Block A implements Session Lifecycle skills (`/toolbox-talk`, `/receipt`, `/as-built`, `/walk`) as read/query/render-only surfaces with no shared-contract widening.
+- Wave 5B Block B implements Compressed Intelligence skills (`/phantoms`, `/ufo`, `/gaps`) as read/query/render-only surfaces with no shared-contract widening.
 - SessionBrief no-widening is hard-locked for Wave 5 (`journeymanLevel` is not added).
 - Journeyman trust reads state at query/render time.
 - Skill topology is locked to exactly 28 skills across 7 groups.
@@ -79,8 +80,15 @@ Wave 5 starts with a governance-first gate:
   - `skills/walk-SKILL.md`
   - `src/SessionLifecycleSkills.js`
   - `tests/golden/SessionLifecycleSkills.golden.test.js`
-- Remaining Wave 5B runtime behavior is not implemented yet.
-- Skills outside Session Lifecycle plus skins/onboarding/package surfaces remain unimplemented.
+- Wave 5B Block B Compressed Intelligence skill micro-slice is now implemented at:
+  - `docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md`
+  - `skills/phantoms-SKILL.md`
+  - `skills/ufo-SKILL.md`
+  - `skills/gaps-SKILL.md`
+  - `src/CompressedIntelligenceSkills.js`
+  - `tests/golden/CompressedIntelligenceSkills.golden.test.js`
+- Remaining Wave 5B runtime behavior outside Blocks A and B is not implemented yet.
+- Skills outside Session Lifecycle and Compressed Intelligence plus skins/onboarding/package surfaces remain unimplemented.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 
 ## Substrate Merit Rule
@@ -108,6 +116,7 @@ Wave 5A:
 Wave 5B:
 
 - Block A runtime/spec/test baseline for Session Lifecycle skills (`/toolbox-talk`, `/receipt`, `/as-built`, `/walk`) as read/query/render-only surfaces
+- Block B runtime/spec/test baseline for Compressed Intelligence skills (`/phantoms`, `/ufo`, `/gaps`) as read/query/render-only surfaces
 - downstream implementation and integration work that depends on Wave 5A contract decisions
 
 ## Block 0 Scope
