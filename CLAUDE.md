@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 + Block B1 + Block C1 baselines implemented, Wave 3 Block D integration proof + closeout shipped, and Wave 4 live oversight shipped
+- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 + Block B1 + Block C1 baselines implemented, Wave 3 Block D integration proof + closeout shipped, Wave 4 live oversight shipped, and Wave 5A Block 0 docs shipped (truth-sync + substrate-gate + naming scrub)
 - Git: initialized on `main`, Wave 0 bootstrap committed, no remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -70,7 +70,14 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Wave 4 is shipped: Blocks A1 + B1 + C1 + D1 + D2 are complete.
 - Wave 4 Block D1 live integration proof is implemented (`tests/live/wave4.live-oversight.live.test.js`) and validates cross-system live oversight behavior.
 - Wave 4 Block D2 closeout and front-door/index truth sync are implemented (`docs/WAVE4_CLOSEOUT.md`, `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, `docs/INDEX.md`, `docs/indexes/WHERE_TO_CHANGE_X.md`).
-- Wave 5 behavior is not implemented.
+- Wave 5 is one narrative wave executed as 5A / 5B.
+- Wave 5A Block 0 docs-only truth/gate artifacts are implemented (`docs/specs/WAVE5_OPERATOR_PRODUCT.md`, `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`).
+- Operator Trust Ledger is approved on engineering merit as the Wave 5A substrate direction candidate (docs decision only; runtime not implemented).
+- Warranty remains derived-first in Wave 5 Block 0.
+- HoldEngine Scarcity Signal is approved as additive enrichment direction only.
+- Wave 5 skill topology is locked at 28 skills across 7 groups.
+- SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
+- Wave 5 runtime behavior is not implemented.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
@@ -90,6 +97,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/FORENSIC_CHAIN.md`
   - `docs/specs/CONTROL_ROD_MODE.md`
   - `docs/specs/FOREMANS_WALK_ENGINE.md`
+  - `docs/specs/WAVE5_OPERATOR_PRODUCT.md`
+- Wave 5 Block 0 substrate-gate memo: `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
 
 ## Canon And Reference Boundary
 

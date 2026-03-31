@@ -6,7 +6,7 @@
 
 This charter defines how Blue Collar Governance Plugin work is governed. It applies to code, specifications, navigation docs, migration handling, and session closeout.
 
-Tim is the Architect. AI is the execution partner.
+The Architect is the human authority. AI is the execution partner.
 
 ## Mission
 
@@ -26,7 +26,7 @@ This repository is not:
 - a public framework repo
 - a skin-first product
 - a thesis document
-- a HoldPoint clone
+- a clone of another repo/product
 
 ## Non-Negotiables
 

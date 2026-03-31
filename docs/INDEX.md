@@ -29,6 +29,8 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/WAVE3_CLOSEOUT.md` - durable Wave 3 integration/proof closeout evidence map
 - `docs/specs/WAVE4_LIVE_OVERSIGHT.md` - authoritative Wave 4 umbrella contract baseline
 - `docs/WAVE4_CLOSEOUT.md` - durable Wave 4 integration/proof closeout evidence map
+- `docs/specs/WAVE5_OPERATOR_PRODUCT.md` - authoritative Wave 5 umbrella truth (one narrative wave executed as 5A / 5B)
+- `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` - authoritative Wave 5A Block 0 substrate merit-gate memo
 
 ## Current State
 
@@ -41,7 +43,12 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 3 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave3.active-governance.live.test.js` and closeout evidence exists at `docs/WAVE3_CLOSEOUT.md`.
 - Wave 4 Buddy behavior is shipped as watcher-only; multi-agent control-room behavior is not shipped.
 - Wave 4 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave4.live-oversight.live.test.js` and closeout evidence exists at `docs/WAVE4_CLOSEOUT.md`.
-- Wave 5 behavior is not shipped in current docs/runtime truth.
+- Wave 5 is one narrative wave executed as 5A / 5B.
+- Wave 5A Block 0 docs-only truth-sync/substrate-gate/naming-scrub is shipped at `docs/specs/WAVE5_OPERATOR_PRODUCT.md` and `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`.
+- Wave 5 locks 28 skills across 7 groups and keeps SessionBrief no-widening (`journeymanLevel` is not introduced).
+- Operator Trust Ledger is approved on engineering merit as the Wave 5A substrate direction candidate (docs decision only; runtime not implemented).
+- Wave 5 runtime behavior is not shipped in current docs/runtime truth.
+- No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
 - `docs/learning-notes/` is not present because no exploration lane is needed for the current repo state.

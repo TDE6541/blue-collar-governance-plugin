@@ -51,6 +51,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/WAVE3_CLOSEOUT.md` — durable Wave 3 closeout evidence map
 - `docs/specs/WAVE4_LIVE_OVERSIGHT.md` — Wave 4 umbrella contract and load-bearing decisions
 - `docs/WAVE4_CLOSEOUT.md` — durable Wave 4 closeout evidence map
+- `docs/specs/WAVE5_OPERATOR_PRODUCT.md` — Wave 5 umbrella truth (one narrative wave executed as 5A / 5B)
+- `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` — Wave 5A Block 0 substrate merit-gate decisions
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -93,7 +95,15 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 4 is shipped: Blocks A1 + B1 + C1 + D1 + D2 are complete.
 - Wave 4 Block D1 live integration proof is implemented at `tests/live/wave4.live-oversight.live.test.js`.
 - Wave 4 Block D2 closeout and front-door/index truth sync are implemented at `docs/WAVE4_CLOSEOUT.md`.
-- Wave 5 behavior is not implemented.
+- Wave 5 is one narrative wave executed as 5A / 5B.
+- Wave 5A Block 0 docs-only truth-sync/substrate-gate/naming-scrub is implemented at `docs/specs/WAVE5_OPERATOR_PRODUCT.md` and `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`.
+- Operator Trust Ledger is approved on engineering merit as the Wave 5A substrate direction candidate (docs decision only; runtime not implemented).
+- Warranty remains derived-first in Wave 5 Block 0.
+- HoldEngine Scarcity Signal is approved as additive enrichment direction only.
+- Wave 5 skill topology is locked at 28 skills across 7 groups.
+- SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
+- Wave 5 runtime behavior is not implemented.
+- No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No multi-agent control room behavior is implemented.
 - No remote is configured yet.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.
