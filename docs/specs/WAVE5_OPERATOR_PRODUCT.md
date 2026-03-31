@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only); Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only); Wave 5B Block D baseline implemented (Compressed Safety posture micro-slice read/query/render-only); Wave 5B Block E1 baseline implemented (Compressed Governance Health micro-slice read/query/render-only); remaining Wave 5B runtime behavior outside Blocks A, B, C, D, and E1 not implemented
+**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only); Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only); Wave 5B Block D baseline implemented (Compressed Safety posture micro-slice read/query/render-only); Wave 5B Block E1 baseline implemented (Compressed Governance Health micro-slice read/query/render-only); Wave 5B read-only `/control-rods` posture slice implemented; remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, and the read-only `/control-rods` posture slice not implemented
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -48,11 +48,12 @@ Wave 5 starts with a governance-first gate:
 - Wave 5B Block C implements Compressed History & Trust skills (`/chain`, `/warranty`, `/journeyman`) as read/query/render-only surfaces with no shared-contract widening.
 - Wave 5B Block D implements Compressed Safety posture skills (`/constraints`, `/silence-map`) as read/query/render-only surfaces with no shared-contract widening and no standalone `/control-rods` skill.
 - Wave 5B Block E1 implements Compressed Governance Health skills (`/prevention-record`, `/rights`) as read/query/render-only surfaces with no shared-contract widening.
+- A Wave 5B post-E1 slice implements `/control-rods` as a read/query/render-only posture/status surface with no shared-contract widening and no edit semantics.
 - `/prevention-record` is explicit-signal-only and does not emit speculative value claims.
 - `/rights` is a static manual declaration route and is not derived from trust-state engines.
 - SessionBrief no-widening is hard-locked for Wave 5 (`journeymanLevel` is not added).
 - Journeyman trust reads state at query/render time.
-- Skill topology now includes exactly 30 skills across 8 groups.
+- Skill topology now includes exactly 31 skills across 9 groups.
 - Skills are read/query/render layers only; no hidden engine behavior is allowed inside skills.
 - Package/install/runtime hook/compatibility claims must remain explicit and honest until verified by real shipped surfaces.
 
@@ -111,8 +112,13 @@ Wave 5 starts with a governance-first gate:
   - `skills/rights-SKILL.md`
   - `src/CompressedGovernanceHealthSkills.js`
   - `tests/golden/CompressedGovernanceHealthSkills.golden.test.js`
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, and E1 is not implemented yet.
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, and Compressed Governance Health plus skins/onboarding/package surfaces remain unimplemented.
+- A Wave 5B read-only `/control-rods` posture slice is now implemented at:
+  - `docs/specs/CONTROL_ROD_POSTURE_SKILL.md`
+  - `skills/control-rods-SKILL.md`
+  - `src/ControlRodPostureSkill.js`
+  - `tests/golden/ControlRodPostureSkill.golden.test.js`
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, and the read-only `/control-rods` posture slice is not implemented yet.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, and Control Rod Posture plus skins/onboarding/package surfaces remain unimplemented.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 
 ## Substrate Merit Rule
