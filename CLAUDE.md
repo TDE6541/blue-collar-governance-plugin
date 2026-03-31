@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 + Block B1 + Block C1 baselines implemented, Wave 3 Block D integration proof + closeout shipped, Wave 4 live oversight shipped, Wave 5A Block 0 docs shipped (truth-sync + substrate-gate + naming scrub), Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1), Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only), and Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only)
+- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 + Block B1 + Block C1 baselines implemented, Wave 3 Block D integration proof + closeout shipped, Wave 4 live oversight shipped, Wave 5A Block 0 docs shipped (truth-sync + substrate-gate + naming scrub), Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1), Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only), Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only), and Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only)
 - Git: initialized on `main`, Wave 0 bootstrap committed, no remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -78,10 +78,12 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Warranty remains derived-first in Wave 5 and is implemented as derived-only monitoring in Block B.
 - Wave 5A Block C baseline is implemented (`docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md`, `src/HoldEngineScarcitySignal.js`, `tests/golden/HoldEngineScarcitySignal.golden.test.js`).
 - HoldEngine Scarcity Signal remains additive direction and is implemented as derived-only enrichment in Block C.
+- Wave 5B Block A baseline is implemented (`docs/specs/SESSION_LIFECYCLE_SKILLS.md`, `skills/toolbox-talk-SKILL.md`, `skills/receipt-SKILL.md`, `skills/as-built-SKILL.md`, `skills/walk-SKILL.md`, `src/SessionLifecycleSkills.js`, `tests/golden/SessionLifecycleSkills.golden.test.js`).
+- Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Wave 5 skill topology is locked at 28 skills across 7 groups.
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
-- Wave 5B runtime behavior is not implemented.
-- Skills/skins/onboarding/package surfaces are not implemented in Block C.
+- Remaining Wave 5B runtime behavior is not implemented.
+- Skills outside Session Lifecycle, skins, onboarding, and package surfaces are not implemented yet.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
@@ -106,6 +108,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md`
   - `docs/specs/WARRANTY_MONITOR.md`
   - `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md`
+  - `docs/specs/SESSION_LIFECYCLE_SKILLS.md`
 - Wave 5 Block 0 substrate-gate memo: `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
 
 ## Canon And Reference Boundary

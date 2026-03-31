@@ -35,6 +35,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` - authoritative Wave 5A Block A Journeyman Trust Engine v1 contract baseline
 - `docs/specs/WARRANTY_MONITOR.md` - authoritative Wave 5A Block B Warranty Monitor v1 derived-only contract baseline
 - `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md` - authoritative Wave 5A Block C HoldEngine Scarcity Signal v1 derived-only contract baseline
+- `docs/specs/SESSION_LIFECYCLE_SKILLS.md` - authoritative Wave 5B Block A Session Lifecycle skill tranche read/query/render-only contract baseline
 
 ## Current State
 
@@ -56,8 +57,10 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Warranty remains derived-first in Wave 5 and is implemented as derived-only monitoring in Block B.
 - Wave 5A Block C baseline is shipped at `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md`, `src/HoldEngineScarcitySignal.js`, and `tests/golden/HoldEngineScarcitySignal.golden.test.js`.
 - HoldEngine Scarcity Signal remains additive direction and is implemented as derived-only enrichment in Block C.
-- Wave 5B runtime behavior is not shipped in current docs/runtime truth.
-- Skills/skins/onboarding/package surfaces are not implemented in Block C.
+- Wave 5B Block A baseline is shipped at `docs/specs/SESSION_LIFECYCLE_SKILLS.md`, `skills/toolbox-talk-SKILL.md`, `skills/receipt-SKILL.md`, `skills/as-built-SKILL.md`, `skills/walk-SKILL.md`, `src/SessionLifecycleSkills.js`, and `tests/golden/SessionLifecycleSkills.golden.test.js`.
+- Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
+- Remaining Wave 5B runtime behavior is not shipped in current docs/runtime truth.
+- Skills outside Session Lifecycle, skins, onboarding, and package surfaces are not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.

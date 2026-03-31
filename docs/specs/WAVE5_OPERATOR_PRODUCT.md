@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B runtime behavior not implemented
+**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); remaining Wave 5B runtime behavior not implemented
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -43,6 +43,7 @@ Wave 5 starts with a governance-first gate:
 - Block B implements Warranty Monitor v1 as derived-only monitoring with no new persisted substrate.
 - Warranty remains derived-first by default and is not a standalone substrate in Block 0.
 - HoldEngine Scarcity Signal is approved as additive enrichment direction and is implemented in Block C as derived-only enrichment (no substrate widening).
+- Wave 5B Block A implements Session Lifecycle skills (`/toolbox-talk`, `/receipt`, `/as-built`, `/walk`) as read/query/render-only surfaces with no shared-contract widening.
 - SessionBrief no-widening is hard-locked for Wave 5 (`journeymanLevel` is not added).
 - Journeyman trust reads state at query/render time.
 - Skill topology is locked to exactly 28 skills across 7 groups.
@@ -70,8 +71,16 @@ Wave 5 starts with a governance-first gate:
   - `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md`
   - `src/HoldEngineScarcitySignal.js`
   - `tests/golden/HoldEngineScarcitySignal.golden.test.js`
-- Skills/skins/onboarding/package surfaces remain unimplemented in Block C.
-- Wave 5B runtime behavior is not implemented yet.
+- Wave 5B Block A Session Lifecycle skill tranche is now implemented at:
+  - `docs/specs/SESSION_LIFECYCLE_SKILLS.md`
+  - `skills/toolbox-talk-SKILL.md`
+  - `skills/receipt-SKILL.md`
+  - `skills/as-built-SKILL.md`
+  - `skills/walk-SKILL.md`
+  - `src/SessionLifecycleSkills.js`
+  - `tests/golden/SessionLifecycleSkills.golden.test.js`
+- Remaining Wave 5B runtime behavior is not implemented yet.
+- Skills outside Session Lifecycle plus skins/onboarding/package surfaces remain unimplemented.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 
 ## Substrate Merit Rule
@@ -98,6 +107,7 @@ Wave 5A:
 
 Wave 5B:
 
+- Block A runtime/spec/test baseline for Session Lifecycle skills (`/toolbox-talk`, `/receipt`, `/as-built`, `/walk`) as read/query/render-only surfaces
 - downstream implementation and integration work that depends on Wave 5A contract decisions
 
 ## Block 0 Scope
@@ -142,4 +152,3 @@ Wave 5 Block 0 truth and decision proof is anchored in:
 - `docs/indexes/WHERE_TO_CHANGE_X.md`
 - `TEAM_CHARTER.md`
 - `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
-
