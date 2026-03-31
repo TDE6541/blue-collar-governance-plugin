@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only); Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only); Wave 5B Block D baseline implemented (Compressed Safety posture micro-slice read/query/render-only); Wave 5B Block E1 baseline implemented (Compressed Governance Health micro-slice read/query/render-only); Wave 5B read-only `/control-rods` posture slice implemented; Wave 5B read-only `/fire-break` audit slice implemented; Wave 5B read-only `/census` repo snapshot slice implemented; Wave 5B read-only `/diagnose` evidence-view slice implemented; remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, and the read-only `/diagnose` evidence-view slice not implemented
+**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only); Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only); Wave 5B Block D baseline implemented (Compressed Safety posture micro-slice read/query/render-only); Wave 5B Block E1 baseline implemented (Compressed Governance Health micro-slice read/query/render-only); Wave 5B read-only `/control-rods` posture slice implemented; Wave 5B read-only `/fire-break` audit slice implemented; Wave 5B read-only `/census` repo snapshot slice implemented; Wave 5B read-only `/diagnose` evidence-view slice implemented; Wave 5B read-only `/keystone` decision-support slice implemented; remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, and the read-only `/keystone` decision-support slice not implemented
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -52,6 +52,7 @@ Wave 5 starts with a governance-first gate:
 - A Wave 5B post-control-rods slice implements `/fire-break` as a manual read/query/render-only governance snapshot over existing Open Items Board truth with no shared-contract widening and no control semantics.
 - A Wave 5B post-fire-break slice implements `/census` as a manual read/query/render-only repo snapshot surface over explicit local repo truth with no shared-contract widening and no analytics behavior.
 - A Wave 5B post-census slice implements `/diagnose` as a read/query/render-only evidence-linked diagnostic view over existing Walk + Chain truth with no shared-contract widening and no heuristic synthesis behavior.
+- A Wave 5B post-diagnose slice implements `/keystone` as a read/query/render-only keystone-finding view over existing Walk findings and existing severity labels with no shared-contract widening, no dependency analysis, and no ranking/weighting/scoring behavior.
 - `/prevention-record` is explicit-signal-only and does not emit speculative value claims.
 - `/rights` is a static manual declaration route and is not derived from trust-state engines.
 - SessionBrief no-widening is hard-locked for Wave 5 (`journeymanLevel` is not added).
@@ -135,9 +136,14 @@ Wave 5 starts with a governance-first gate:
   - `skills/diagnose-SKILL.md`
   - `src/DiagnoseSkill.js`
   - `tests/golden/DiagnoseSkill.golden.test.js`
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, and the read-only `/diagnose` evidence-view slice is not implemented yet.
-- `/keystone` and `/eliminate` remain pending.
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, and Diagnose View plus skins/onboarding/package surfaces remain unimplemented.
+- A Wave 5B read-only `/keystone` decision-support slice is now implemented at:
+  - `docs/specs/KEYSTONE_SKILL.md`
+  - `skills/keystone-SKILL.md`
+  - `src/KeystoneSkill.js`
+  - `tests/golden/KeystoneSkill.golden.test.js`
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, and the read-only `/keystone` decision-support slice is not implemented yet.
+- `/eliminate` remains pending.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, and Keystone View plus skins/onboarding/package surfaces remain unimplemented.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 
 ## Substrate Merit Rule
@@ -171,6 +177,7 @@ Wave 5B:
 - post-control-rods runtime/spec/test baseline for read-only `/fire-break` audit skill surface
 - post-fire-break runtime/spec/test baseline for read-only `/census` repo snapshot skill surface
 - post-census runtime/spec/test baseline for read-only `/diagnose` evidence-view skill surface
+- post-diagnose runtime/spec/test baseline for read-only `/keystone` decision-support skill surface
 - downstream implementation and integration work that depends on Wave 5A contract decisions
 
 ## Block 0 Scope

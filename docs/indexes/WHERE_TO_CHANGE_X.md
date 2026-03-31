@@ -73,6 +73,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/FIRE_BREAK_SKILL.md` for the Wave 5B read-only `/fire-break` audit slice contract boundaries and invariants.
 - Change `docs/specs/CENSUS_SKILL.md` for the Wave 5B read-only `/census` repo snapshot slice contract boundaries and invariants.
 - Change `docs/specs/DIAGNOSE_SKILL.md` for the Wave 5B read-only `/diagnose` evidence-view slice contract boundaries and invariants.
+- Change `docs/specs/KEYSTONE_SKILL.md` for the Wave 5B read-only `/keystone` decision-support slice contract boundaries and invariants.
 
 ## Wave 4 Closeout Truth
 
@@ -113,6 +114,7 @@ Use this index to find the right canon surface before making a change.
 - Change `src/FireBreakSkill.js` for deterministic read/query/render-only `/fire-break` audit snapshot rendering behavior.
 - Change `src/CensusSkill.js` for deterministic read/query/render-only `/census` repo snapshot rendering behavior.
 - Change `src/DiagnoseSkill.js` for deterministic read/query/render-only `/diagnose` evidence-view rendering behavior.
+- Change `src/KeystoneSkill.js` for deterministic read/query/render-only `/keystone` decision-support rendering behavior.
 - Change `skills/toolbox-talk-SKILL.md` for Wave 5B Block A `/toolbox-talk` operator-facing skill behavior.
 - Change `skills/receipt-SKILL.md` for Wave 5B Block A `/receipt` operator-facing skill behavior.
 - Change `skills/as-built-SKILL.md` for Wave 5B Block A `/as-built` operator-facing skill behavior.
@@ -131,6 +133,7 @@ Use this index to find the right canon surface before making a change.
 - Change `skills/fire-break-SKILL.md` for the Wave 5B read-only `/fire-break` operator-facing skill behavior.
 - Change `skills/census-SKILL.md` for the Wave 5B read-only `/census` operator-facing skill behavior.
 - Change `skills/diagnose-SKILL.md` for the Wave 5B read-only `/diagnose` operator-facing skill behavior.
+- Change `skills/keystone-SKILL.md` for the Wave 5B read-only `/keystone` operator-facing skill behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add `tests/golden/ForensicChain.golden.test.js` for Forensic Chain golden verification.
 - Add `tests/golden/ControlRodMode.golden.test.js` for Control Rod Mode v2 golden verification.
@@ -154,6 +157,7 @@ Use this index to find the right canon surface before making a change.
 - Add `tests/golden/FireBreakSkill.golden.test.js` for read-only `/fire-break` audit skill adapter golden verification.
 - Add `tests/golden/CensusSkill.golden.test.js` for read-only `/census` repo snapshot skill adapter golden verification.
 - Add `tests/golden/DiagnoseSkill.golden.test.js` for read-only `/diagnose` evidence-view skill adapter golden verification.
+- Add `tests/golden/KeystoneSkill.golden.test.js` for read-only `/keystone` decision-support skill adapter golden verification.
 - Add golden references under `tests/golden/`.
 - Add `tests/live/wave3.active-governance.live.test.js` for Wave 3 Block D integration proof.
 - Add `tests/live/wave4.live-oversight.live.test.js` for Wave 4 Block D integration proof.

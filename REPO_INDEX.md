@@ -67,6 +67,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/FIRE_BREAK_SKILL.md` — Wave 5B post-control-rods read-only `/fire-break` audit skill slice contract baseline
 - `docs/specs/CENSUS_SKILL.md` — Wave 5B post-fire-break read-only `/census` repo snapshot skill slice contract baseline
 - `docs/specs/DIAGNOSE_SKILL.md` — Wave 5B post-census read-only `/diagnose` evidence-view skill slice contract baseline
+- `docs/specs/KEYSTONE_SKILL.md` — Wave 5B post-diagnose read-only `/keystone` decision-support skill slice contract baseline
 - `skills/toolbox-talk-SKILL.md` — Wave 5B Block A `/toolbox-talk` skill artifact
 - `skills/receipt-SKILL.md` — Wave 5B Block A `/receipt` skill artifact
 - `skills/as-built-SKILL.md` — Wave 5B Block A `/as-built` skill artifact
@@ -85,6 +86,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `skills/fire-break-SKILL.md` — Wave 5B read-only `/fire-break` audit skill artifact
 - `skills/census-SKILL.md` — Wave 5B read-only `/census` repo snapshot skill artifact
 - `skills/diagnose-SKILL.md` — Wave 5B read-only `/diagnose` evidence-view skill artifact
+- `skills/keystone-SKILL.md` — Wave 5B read-only `/keystone` decision-support skill artifact
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -145,16 +147,17 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - A Wave 5B read-only `/fire-break` audit slice is implemented at `docs/specs/FIRE_BREAK_SKILL.md`, `skills/fire-break-SKILL.md`, `src/FireBreakSkill.js`, and `tests/golden/FireBreakSkill.golden.test.js`.
 - A Wave 5B read-only `/census` repo snapshot slice is implemented at `docs/specs/CENSUS_SKILL.md`, `skills/census-SKILL.md`, `src/CensusSkill.js`, and `tests/golden/CensusSkill.golden.test.js`.
 - A Wave 5B read-only `/diagnose` evidence-view slice is implemented at `docs/specs/DIAGNOSE_SKILL.md`, `skills/diagnose-SKILL.md`, `src/DiagnoseSkill.js`, and `tests/golden/DiagnoseSkill.golden.test.js`.
+- A Wave 5B read-only `/keystone` decision-support slice is implemented at `docs/specs/KEYSTONE_SKILL.md`, `skills/keystone-SKILL.md`, `src/KeystoneSkill.js`, and `tests/golden/KeystoneSkill.golden.test.js`.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
 - Wave 5 skill topology is now 32 skills across 10 groups.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, and the read-only `/diagnose` evidence-view slice is not implemented.
-- `/keystone` and `/eliminate` remain pending.
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, and Diagnose View, plus skins, onboarding, and package surfaces are not implemented yet.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, and the read-only `/keystone` decision-support slice is not implemented.
+- `/eliminate` remains pending.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, and Keystone View, plus skins, onboarding, and package surfaces are not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No multi-agent control room behavior is implemented.
-- No remote is configured yet.
+- `origin` remote is configured.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.
