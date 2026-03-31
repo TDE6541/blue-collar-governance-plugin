@@ -62,6 +62,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md` — Wave 5B Block B Compressed Intelligence skill micro-slice read/query/render-only contract baseline
 - `docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md` — Wave 5B Block C Compressed History & Trust skill micro-slice read/query/render-only contract baseline
 - `docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md` — Wave 5B Block D Compressed Safety posture skill micro-slice read/query/render-only contract baseline
+- `docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md` — Wave 5B Block E1 Compressed Governance Health skill micro-slice read/query/render-only contract baseline
 - `skills/toolbox-talk-SKILL.md` — Wave 5B Block A `/toolbox-talk` skill artifact
 - `skills/receipt-SKILL.md` — Wave 5B Block A `/receipt` skill artifact
 - `skills/as-built-SKILL.md` — Wave 5B Block A `/as-built` skill artifact
@@ -74,6 +75,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `skills/journeyman-SKILL.md` — Wave 5B Block C `/journeyman` skill artifact
 - `skills/constraints-SKILL.md` — Wave 5B Block D `/constraints` skill artifact
 - `skills/silence-map-SKILL.md` — Wave 5B Block D `/silence-map` skill artifact
+- `skills/prevention-record-SKILL.md` — Wave 5B Block E1 `/prevention-record` skill artifact
+- `skills/rights-SKILL.md` — Wave 5B Block E1 `/rights` skill artifact
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -129,13 +132,15 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 5B Block C baseline is implemented at `docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md`, `skills/chain-SKILL.md`, `skills/warranty-SKILL.md`, `skills/journeyman-SKILL.md`, `src/CompressedHistoryTrustSkills.js`, and `tests/golden/CompressedHistoryTrustSkills.golden.test.js`.
 - Wave 5B Block D baseline is implemented at `docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md`, `skills/constraints-SKILL.md`, `skills/silence-map-SKILL.md`, `src/CompressedSafetyPostureSkills.js`, and `tests/golden/CompressedSafetyPostureSkills.golden.test.js`.
 - Compressed Safety posture skills are read/query/render-only surfaces over existing ConstraintsRegistry truth, SafetyInterlocks truth, and ControlRodMode posture/status views; no standalone `/control-rods` skill is shipped.
+- Wave 5B Block E1 baseline is implemented at `docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md`, `skills/prevention-record-SKILL.md`, `skills/rights-SKILL.md`, `src/CompressedGovernanceHealthSkills.js`, and `tests/golden/CompressedGovernanceHealthSkills.golden.test.js`.
+- Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Wave 5 skill topology is locked at 28 skills across 7 groups.
+- Wave 5 skill topology is now 30 skills across 8 groups.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, and D is not implemented.
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, and Compressed Safety posture, plus skins, onboarding, and package surfaces are not implemented yet.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, and E1 is not implemented.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, and Compressed Governance Health, plus skins, onboarding, and package surfaces are not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No multi-agent control room behavior is implemented.
 - No remote is configured yet.
