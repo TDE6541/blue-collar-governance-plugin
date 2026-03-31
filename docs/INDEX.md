@@ -43,6 +43,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/CONTROL_ROD_POSTURE_SKILL.md` - authoritative Wave 5B read-only `/control-rods` posture skill slice contract baseline
 - `docs/specs/FIRE_BREAK_SKILL.md` - authoritative Wave 5B read-only `/fire-break` audit skill slice contract baseline
 - `docs/specs/CENSUS_SKILL.md` - authoritative Wave 5B read-only `/census` repo snapshot skill slice contract baseline
+- `docs/specs/DIAGNOSE_SKILL.md` - authoritative Wave 5B read-only `/diagnose` evidence-view skill slice contract baseline
 
 ## Current State
 
@@ -73,12 +74,14 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - A Wave 5B read-only `/control-rods` posture slice is shipped at `docs/specs/CONTROL_ROD_POSTURE_SKILL.md`, `skills/control-rods-SKILL.md`, `src/ControlRodPostureSkill.js`, and `tests/golden/ControlRodPostureSkill.golden.test.js`.
 - A Wave 5B read-only `/fire-break` audit slice is shipped at `docs/specs/FIRE_BREAK_SKILL.md`, `skills/fire-break-SKILL.md`, `src/FireBreakSkill.js`, and `tests/golden/FireBreakSkill.golden.test.js`.
 - A Wave 5B read-only `/census` repo snapshot slice is shipped at `docs/specs/CENSUS_SKILL.md`, `skills/census-SKILL.md`, `src/CensusSkill.js`, and `tests/golden/CensusSkill.golden.test.js`.
+- A Wave 5B read-only `/diagnose` evidence-view slice is shipped at `docs/specs/DIAGNOSE_SKILL.md`, `skills/diagnose-SKILL.md`, `src/DiagnoseSkill.js`, and `tests/golden/DiagnoseSkill.golden.test.js`.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, and the read-only `/census` repo snapshot slice is not shipped in current docs/runtime truth.
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, and Census Snapshot, plus skins, onboarding, and package surfaces are not implemented yet.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, and the read-only `/diagnose` evidence-view slice is not shipped in current docs/runtime truth.
+- `/keystone` and `/eliminate` remain pending.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, and Diagnose View, plus skins, onboarding, and package surfaces are not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
