@@ -38,6 +38,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/SESSION_LIFECYCLE_SKILLS.md` - authoritative Wave 5B Block A Session Lifecycle skill tranche read/query/render-only contract baseline
 - `docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md` - authoritative Wave 5B Block B Compressed Intelligence skill micro-slice read/query/render-only contract baseline
 - `docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md` - authoritative Wave 5B Block C Compressed History & Trust skill micro-slice read/query/render-only contract baseline
+- `docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md` - authoritative Wave 5B Block D Compressed Safety posture skill micro-slice read/query/render-only contract baseline
 
 ## Current State
 
@@ -62,11 +63,13 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 5B Block A baseline is shipped at `docs/specs/SESSION_LIFECYCLE_SKILLS.md`, `skills/toolbox-talk-SKILL.md`, `skills/receipt-SKILL.md`, `skills/as-built-SKILL.md`, `skills/walk-SKILL.md`, `src/SessionLifecycleSkills.js`, and `tests/golden/SessionLifecycleSkills.golden.test.js`.
 - Wave 5B Block B baseline is shipped at `docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md`, `skills/phantoms-SKILL.md`, `skills/ufo-SKILL.md`, `skills/gaps-SKILL.md`, `src/CompressedIntelligenceSkills.js`, and `tests/golden/CompressedIntelligenceSkills.golden.test.js`.
 - Wave 5B Block C baseline is shipped at `docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md`, `skills/chain-SKILL.md`, `skills/warranty-SKILL.md`, `skills/journeyman-SKILL.md`, `src/CompressedHistoryTrustSkills.js`, and `tests/golden/CompressedHistoryTrustSkills.golden.test.js`.
+- Wave 5B Block D baseline is shipped at `docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md`, `skills/constraints-SKILL.md`, `skills/silence-map-SKILL.md`, `src/CompressedSafetyPostureSkills.js`, and `tests/golden/CompressedSafetyPostureSkills.golden.test.js`.
+- Compressed Safety posture skills are read/query/render-only surfaces over existing ConstraintsRegistry truth, SafetyInterlocks truth, and ControlRodMode posture/status views; no standalone `/control-rods` skill is shipped.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, and C is not shipped in current docs/runtime truth.
-- Skills outside Session Lifecycle, Compressed Intelligence, and Compressed History & Trust, plus skins, onboarding, and package surfaces are not implemented yet.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, and D is not shipped in current docs/runtime truth.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, and Compressed Safety posture, plus skins, onboarding, and package surfaces are not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.

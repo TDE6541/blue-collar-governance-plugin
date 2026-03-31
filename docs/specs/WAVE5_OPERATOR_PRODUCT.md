@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only); Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only); remaining Wave 5B runtime behavior outside Blocks A, B, and C not implemented
+**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only); Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only); Wave 5B Block D baseline implemented (Compressed Safety posture micro-slice read/query/render-only); remaining Wave 5B runtime behavior outside Blocks A, B, C, and D not implemented
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -46,6 +46,7 @@ Wave 5 starts with a governance-first gate:
 - Wave 5B Block A implements Session Lifecycle skills (`/toolbox-talk`, `/receipt`, `/as-built`, `/walk`) as read/query/render-only surfaces with no shared-contract widening.
 - Wave 5B Block B implements Compressed Intelligence skills (`/phantoms`, `/ufo`, `/gaps`) as read/query/render-only surfaces with no shared-contract widening.
 - Wave 5B Block C implements Compressed History & Trust skills (`/chain`, `/warranty`, `/journeyman`) as read/query/render-only surfaces with no shared-contract widening.
+- Wave 5B Block D implements Compressed Safety posture skills (`/constraints`, `/silence-map`) as read/query/render-only surfaces with no shared-contract widening and no standalone `/control-rods` skill.
 - SessionBrief no-widening is hard-locked for Wave 5 (`journeymanLevel` is not added).
 - Journeyman trust reads state at query/render time.
 - Skill topology is locked to exactly 28 skills across 7 groups.
@@ -95,8 +96,14 @@ Wave 5 starts with a governance-first gate:
   - `skills/journeyman-SKILL.md`
   - `src/CompressedHistoryTrustSkills.js`
   - `tests/golden/CompressedHistoryTrustSkills.golden.test.js`
-- Remaining Wave 5B runtime behavior outside Blocks A, B, and C is not implemented yet.
-- Skills outside Session Lifecycle, Compressed Intelligence, and Compressed History & Trust plus skins/onboarding/package surfaces remain unimplemented.
+- Wave 5B Block D Compressed Safety posture skill micro-slice is now implemented at:
+  - `docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md`
+  - `skills/constraints-SKILL.md`
+  - `skills/silence-map-SKILL.md`
+  - `src/CompressedSafetyPostureSkills.js`
+  - `tests/golden/CompressedSafetyPostureSkills.golden.test.js`
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, and D is not implemented yet.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, and Compressed Safety posture plus skins/onboarding/package surfaces remain unimplemented.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 
 ## Substrate Merit Rule
@@ -126,6 +133,7 @@ Wave 5B:
 - Block A runtime/spec/test baseline for Session Lifecycle skills (`/toolbox-talk`, `/receipt`, `/as-built`, `/walk`) as read/query/render-only surfaces
 - Block B runtime/spec/test baseline for Compressed Intelligence skills (`/phantoms`, `/ufo`, `/gaps`) as read/query/render-only surfaces
 - Block C runtime/spec/test baseline for Compressed History & Trust skills (`/chain`, `/warranty`, `/journeyman`) as read/query/render-only surfaces
+- Block D runtime/spec/test baseline for Compressed Safety posture skills (`/constraints`, `/silence-map`) as read/query/render-only surfaces
 - downstream implementation and integration work that depends on Wave 5A contract decisions
 
 ## Block 0 Scope

@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 + Block B1 + Block C1 baselines implemented, Wave 3 Block D integration proof + closeout shipped, Wave 4 live oversight shipped, Wave 5A Block 0 docs shipped (truth-sync + substrate-gate + naming scrub), Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1), Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only), Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only), Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only), and Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only), and Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only)
+- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 + Block B1 + Block C1 baselines implemented, Wave 3 Block D integration proof + closeout shipped, Wave 4 live oversight shipped, Wave 5A Block 0 docs shipped (truth-sync + substrate-gate + naming scrub), Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1), Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only), Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only), Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only), and Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only), and Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only), and Wave 5B Block D baseline implemented (Compressed Safety posture micro-slice read/query/render-only)
 - Git: initialized on `main`, Wave 0 bootstrap committed, no remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -83,11 +83,13 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Wave 5B Block B baseline is implemented (`docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md`, `skills/phantoms-SKILL.md`, `skills/ufo-SKILL.md`, `skills/gaps-SKILL.md`, `src/CompressedIntelligenceSkills.js`, `tests/golden/CompressedIntelligenceSkills.golden.test.js`).
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Wave 5B Block C baseline is implemented (`docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md`, `skills/chain-SKILL.md`, `skills/warranty-SKILL.md`, `skills/journeyman-SKILL.md`, `src/CompressedHistoryTrustSkills.js`, `tests/golden/CompressedHistoryTrustSkills.golden.test.js`).
+- Wave 5B Block D baseline is implemented (`docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md`, `skills/constraints-SKILL.md`, `skills/silence-map-SKILL.md`, `src/CompressedSafetyPostureSkills.js`, `tests/golden/CompressedSafetyPostureSkills.golden.test.js`).
+- Compressed Safety posture skills are read/query/render-only surfaces over existing ConstraintsRegistry truth, SafetyInterlocks truth, and ControlRodMode posture/status views; no standalone `/control-rods` skill is shipped.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
 - Wave 5 skill topology is locked at 28 skills across 7 groups.
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, and C is not implemented.
-- Skills outside Session Lifecycle, Compressed Intelligence, and Compressed History & Trust, plus skins, onboarding, and package surfaces are not implemented yet.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, and D is not implemented.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, and Compressed Safety posture, plus skins, onboarding, and package surfaces are not implemented yet.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
@@ -115,6 +117,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/SESSION_LIFECYCLE_SKILLS.md`
   - `docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md`
   - `docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md`
+  - `docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md`
 - Wave 5 Block 0 substrate-gate memo: `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
 
 ## Canon And Reference Boundary
