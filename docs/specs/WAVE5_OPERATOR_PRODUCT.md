@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5B runtime behavior not implemented
+**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5B runtime behavior not implemented
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -40,6 +40,7 @@ Wave 5 starts with a governance-first gate:
 - Wave 5 runtime behavior is not shipped in Block 0.
 - Operator Trust Ledger passes the Block 0 merit gate and is approved as the Wave 5A substrate direction candidate.
 - Block A implements Operator Trust Ledger v1 and Journeyman Trust Engine v1 with SessionBrief no-widening preserved.
+- Block B implements Warranty Monitor v1 as derived-only monitoring with no new persisted substrate.
 - Warranty remains derived-first by default and is not a standalone substrate in Block 0.
 - HoldEngine Scarcity Signal is approved as additive enrichment direction only.
 - SessionBrief no-widening is hard-locked for Wave 5 (`journeymanLevel` is not added).
@@ -61,6 +62,11 @@ Wave 5 starts with a governance-first gate:
   - `src/JourneymanTrustEngine.js`
   - `tests/golden/OperatorTrustLedger.golden.test.js`
   - `tests/golden/JourneymanTrustEngine.golden.test.js`
+- Wave 5A Block B derived-only warranty baseline is now implemented at:
+  - `docs/specs/WARRANTY_MONITOR.md`
+  - `src/WarrantyMonitor.js`
+  - `tests/golden/WarrantyMonitor.golden.test.js`
+- HoldEngine Scarcity Signal and skills/skins/onboarding/package surfaces remain unimplemented in Block B.
 - Wave 5B runtime behavior is not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 
@@ -82,6 +88,7 @@ Wave 5A:
 
 - Block 0 truth sync, substrate gate, naming scrub, no-leakage fence refresh
 - Block A runtime/spec/test baseline for Operator Trust Ledger v1 and Journeyman Trust Engine v1
+- Block B runtime/spec/test baseline for Warranty Monitor v1 (derived-only)
 - later 5A blocks only by explicit approval
 
 Wave 5B:

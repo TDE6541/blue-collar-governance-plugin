@@ -62,6 +62,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` for Block 0 substrate merit rubric and decisions (Operator Trust Ledger, Warranty, Scarcity Signal, SessionBrief no-widening).
 - Change `docs/specs/OPERATOR_TRUST_LEDGER.md` for Wave 5A Block A operator trust lifecycle substrate contract shape and invariants.
 - Change `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` for Wave 5A Block A deterministic trust decision contract shape and boundaries.
+- Change `docs/specs/WARRANTY_MONITOR.md` for Wave 5A Block B derived-only warranty monitoring contract shape and invariants.
 
 ## Wave 4 Closeout Truth
 
@@ -91,6 +92,7 @@ Use this index to find the right canon surface before making a change.
 - Change `src/ForemansWalk.js` for Wave 3 Block C1 post-session verification findings and As-Built accountability behavior.
 - Change `src/OperatorTrustLedger.js` for Wave 5A Block A operator trust lifecycle persistence behavior.
 - Change `src/JourneymanTrustEngine.js` for Wave 5A Block A deterministic trust decision and trust-ledger write behavior.
+- Change `src/WarrantyMonitor.js` for Wave 5A Block B derived-only warranty monitoring behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add `tests/golden/ForensicChain.golden.test.js` for Forensic Chain golden verification.
 - Add `tests/golden/ControlRodMode.golden.test.js` for Control Rod Mode v2 golden verification.
@@ -103,6 +105,7 @@ Use this index to find the right canon surface before making a change.
 - Add `tests/golden/OpenItemsBoard.golden.test.js` for Open Items Board golden verification.
 - Add `tests/golden/OperatorTrustLedger.golden.test.js` for Wave 5A Block A operator trust lifecycle golden verification.
 - Add `tests/golden/JourneymanTrustEngine.golden.test.js` for Wave 5A Block A deterministic trust decision golden verification.
+- Add `tests/golden/WarrantyMonitor.golden.test.js` for Wave 5A Block B derived-only warranty monitoring golden verification.
 - Add golden references under `tests/golden/`.
 - Add `tests/live/wave3.active-governance.live.test.js` for Wave 3 Block D integration proof.
 - Add `tests/live/wave4.live-oversight.live.test.js` for Wave 4 Block D integration proof.
