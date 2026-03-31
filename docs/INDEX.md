@@ -31,6 +31,8 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/WAVE4_CLOSEOUT.md` - durable Wave 4 integration/proof closeout evidence map
 - `docs/specs/WAVE5_OPERATOR_PRODUCT.md` - authoritative Wave 5 umbrella truth (one narrative wave executed as 5A / 5B)
 - `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` - authoritative Wave 5A Block 0 substrate merit-gate memo
+- `docs/specs/OPERATOR_TRUST_LEDGER.md` - authoritative Wave 5A Block A Operator Trust Ledger v1 contract baseline
+- `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` - authoritative Wave 5A Block A Journeyman Trust Engine v1 contract baseline
 
 ## Current State
 
@@ -45,9 +47,10 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 4 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave4.live-oversight.live.test.js` and closeout evidence exists at `docs/WAVE4_CLOSEOUT.md`.
 - Wave 5 is one narrative wave executed as 5A / 5B.
 - Wave 5A Block 0 docs-only truth-sync/substrate-gate/naming-scrub is shipped at `docs/specs/WAVE5_OPERATOR_PRODUCT.md` and `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`.
+- Wave 5A Block A baselines are shipped at `docs/specs/OPERATOR_TRUST_LEDGER.md`, `docs/specs/JOURNEYMAN_TRUST_ENGINE.md`, `src/OperatorTrustLedger.js`, `src/JourneymanTrustEngine.js`, `tests/golden/OperatorTrustLedger.golden.test.js`, and `tests/golden/JourneymanTrustEngine.golden.test.js`.
 - Wave 5 locks 28 skills across 7 groups and keeps SessionBrief no-widening (`journeymanLevel` is not introduced).
-- Operator Trust Ledger is approved on engineering merit as the Wave 5A substrate direction candidate (docs decision only; runtime not implemented).
-- Wave 5 runtime behavior is not shipped in current docs/runtime truth.
+- Operator Trust Ledger is approved on engineering merit and implemented as the Wave 5A Block A substrate baseline.
+- Wave 5B runtime behavior is not shipped in current docs/runtime truth.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.

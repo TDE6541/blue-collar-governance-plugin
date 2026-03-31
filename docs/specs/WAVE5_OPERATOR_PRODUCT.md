@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5 runtime behavior not implemented
+**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5B runtime behavior not implemented
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -11,7 +11,7 @@ Wave 5 is one narrative wave executed in two delivery phases:
 - Wave 5A
 - Wave 5B
 
-Wave 5A starts with Block 0 as a docs-only truth-sync and substrate-gate step.
+Wave 5A starts with Block 0 as a docs-only truth-sync and substrate-gate step, then implements the first runtime baseline in Block A.
 
 ## What Wave 5 Proves
 
@@ -39,6 +39,7 @@ Wave 5 starts with a governance-first gate:
 - Wave 5A Block 0 is docs-only and ships truth-sync, substrate-gate, and naming scrub only.
 - Wave 5 runtime behavior is not shipped in Block 0.
 - Operator Trust Ledger passes the Block 0 merit gate and is approved as the Wave 5A substrate direction candidate.
+- Block A implements Operator Trust Ledger v1 and Journeyman Trust Engine v1 with SessionBrief no-widening preserved.
 - Warranty remains derived-first by default and is not a standalone substrate in Block 0.
 - HoldEngine Scarcity Signal is approved as additive enrichment direction only.
 - SessionBrief no-widening is hard-locked for Wave 5 (`journeymanLevel` is not added).
@@ -53,7 +54,14 @@ Wave 5 starts with a governance-first gate:
 - Wave 5 Block 0 truth surfaces now exist at:
   - `docs/specs/WAVE5_OPERATOR_PRODUCT.md`
   - `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
-- Wave 5 runtime behavior is not implemented yet.
+- Wave 5A Block A runtime baselines are now implemented at:
+  - `docs/specs/OPERATOR_TRUST_LEDGER.md`
+  - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md`
+  - `src/OperatorTrustLedger.js`
+  - `src/JourneymanTrustEngine.js`
+  - `tests/golden/OperatorTrustLedger.golden.test.js`
+  - `tests/golden/JourneymanTrustEngine.golden.test.js`
+- Wave 5B runtime behavior is not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 
 ## Substrate Merit Rule
@@ -73,7 +81,8 @@ Doctrine inheritance alone is not sufficient evidence.
 Wave 5A:
 
 - Block 0 truth sync, substrate gate, naming scrub, no-leakage fence refresh
-- followed by implementation blocks after explicit approval
+- Block A runtime/spec/test baseline for Operator Trust Ledger v1 and Journeyman Trust Engine v1
+- later 5A blocks only by explicit approval
 
 Wave 5B:
 
