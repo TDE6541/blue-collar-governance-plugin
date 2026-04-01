@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 + Block B1 + Block C1 baselines implemented, Wave 3 Block D integration proof + closeout shipped, Wave 4 live oversight shipped, Wave 5A Block 0 docs shipped (truth-sync + substrate-gate + naming scrub), Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1), Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only), Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only), Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only), and Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only), and Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only), and Wave 5B Block D baseline implemented (Compressed Safety posture micro-slice read/query/render-only), and Wave 5B Block E1 baseline implemented (Compressed Governance Health micro-slice read/query/render-only), and a Wave 5B read-only `/control-rods` posture slice implemented, and a Wave 5B read-only `/fire-break` audit slice implemented, and a Wave 5B read-only `/census` repo snapshot slice implemented, and a Wave 5B read-only `/diagnose` evidence-view slice implemented, and a Wave 5B read-only `/keystone` decision-support slice implemented, and a Wave 5B read-only `/eliminate` hold-options slice implemented, and a Wave 5B read-only `/buddy-status` watcher-state slice implemented, and a Wave 5B read-only `/change-order` status slice implemented, and a Wave 5B read-only `/callout` callout-detail slice implemented
+- Status: private runtime trust layer with Wave 1 implemented, Wave 2 Block A + Block B1 + Block C1 + Block D1 baselines implemented, Wave 3 Block A1 + Block B1 + Block C1 baselines implemented, Wave 3 Block D integration proof + closeout shipped, Wave 4 live oversight shipped, Wave 5A Block 0 docs shipped (truth-sync + substrate-gate + naming scrub), Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1), Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only), Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only), Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only), and Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only), and Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only), and Wave 5B Block D baseline implemented (Compressed Safety posture micro-slice read/query/render-only), and Wave 5B Block E1 baseline implemented (Compressed Governance Health micro-slice read/query/render-only), and a Wave 5B read-only `/control-rods` posture slice implemented, and a Wave 5B read-only `/fire-break` audit slice implemented, and a Wave 5B read-only `/census` repo snapshot slice implemented, and a Wave 5B read-only `/diagnose` evidence-view slice implemented, and a Wave 5B read-only `/keystone` decision-support slice implemented, and a Wave 5B read-only `/eliminate` hold-options slice implemented, and a Wave 5B read-only `/buddy-status` watcher-state slice implemented, and a Wave 5B read-only `/change-order` status slice implemented, and a Wave 5B read-only `/callout` callout-detail slice implemented, and a Wave 5B `/red-tag` interlock decision surface implemented
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -95,13 +95,14 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - A Wave 5B read-only `/buddy-status` watcher-state slice is implemented (`docs/specs/BUDDY_STATUS_SKILL.md`, `skills/buddy-status-SKILL.md`, `src/BuddyStatusSkill.js`, `tests/golden/BuddyStatusSkill.golden.test.js`).
 - A Wave 5B read-only `/change-order` status slice is implemented (`docs/specs/CHANGE_ORDER_SKILL.md`, `skills/change-order-SKILL.md`, `src/ChangeOrderSkill.js`, `tests/golden/ChangeOrderSkill.golden.test.js`).
 - A Wave 5B read-only `/callout` callout-detail slice is implemented (`docs/specs/CALLOUT_SKILL.md`, `skills/callout-SKILL.md`, `src/CalloutSkill.js`, `tests/golden/CalloutSkill.golden.test.js`).
+- A Wave 5B `/red-tag` interlock decision surface is implemented (`docs/specs/RED_TAG_SKILL.md`, `skills/red-tag-SKILL.md`, `src/RedTagSkill.js`, `tests/golden/RedTagSkill.golden.test.js`).
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Wave 5 skill topology is now 36 skills across 10 groups.
+- Wave 5 skill topology is now 37 skills across 10 groups.
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, the read-only `/change-order` status slice, and the read-only `/callout` callout-detail slice is not implemented.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, the read-only `/change-order` status slice, the read-only `/callout` callout-detail slice, and the `/red-tag` interlock decision surface is not implemented.
 
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, Buddy Status View, Change Order View, and Callout View, plus skins, onboarding, and package surfaces are not implemented yet.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, Buddy Status View, Change Order View, Callout View, and Red Tag View remain unimplemented.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Hook/runtime compatibility paths: not implemented yet
 - Package metadata or publishing surfaces: not implemented yet
@@ -133,9 +134,10 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md`
   - `docs/specs/CONTROL_ROD_POSTURE_SKILL.md`
   - `docs/specs/FIRE_BREAK_SKILL.md`
-  - `docs/specs/CENSUS_SKILL.md`
-  - `docs/specs/BUDDY_STATUS_SKILL.md`
-  - `docs/specs/CHANGE_ORDER_SKILL.md`
+- `docs/specs/CENSUS_SKILL.md`
+- `docs/specs/RED_TAG_SKILL.md`
+- `docs/specs/BUDDY_STATUS_SKILL.md`
+- `docs/specs/CHANGE_ORDER_SKILL.md`
 - Wave 5 Block 0 substrate-gate memo: `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
 
 ## Canon And Reference Boundary

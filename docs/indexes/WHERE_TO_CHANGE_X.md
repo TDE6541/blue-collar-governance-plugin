@@ -78,6 +78,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/BUDDY_STATUS_SKILL.md` for the Wave 5B read-only `/buddy-status` watcher-state slice contract boundaries and invariants.
 - Change `docs/specs/CHANGE_ORDER_SKILL.md` for the Wave 5B read-only `/change-order` status slice contract boundaries and invariants.
 - Change `docs/specs/CALLOUT_SKILL.md` for the Wave 5B read-only `/callout` callout-detail slice contract boundaries and invariants.
+- Change `docs/specs/RED_TAG_SKILL.md` for the Wave 5B `/red-tag` interlock decision surface contract boundaries and invariants.
 
 ## Wave 4 Closeout Truth
 
@@ -123,6 +124,7 @@ Use this index to find the right canon surface before making a change.
 - Change `src/BuddyStatusSkill.js` for deterministic read/query/render-only `/buddy-status` watcher-state rendering behavior.
 - Change `src/ChangeOrderSkill.js` for deterministic read/query/render-only `/change-order` status rendering behavior.
 - Change `src/CalloutSkill.js` for deterministic read/query/render-only `/callout` callout-detail rendering behavior.
+- Change `src/RedTagSkill.js` for deterministic evaluate/render-only `/red-tag` interlock decision behavior over existing SafetyInterlocks truth.
 - Change `skills/toolbox-talk-SKILL.md` for Wave 5B Block A `/toolbox-talk` operator-facing skill behavior.
 - Change `skills/receipt-SKILL.md` for Wave 5B Block A `/receipt` operator-facing skill behavior.
 - Change `skills/as-built-SKILL.md` for Wave 5B Block A `/as-built` operator-facing skill behavior.
@@ -146,6 +148,7 @@ Use this index to find the right canon surface before making a change.
 - Change `skills/buddy-status-SKILL.md` for the Wave 5B read-only `/buddy-status` operator-facing skill behavior.
 - Change `skills/change-order-SKILL.md` for the Wave 5B read-only `/change-order` operator-facing skill behavior.
 - Change `skills/callout-SKILL.md` for the Wave 5B read-only `/callout` operator-facing skill behavior.
+- Change `skills/red-tag-SKILL.md` for the Wave 5B `/red-tag` operator-facing interlock decision surface behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add `tests/golden/ForensicChain.golden.test.js` for Forensic Chain golden verification.
 - Add `tests/golden/ControlRodMode.golden.test.js` for Control Rod Mode v2 golden verification.
@@ -174,6 +177,7 @@ Use this index to find the right canon surface before making a change.
 - Add `tests/golden/BuddyStatusSkill.golden.test.js` for read-only `/buddy-status` watcher-state skill adapter golden verification.
 - Add `tests/golden/ChangeOrderSkill.golden.test.js` for read-only `/change-order` status skill adapter golden verification.
 - Add `tests/golden/CalloutSkill.golden.test.js` for read-only `/callout` callout-detail skill adapter golden verification.
+- Add `tests/golden/RedTagSkill.golden.test.js` for `/red-tag` interlock decision surface skill adapter golden verification.
 - Add golden references under `tests/golden/`.
 - Add `tests/live/wave3.active-governance.live.test.js` for Wave 3 Block D integration proof.
 - Add `tests/live/wave4.live-oversight.live.test.js` for Wave 4 Block D integration proof.
