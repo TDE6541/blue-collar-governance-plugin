@@ -1,3 +1,4 @@
+> 🚧 **ACTIVE BUILD** — 5 waves shipped, 260+ tests passing, crew still on site. README reflects real-time build state, not final documentation.
 # Blue Collar Governance Plugin
 
 **Status:** Wave 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain; later Wave 5 work outside the current shipped set remains pending; install/package/runtime-hook/compatibility claims remain unverified
