@@ -70,6 +70,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/KEYSTONE_SKILL.md` — Wave 5B post-diagnose read-only `/keystone` decision-support skill slice contract baseline
 - `docs/specs/ELIMINATE_SKILL.md` — Wave 5B post-keystone read-only `/eliminate` hold-options skill slice contract baseline
 - `docs/specs/BUDDY_STATUS_SKILL.md` — Wave 5B post-eliminate read-only `/buddy-status` watcher-state skill slice contract baseline
+- `docs/specs/CHANGE_ORDER_SKILL.md` — Wave 5B post-buddy-status read-only `/change-order` status skill slice contract baseline
 - `skills/toolbox-talk-SKILL.md` — Wave 5B Block A `/toolbox-talk` skill artifact
 - `skills/receipt-SKILL.md` — Wave 5B Block A `/receipt` skill artifact
 - `skills/as-built-SKILL.md` — Wave 5B Block A `/as-built` skill artifact
@@ -91,6 +92,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `skills/keystone-SKILL.md` — Wave 5B read-only `/keystone` decision-support skill artifact
 - `skills/eliminate-SKILL.md` — Wave 5B read-only `/eliminate` hold-options skill artifact
 - `skills/buddy-status-SKILL.md` — Wave 5B read-only `/buddy-status` watcher-state skill artifact
+- `skills/change-order-SKILL.md` — Wave 5B read-only `/change-order` status skill artifact
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -154,15 +156,16 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - A Wave 5B read-only `/keystone` decision-support slice is implemented at `docs/specs/KEYSTONE_SKILL.md`, `skills/keystone-SKILL.md`, `src/KeystoneSkill.js`, and `tests/golden/KeystoneSkill.golden.test.js`.
 - A Wave 5B read-only `/eliminate` hold-options slice is implemented at `docs/specs/ELIMINATE_SKILL.md`, `skills/eliminate-SKILL.md`, `src/EliminateSkill.js`, and `tests/golden/EliminateSkill.golden.test.js`.
 - A Wave 5B read-only `/buddy-status` watcher-state slice is implemented at `docs/specs/BUDDY_STATUS_SKILL.md`, `skills/buddy-status-SKILL.md`, `src/BuddyStatusSkill.js`, and `tests/golden/BuddyStatusSkill.golden.test.js`.
+- A Wave 5B read-only `/change-order` status slice is implemented at `docs/specs/CHANGE_ORDER_SKILL.md`, `skills/change-order-SKILL.md`, `src/ChangeOrderSkill.js`, and `tests/golden/ChangeOrderSkill.golden.test.js`.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Wave 5 skill topology is now 34 skills across 10 groups.
+- Wave 5 skill topology is now 35 skills across 10 groups.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, and the read-only `/buddy-status` watcher-state slice is not implemented.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, and the read-only `/change-order` status slice is not implemented.
 
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, and Buddy Status View, plus skins, onboarding, and package surfaces are not implemented yet.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, Buddy Status View, and Change Order View, plus skins, onboarding, and package surfaces are not implemented yet.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No multi-agent control room behavior is implemented.
 - `origin` remote is configured.
