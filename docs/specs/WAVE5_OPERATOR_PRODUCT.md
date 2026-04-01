@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only); Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only); Wave 5B Block D baseline implemented (Compressed Safety posture micro-slice read/query/render-only); Wave 5B Block E1 baseline implemented (Compressed Governance Health micro-slice read/query/render-only); Wave 5B read-only `/control-rods` posture slice implemented; Wave 5B read-only `/fire-break` audit slice implemented; Wave 5B read-only `/census` repo snapshot slice implemented; Wave 5B read-only `/diagnose` evidence-view slice implemented; Wave 5B read-only `/keystone` decision-support slice implemented; Wave 5B read-only `/eliminate` hold-options slice implemented; Wave 5B read-only `/buddy-status` watcher-state slice implemented; Wave 5B read-only `/change-order` status slice implemented; remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, and the read-only `/change-order` status slice not implemented
+**Status:** Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub shipped; Wave 5A Block A baselines implemented (Operator Trust Ledger v1 + Journeyman Trust Engine v1); Wave 5A Block B baseline implemented (Warranty Monitor v1 derived-only); Wave 5A Block C baseline implemented (HoldEngine Scarcity Signal v1 derived-only); Wave 5B Block A baseline implemented (Session Lifecycle skills tranche read/query/render-only); Wave 5B Block B baseline implemented (Compressed Intelligence skills micro-slice read/query/render-only); Wave 5B Block C baseline implemented (Compressed History & Trust skills micro-slice read/query/render-only); Wave 5B Block D baseline implemented (Compressed Safety posture micro-slice read/query/render-only); Wave 5B Block E1 baseline implemented (Compressed Governance Health micro-slice read/query/render-only); Wave 5B read-only `/control-rods` posture slice implemented; Wave 5B read-only `/fire-break` audit slice implemented; Wave 5B read-only `/census` repo snapshot slice implemented; Wave 5B read-only `/diagnose` evidence-view slice implemented; Wave 5B read-only `/keystone` decision-support slice implemented; Wave 5B read-only `/eliminate` hold-options slice implemented; Wave 5B read-only `/buddy-status` watcher-state slice implemented; Wave 5B read-only `/change-order` status slice implemented; Wave 5B read-only `/callout` callout-detail slice implemented; remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, and the read-only `/change-order` status slice, and the read-only `/callout` callout-detail slice not implemented
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -56,11 +56,12 @@ Wave 5 starts with a governance-first gate:
 - A Wave 5B post-keystone slice implements `/eliminate` as a read/query/render-only hold-options view over existing hold snapshots and existing derived scarcity assessments with direct `holdId` join only, explicit null scarcity when unmatched, and no recommendation/ranking/pruning/scoring behavior.
 - A Wave 5B post-eliminate slice implements `/buddy-status` as a read/query/render-only watcher-state view over existing Buddy policy and callout snapshots with no shared-contract widening, no control semantics, and no mutation behavior.
 - A Wave 5B post-buddy-status slice implements `/change-order` as a read/query/render-only status view over existing change-order snapshots and deterministic statuses with no shared-contract widening, no action semantics, and no mutation behavior.
+- A Wave 5B post-change-order slice implements `/callout` as a read/query/render-only callout-detail view over existing Buddy callout snapshots with no shared-contract widening, no control semantics, and no mutation behavior.
 - `/prevention-record` is explicit-signal-only and does not emit speculative value claims.
 - `/rights` is a static manual declaration route and is not derived from trust-state engines.
 - SessionBrief no-widening is hard-locked for Wave 5 (`journeymanLevel` is not added).
 - Journeyman trust reads state at query/render time.
-- Skill topology now includes exactly 35 skills across 10 groups.
+- Skill topology now includes exactly 36 skills across 10 groups.
 - Skills are read/query/render layers only; no hidden engine behavior is allowed inside skills.
 - Package/install/runtime hook/compatibility claims must remain explicit and honest until verified by real shipped surfaces.
 
@@ -159,8 +160,13 @@ Wave 5 starts with a governance-first gate:
   - `skills/change-order-SKILL.md`
   - `src/ChangeOrderSkill.js`
   - `tests/golden/ChangeOrderSkill.golden.test.js`
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, and the read-only `/change-order` status slice is not implemented yet.
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, Buddy Status View, and Change Order View plus skins/onboarding/package surfaces remain unimplemented.
+- A Wave 5B read-only `/callout` callout-detail slice is now implemented at:
+  - `docs/specs/CALLOUT_SKILL.md`
+  - `skills/callout-SKILL.md`
+  - `src/CalloutSkill.js`
+  - `tests/golden/CalloutSkill.golden.test.js`
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, the read-only `/change-order` status slice, and the read-only `/callout` callout-detail slice is not implemented yet.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, Buddy Status View, Change Order View, and Callout View plus skins/onboarding/package surfaces remain unimplemented.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 
 ## Substrate Merit Rule
@@ -198,6 +204,7 @@ Wave 5B:
 - post-keystone runtime/spec/test baseline for read-only `/eliminate` hold-options skill surface
 - post-eliminate runtime/spec/test baseline for read-only `/buddy-status` watcher-state skill surface
 - post-buddy-status runtime/spec/test baseline for read-only `/change-order` status skill surface
+- post-change-order runtime/spec/test baseline for read-only `/callout` callout-detail skill surface
 - downstream implementation and integration work that depends on Wave 5A contract decisions
 
 ## Block 0 Scope
