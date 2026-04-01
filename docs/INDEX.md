@@ -50,6 +50,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/CHANGE_ORDER_SKILL.md` - authoritative Wave 5B read-only `/change-order` status skill slice contract baseline
 - `docs/specs/CALLOUT_SKILL.md` - authoritative Wave 5B read-only `/callout` callout-detail skill slice contract baseline
 - `docs/specs/RED_TAG_SKILL.md` - authoritative Wave 5B `/red-tag` interlock decision surface contract baseline
+- `docs/specs/PERMIT_SKILL.md` - authoritative Wave 5B `/permit` gate decision surface contract baseline
 
 ## Current State
 
@@ -87,13 +88,14 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - A Wave 5B read-only `/change-order` status slice is shipped at `docs/specs/CHANGE_ORDER_SKILL.md`, `skills/change-order-SKILL.md`, `src/ChangeOrderSkill.js`, and `tests/golden/ChangeOrderSkill.golden.test.js`.
 - A Wave 5B read-only `/callout` callout-detail slice is shipped at `docs/specs/CALLOUT_SKILL.md`, `skills/callout-SKILL.md`, `src/CalloutSkill.js`, and `tests/golden/CalloutSkill.golden.test.js`.
 - A Wave 5B `/red-tag` interlock decision surface is shipped at `docs/specs/RED_TAG_SKILL.md`, `skills/red-tag-SKILL.md`, `src/RedTagSkill.js`, and `tests/golden/RedTagSkill.golden.test.js`.
+- A Wave 5B `/permit` gate decision surface is shipped at `docs/specs/PERMIT_SKILL.md`, `skills/permit-SKILL.md`, `src/PermitSkill.js`, and `tests/golden/PermitSkill.golden.test.js`.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, the read-only `/change-order` status slice, and the read-only `/callout` callout-detail slice, and the `/red-tag` interlock decision surface is not shipped in current docs/runtime truth.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, the read-only `/change-order` status slice, and the read-only `/callout` callout-detail slice, and the `/red-tag` interlock decision surface, and the `/permit` gate decision surface is not shipped in current docs/runtime truth.
 
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, Buddy Status View, Change Order View, Callout View, and Red Tag View remain unimplemented.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, Buddy Status View, Change Order View, Callout View, and Red Tag View, and Permit View remain unimplemented.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.

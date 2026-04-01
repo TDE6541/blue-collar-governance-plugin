@@ -73,6 +73,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/CHANGE_ORDER_SKILL.md` — Wave 5B post-buddy-status read-only `/change-order` status skill slice contract baseline
 - `docs/specs/CALLOUT_SKILL.md` — Wave 5B post-change-order read-only `/callout` callout-detail skill slice contract baseline
 - `docs/specs/RED_TAG_SKILL.md` — Wave 5B post-callout `/red-tag` interlock decision surface contract baseline
+- `docs/specs/PERMIT_SKILL.md` — Wave 5B post-red-tag `/permit` gate decision surface contract baseline
 - `skills/toolbox-talk-SKILL.md` — Wave 5B Block A `/toolbox-talk` skill artifact
 - `skills/receipt-SKILL.md` — Wave 5B Block A `/receipt` skill artifact
 - `skills/as-built-SKILL.md` — Wave 5B Block A `/as-built` skill artifact
@@ -97,6 +98,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `skills/change-order-SKILL.md` — Wave 5B read-only `/change-order` status skill artifact
 - `skills/callout-SKILL.md` — Wave 5B read-only `/callout` callout-detail skill artifact
 - `skills/red-tag-SKILL.md` — Wave 5B `/red-tag` interlock decision surface skill artifact
+- `skills/permit-SKILL.md` — Wave 5B `/permit` gate decision surface skill artifact
 - `CLAUDE.md` — current session posture and closeout expectations
 - `README.md` — repo identity and current implementation truth
 
@@ -163,15 +165,16 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - A Wave 5B read-only `/change-order` status slice is implemented at `docs/specs/CHANGE_ORDER_SKILL.md`, `skills/change-order-SKILL.md`, `src/ChangeOrderSkill.js`, and `tests/golden/ChangeOrderSkill.golden.test.js`.
 - A Wave 5B read-only `/callout` callout-detail slice is implemented at `docs/specs/CALLOUT_SKILL.md`, `skills/callout-SKILL.md`, `src/CalloutSkill.js`, and `tests/golden/CalloutSkill.golden.test.js`.
 - A Wave 5B `/red-tag` interlock decision surface is implemented at `docs/specs/RED_TAG_SKILL.md`, `skills/red-tag-SKILL.md`, `src/RedTagSkill.js`, and `tests/golden/RedTagSkill.golden.test.js`.
+- A Wave 5B `/permit` gate decision surface is implemented at `docs/specs/PERMIT_SKILL.md`, `skills/permit-SKILL.md`, `src/PermitSkill.js`, and `tests/golden/PermitSkill.golden.test.js`.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
 - Wave 5 skill topology is now 37 skills across 10 groups.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, the read-only `/change-order` status slice, the read-only `/callout` callout-detail slice, and the `/red-tag` interlock decision surface is not implemented.
+- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, the read-only `/change-order` status slice, the read-only `/callout` callout-detail slice, and the `/red-tag` interlock decision surface, and the `/permit` gate decision surface is not implemented.
 
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, Buddy Status View, Change Order View, Callout View, and Red Tag View remain unimplemented.
+- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, Buddy Status View, Change Order View, Callout View, and Red Tag View, and Permit View remain unimplemented.
 - No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No multi-agent control room behavior is implemented.
 - `origin` remote is configured.
