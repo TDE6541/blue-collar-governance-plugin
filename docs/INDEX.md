@@ -65,40 +65,12 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 4 Buddy behavior is shipped as watcher-only; multi-agent control-room behavior is not shipped.
 - Wave 4 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave4.live-oversight.live.test.js` and closeout evidence exists at `docs/WAVE4_CLOSEOUT.md`.
 - Wave 5 is one narrative wave executed as 5A / 5B.
-- Wave 5A Block 0 docs-only truth-sync/substrate-gate/naming-scrub is shipped at `docs/specs/WAVE5_OPERATOR_PRODUCT.md` and `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`.
-- Wave 5A Block A baselines are shipped at `docs/specs/OPERATOR_TRUST_LEDGER.md`, `docs/specs/JOURNEYMAN_TRUST_ENGINE.md`, `src/OperatorTrustLedger.js`, `src/JourneymanTrustEngine.js`, `tests/golden/OperatorTrustLedger.golden.test.js`, and `tests/golden/JourneymanTrustEngine.golden.test.js`.
 - Wave 5 now includes 37 skills across 10 groups and keeps SessionBrief no-widening (`journeymanLevel` is not introduced).
-- Operator Trust Ledger is approved on engineering merit and implemented as the Wave 5A Block A substrate baseline.
-- Wave 5A Block B baseline is shipped at `docs/specs/WARRANTY_MONITOR.md`, `src/WarrantyMonitor.js`, and `tests/golden/WarrantyMonitor.golden.test.js`.
-- Warranty remains derived-first in Wave 5 and is implemented as derived-only monitoring in Block B.
-- Wave 5A Block C baseline is shipped at `docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md`, `src/HoldEngineScarcitySignal.js`, and `tests/golden/HoldEngineScarcitySignal.golden.test.js`.
-- HoldEngine Scarcity Signal remains additive direction and is implemented as derived-only enrichment in Block C.
-- Wave 5B Block A baseline is shipped at `docs/specs/SESSION_LIFECYCLE_SKILLS.md`, `skills/toolbox-talk-SKILL.md`, `skills/receipt-SKILL.md`, `skills/as-built-SKILL.md`, `skills/walk-SKILL.md`, `src/SessionLifecycleSkills.js`, and `tests/golden/SessionLifecycleSkills.golden.test.js`.
-- Wave 5B Block B baseline is shipped at `docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md`, `skills/phantoms-SKILL.md`, `skills/ufo-SKILL.md`, `skills/gaps-SKILL.md`, `src/CompressedIntelligenceSkills.js`, and `tests/golden/CompressedIntelligenceSkills.golden.test.js`.
-- Wave 5B Block C baseline is shipped at `docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md`, `skills/chain-SKILL.md`, `skills/warranty-SKILL.md`, `skills/journeyman-SKILL.md`, `src/CompressedHistoryTrustSkills.js`, and `tests/golden/CompressedHistoryTrustSkills.golden.test.js`.
-- Wave 5B Block D baseline is shipped at `docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md`, `skills/constraints-SKILL.md`, `skills/silence-map-SKILL.md`, `src/CompressedSafetyPostureSkills.js`, and `tests/golden/CompressedSafetyPostureSkills.golden.test.js`.
-- Compressed Safety posture skills are read/query/render-only surfaces over existing ConstraintsRegistry truth, SafetyInterlocks truth, and ControlRodMode posture/status views; no standalone `/control-rods` skill is shipped in Block D.
-- Wave 5B Block E1 baseline is shipped at `docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md`, `skills/prevention-record-SKILL.md`, `skills/rights-SKILL.md`, `src/CompressedGovernanceHealthSkills.js`, and `tests/golden/CompressedGovernanceHealthSkills.golden.test.js`.
-- A Wave 5B read-only `/control-rods` posture slice is shipped at `docs/specs/CONTROL_ROD_POSTURE_SKILL.md`, `skills/control-rods-SKILL.md`, `src/ControlRodPostureSkill.js`, and `tests/golden/ControlRodPostureSkill.golden.test.js`.
-- A Wave 5B read-only `/fire-break` audit slice is shipped at `docs/specs/FIRE_BREAK_SKILL.md`, `skills/fire-break-SKILL.md`, `src/FireBreakSkill.js`, and `tests/golden/FireBreakSkill.golden.test.js`.
-- A Wave 5B read-only `/census` repo snapshot slice is shipped at `docs/specs/CENSUS_SKILL.md`, `skills/census-SKILL.md`, `src/CensusSkill.js`, and `tests/golden/CensusSkill.golden.test.js`.
-- A Wave 5B read-only `/diagnose` evidence-view slice is shipped at `docs/specs/DIAGNOSE_SKILL.md`, `skills/diagnose-SKILL.md`, `src/DiagnoseSkill.js`, and `tests/golden/DiagnoseSkill.golden.test.js`.
-- A Wave 5B read-only `/keystone` decision-support slice is shipped at `docs/specs/KEYSTONE_SKILL.md`, `skills/keystone-SKILL.md`, `src/KeystoneSkill.js`, and `tests/golden/KeystoneSkill.golden.test.js`.
-- A Wave 5B read-only `/eliminate` hold-options slice is shipped at `docs/specs/ELIMINATE_SKILL.md`, `skills/eliminate-SKILL.md`, `src/EliminateSkill.js`, and `tests/golden/EliminateSkill.golden.test.js`.
-- A Wave 5B read-only `/buddy-status` watcher-state slice is shipped at `docs/specs/BUDDY_STATUS_SKILL.md`, `skills/buddy-status-SKILL.md`, `src/BuddyStatusSkill.js`, and `tests/golden/BuddyStatusSkill.golden.test.js`.
-- A Wave 5B read-only `/change-order` status slice is shipped at `docs/specs/CHANGE_ORDER_SKILL.md`, `skills/change-order-SKILL.md`, `src/ChangeOrderSkill.js`, and `tests/golden/ChangeOrderSkill.golden.test.js`.
-- A Wave 5B read-only `/callout` callout-detail slice is shipped at `docs/specs/CALLOUT_SKILL.md`, `skills/callout-SKILL.md`, `src/CalloutSkill.js`, and `tests/golden/CalloutSkill.golden.test.js`.
-- A Wave 5B `/red-tag` interlock decision surface is shipped at `docs/specs/RED_TAG_SKILL.md`, `skills/red-tag-SKILL.md`, `src/RedTagSkill.js`, and `tests/golden/RedTagSkill.golden.test.js`.
-- A Wave 5B `/permit` gate decision surface is shipped at `docs/specs/PERMIT_SKILL.md`, `skills/permit-SKILL.md`, `src/PermitSkill.js`, and `tests/golden/PermitSkill.golden.test.js`.
-- A Wave 5B `/lockout` LOTO validation surface is shipped at `docs/specs/LOCKOUT_SKILL.md`, `skills/lockout-SKILL.md`, `src/LockoutSkill.js`, and `tests/golden/LockoutSkill.golden.test.js`.
-- Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
-- Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
-- Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
-- Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Remaining Wave 5B runtime behavior outside Blocks A, B, C, D, E1, the read-only `/control-rods` posture slice, the read-only `/fire-break` audit slice, the read-only `/census` repo snapshot slice, the read-only `/diagnose` evidence-view slice, the read-only `/keystone` decision-support slice, the read-only `/eliminate` hold-options slice, the read-only `/buddy-status` watcher-state slice, the read-only `/change-order` status slice, the read-only `/callout` callout-detail slice, and the `/red-tag` interlock decision surface, and the `/permit` gate decision surface, and the `/lockout` LOTO validation surface is not shipped in current docs/runtime truth.
-
-- Skills outside Session Lifecycle, Compressed Intelligence, Compressed History & Trust, Compressed Safety posture, Compressed Governance Health, Control Rod Posture, Fire Break Audit, Census Snapshot, Diagnose View, Keystone View, Eliminate View, Buddy Status View, Change Order View, Callout View, and Red Tag View, and Permit View remain unimplemented.
-- No installable plugin package, runtime hook path, or compatibility layer is implemented yet.
+- Shipped now: Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub, Wave 5A Blocks A-C, Wave 5B Blocks A-D-E1, and the read-only or thin surfaces `/control-rods`, `/fire-break`, `/census`, `/diagnose`, `/keystone`, `/eliminate`, `/buddy-status`, `/change-order`, `/callout`, `/red-tag`, `/permit`, and `/lockout`.
+- Warranty remains derived-first in Wave 5 and HoldEngine Scarcity Signal remains derived-only enrichment.
+- Shipped skill tranches remain deterministic route adapters over existing engine truth with no hidden behavior.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including skins, onboarding/package work, and later proof/integration work, remains pending.
+- Not claimed / not verified: no installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
 - `docs/learning-notes/` is not present because no exploration lane is needed for the current repo state.

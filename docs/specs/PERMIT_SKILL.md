@@ -40,7 +40,7 @@ This spec does not define:
 - Route behavior remains evaluate/render over existing engine output.
 - Adapter behavior may use canonical non-mutating gate evaluation already shipped.
 - Mapping reinterpretation is not allowed in this slice.
-- `/lockout` remains a separate pending surface.
+- `/lockout` remains a separate shipped surface.
 
 ## Evaluate/Render Posture
 
