@@ -20,6 +20,26 @@
     ]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash|Write|Edit",

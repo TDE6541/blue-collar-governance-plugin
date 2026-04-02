@@ -6,6 +6,11 @@ const path = require("node:path");
 
 const { ControlRodMode } = require("./ControlRodMode");
 const { ForemansWalk } = require("./ForemansWalk");
+const {
+  getCompactionStateFilePath,
+  handlePreCompactSlice,
+  handleSessionStartSlice,
+} = require("./HookRuntimeSlice2");
 
 const HOOK_RUNTIME_VERSION = 1;
 const DEFAULT_PROFILE_ID = "conservative";
@@ -738,6 +743,25 @@ function runHookEvent(eventName, input, options = {}) {
   const config = resolveRuntimeConfig(resolveProjectDir(input, options));
 
   switch (eventName) {
+    case "SessionStart":
+      return handleSessionStartSlice({
+        input,
+        config,
+        options,
+        createEmptySessionState,
+        createToolFingerprint,
+        loadSessionState,
+        resolveNow,
+        saveSessionState,
+      });
+    case "PreCompact":
+      return handlePreCompactSlice({
+        input,
+        config,
+        options,
+        loadSessionState,
+        resolveNow,
+      });
     case "PreToolUse":
       return handlePreToolUse(input, config, options);
     case "PermissionRequest":
@@ -760,6 +784,7 @@ module.exports = {
   classifyToolAction,
   createEmptySessionState,
   createToolFingerprint,
+  getCompactionStateFilePath,
   getStateFilePath,
   loadSessionState,
   resolveRuntimeConfig,
