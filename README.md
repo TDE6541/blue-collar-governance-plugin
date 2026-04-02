@@ -1,7 +1,7 @@
 > 🚧 **ACTIVE BUILD** — 5 waves shipped, 260+ tests passing, crew still on site. README reflects real-time build state, not final documentation.
 # Blue Collar Governance Plugin
 
-**Status:** Wave 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain; later Wave 5 work outside the current shipped set remains pending; install/package/runtime-hook/compatibility claims remain unverified
+**Status:** Wave 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 1 skins rendering for supported routes; later Wave 5 work outside the current shipped set remains pending; install/package/runtime-hook/compatibility claims remain unverified
 **Repo type:** Private runtime/control layer  
 **Implementation state:** All six Wave 1 systems now have runtime implementations (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 
@@ -64,7 +64,9 @@ Governed Workflow is the methodology spine behind the work. This repository is n
 - Current shipped read-only or thin Wave 5 surfaces include `/control-rods`, `/fire-break`, `/census`, `/diagnose`, `/keystone`, `/eliminate`, `/buddy-status`, `/change-order`, `/callout`, `/red-tag`, `/permit`, and `/lockout`.
 - Warranty remains derived-first in Wave 5 and HoldEngine Scarcity Signal remains derived-only enrichment.
 - Shipped skill tranches remain deterministic route adapters with no hidden engine behavior.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including skins, onboarding/package work, and later proof/integration work, remains pending.
+- Wave 5 skins tranche 1 is now implemented as an optional rendering layer at `docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, and `tests/golden/SkinFramework.golden.test.js`.
+- Tranche 1 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`, plus Inspection Report for `/receipt`, `/as-built`, and `/walk`; unsupported combinations fail closed to raw canonical render.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 1, onboarding/package work, and later proof/integration work, remains pending.
 - Not yet claimed / not verified: no installable plugin package, runtime hook path, compatibility layer, marketplace/install command surface, or end-to-end runtime setup sequence is implemented yet.
 
 ## Wave 1 Focus
@@ -135,9 +137,9 @@ Read these in order:
 
 ## Working In This Repo
 
-There is no end-to-end runtime setup sequence yet. Runtime and proof surfaces exist for Waves 1-5 through the currently shipped `/lockout` slice, with canon under `docs/specs/`, runtime under `src/`, golden proof under `tests/golden/`, and live integration proof under `tests/live/` for Waves 1, 3, and 4.
+There is no end-to-end runtime setup sequence yet. Runtime and proof surfaces exist for Waves 1-5 through the currently shipped `/lockout` slice plus tranche 1 skins rendering for supported routes, with canon under `docs/specs/`, runtime under `src/`, golden proof under `tests/golden/`, and live integration proof under `tests/live/` for Waves 1, 3, and 4.
 
-Later Wave 5 skins, onboarding/package work, and install/runtime-hook/compatibility claims remain pending or unverified; see `docs/specs/WAVE5_OPERATOR_PRODUCT.md` for the current shipped-vs-later cut.
+Later Wave 5 skins beyond tranche 1, onboarding/package work, and install/runtime-hook/compatibility claims remain pending or unverified; see `docs/specs/WAVE5_OPERATOR_PRODUCT.md` for the current shipped-vs-later cut.
 
 ## Contributing
 

@@ -53,6 +53,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/WAVE4_LIVE_OVERSIGHT.md` — Wave 4 umbrella contract and load-bearing decisions
 - `docs/WAVE4_CLOSEOUT.md` — durable Wave 4 closeout evidence map
 - `docs/specs/WAVE5_OPERATOR_PRODUCT.md` — Wave 5 umbrella truth (one narrative wave executed as 5A / 5B)
+- `docs/specs/SKIN_FRAMEWORK.md` — Wave 5 skins tranche 1 rendering contract baseline
 - `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` — Wave 5A Block 0 substrate merit-gate decisions
 - `docs/specs/OPERATOR_TRUST_LEDGER.md` — Wave 5A Block A Operator Trust Ledger v1 contract baseline
 - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` — Wave 5A Block A Journeyman Trust Engine v1 contract baseline
@@ -106,7 +107,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 
 ## Current State
 
-- The repo is on `main` with `origin` configured and current shipped truth running through the Wave 5 `/lockout` surface.
+- The repo is on `main` with `origin` configured and current shipped truth running through the Wave 5 `/lockout` surface plus tranche 1 skins rendering for supported routes.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.
@@ -169,6 +170,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - A Wave 5B `/red-tag` interlock decision surface is implemented at `docs/specs/RED_TAG_SKILL.md`, `skills/red-tag-SKILL.md`, `src/RedTagSkill.js`, and `tests/golden/RedTagSkill.golden.test.js`.
 - A Wave 5B `/permit` gate decision surface is implemented at `docs/specs/PERMIT_SKILL.md`, `skills/permit-SKILL.md`, `src/PermitSkill.js`, and `tests/golden/PermitSkill.golden.test.js`.
 - A Wave 5B `/lockout` LOTO validation surface is implemented at `docs/specs/LOCKOUT_SKILL.md`, `skills/lockout-SKILL.md`, `src/LockoutSkill.js`, and `tests/golden/LockoutSkill.golden.test.js`.
+- Wave 5 skins tranche 1 is implemented at `docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, and `tests/golden/SkinFramework.golden.test.js`.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
@@ -176,7 +178,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 5 skill topology is now 37 skills across 10 groups.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including skins, onboarding/package work, and later proof/integration work, remains pending.
+- Tranche 1 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`, plus Inspection Report for `/receipt`, `/as-built`, and `/walk`; unsupported combinations fail closed to raw canonical render.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 1, onboarding/package work, and later proof/integration work, remains pending.
 - Not claimed / not verified: no installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - No multi-agent control room behavior is implemented.
 - `origin` remote is configured.

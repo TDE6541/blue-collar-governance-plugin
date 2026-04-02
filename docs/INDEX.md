@@ -30,6 +30,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/WAVE4_LIVE_OVERSIGHT.md` - authoritative Wave 4 umbrella contract baseline
 - `docs/WAVE4_CLOSEOUT.md` - durable Wave 4 integration/proof closeout evidence map
 - `docs/specs/WAVE5_OPERATOR_PRODUCT.md` - authoritative Wave 5 umbrella truth (one narrative wave executed as 5A / 5B)
+- `docs/specs/SKIN_FRAMEWORK.md` - authoritative Wave 5 skins tranche 1 rendering contract baseline
 - `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` - authoritative Wave 5A Block 0 substrate merit-gate memo
 - `docs/specs/OPERATOR_TRUST_LEDGER.md` - authoritative Wave 5A Block A Operator Trust Ledger v1 contract baseline
 - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` - authoritative Wave 5A Block A Journeyman Trust Engine v1 contract baseline
@@ -69,7 +70,9 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Shipped now: Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub, Wave 5A Blocks A-C, Wave 5B Blocks A-D-E1, and the read-only or thin surfaces `/control-rods`, `/fire-break`, `/census`, `/diagnose`, `/keystone`, `/eliminate`, `/buddy-status`, `/change-order`, `/callout`, `/red-tag`, `/permit`, and `/lockout`.
 - Warranty remains derived-first in Wave 5 and HoldEngine Scarcity Signal remains derived-only enrichment.
 - Shipped skill tranches remain deterministic route adapters over existing engine truth with no hidden behavior.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including skins, onboarding/package work, and later proof/integration work, remains pending.
+- Wave 5 skins tranche 1 is implemented at `docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, and `tests/golden/SkinFramework.golden.test.js`.
+- Tranche 1 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`, plus Inspection Report for `/receipt`, `/as-built`, and `/walk`; unsupported combinations fail closed to raw canonical render.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 1, onboarding/package work, and later proof/integration work, remains pending.
 - Not claimed / not verified: no installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
