@@ -1,10 +1,10 @@
 # SKIN_FRAMEWORK.md
-**Status:** Wave 5 skins tranche 1 contract baseline (v1)
+**Status:** Wave 5 skins contract baseline (v2: tranches 1-2)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
 
-This document defines the Wave 5 skins tranche 1 contract baseline for `SkinFramework`.
+This document defines the Wave 5 skins contract baseline for `SkinFramework`.
 
 The tranche introduces one optional rendering layer over already-shipped canonical route views.
 
@@ -14,12 +14,12 @@ Same engine data, different rendering.
 
 `SkinFramework` defines:
 
-- the supported tranche 1 skin ids
-- the supported tranche 1 route matrix
+- the supported shipped skin ids
+- the supported shipped route matrix
 - the Whiteboard default rule for supported routes
 - deterministic translation of existing canonical route views into skin display sections
 - explicit fail-closed behavior for unsupported skin/route combinations
-- structural distinction rules for Whiteboard, Punch List, and Inspection Report
+- structural distinction rules for Whiteboard, Punch List, Inspection Report, Work Order, Dispatch Board, and Ticket System
 
 This spec does not define:
 
@@ -30,13 +30,13 @@ This spec does not define:
 - any `/skin` slash route
 - any skin editor, customization UI, or generalized template engine
 - onboarding, package, install, runtime-hook, compatibility, or marketplace behavior
-- Military Brief, Estimate / Bid, or later skin tranches
+- Military Brief, Estimate / Bid, or later skin tranches beyond tranche 2
 
 ## Public And Internal Names
 
 - Public/operator-facing tranche label: `Skin Framework`
 - Internal build name: `SkinFramework`
-- Tranche 1 supported skins: `whiteboard`, `punch-list`, `inspection-report`
+- Supported skins: `whiteboard`, `punch-list`, `inspection-report`, `work-order`, `dispatch-board`, `ticket-system`
 
 ## Core Rule
 
@@ -52,11 +52,17 @@ This spec does not define:
 | `whiteboard` | `/toolbox-talk`, `/receipt`, `/as-built`, `/walk` |
 | `punch-list` | `/toolbox-talk`, `/receipt`, `/as-built`, `/walk` |
 | `inspection-report` | `/receipt`, `/as-built`, `/walk` |
+| `work-order` | `/toolbox-talk`, `/receipt`, `/as-built` |
+| `dispatch-board` | `/walk`, `/phantoms`, `/change-order`, `/control-rods` |
+| `ticket-system` | `/receipt`, `/walk`, `/phantoms`, `/change-order` |
 
-Tranche 1 limits:
+Tranche 1-2 limits:
 
 - `inspection-report` does not support `/toolbox-talk`.
-- Routes outside this matrix remain raw canonical views in tranche 1.
+- `work-order` does not support `/walk`, `/phantoms`, `/change-order`, or `/control-rods`.
+- `dispatch-board` does not support `/toolbox-talk`, `/receipt`, or `/as-built`.
+- `ticket-system` does not support `/toolbox-talk`, `/as-built`, or `/control-rods`.
+- Routes outside this matrix remain raw canonical views in shipped skin behavior.
 
 ## Default Rule
 
@@ -75,14 +81,20 @@ Tranche 1 limits:
 - `whiteboard` is the minimum-information universal board.
 - `punch-list` is a closeout/status list with sign-off framing.
 - `inspection-report` is an observation/evaluation/corrections view.
+- `work-order` is a job-start / scope-of-work document view.
+- `dispatch-board` is a grouped operational overview / board-lane view.
+- `ticket-system` is a record-detail / lifecycle view.
 - No two skins may ship as near-duplicates with renamed headings only.
 - `inspection-report` must not invent green/yellow/red or other evaluative semantics where the canonical route view does not honestly support them.
+- `dispatch-board` must not invent GPS, fleet telemetry, dispatch timing, or crew-ownership fields not present in canonical route truth.
+- `ticket-system` must not invent age badges, SLA markers, ETA, assignment state, or duration fields not present in canonical route truth.
 
 ## No-Fake-Field Rule
 
 - Skin rendering must use existing canonical route fields only.
 - Skin rendering must not invent scores, ranks, badges, leaderboards, or other gamification fields.
 - Skin rendering must not invent workflow state, severity, approval state, or evaluation state not present in canonical route truth.
+- Skin rendering must not invent labor totals, pricing, GPS / fleet telemetry, ETA, age badges, SLA markers, duration, or assignment metadata not present in canonical route truth.
 - Skin rendering must not widen raw route objects with skin-only fields.
 
 ## Runtime Contract
@@ -99,7 +111,7 @@ Output object:
 | `route` | string | Yes | Literal canonical route from `rawView.route`. |
 | `requestedSkinId` | string | Yes | Requested skin id or defaulted `whiteboard`. |
 | `appliedSkinId` | string\|null | Yes | Applied skin id when supported; otherwise `null`. |
-| `supported` | boolean | Yes | Whether the requested skin supports the route in tranche 1. |
+| `supported` | boolean | Yes | Whether the requested skin supports the route in the shipped support matrix. |
 | `fallbackMode` | string | Yes | `none` or `raw_canonical_view`. |
 | `rawView` | object | Yes | Canonical route view preserved unchanged underneath. |
 | `presentation` | object\|null | Yes | Skin presentation payload when supported; otherwise `null`. |
@@ -135,4 +147,4 @@ Output object:
 
 - Runtime framework implementation exists at `src/SkinFramework.js`.
 - Golden proof exists at `tests/golden/SkinFramework.golden.test.js`.
-- This contract is the sole tranche 1 skin behavior owner.
+- This contract is the sole tranche 1-2 skin behavior owner.
