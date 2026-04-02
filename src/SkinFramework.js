@@ -7,6 +7,9 @@ const SUPPORTED_SKINS = Object.freeze([
   "work-order",
   "dispatch-board",
   "ticket-system",
+  "daily-log",
+  "repair-order",
+  "kitchen-ticket",
 ]);
 const SUPPORTED_SKIN_SET = new Set(SUPPORTED_SKINS);
 
@@ -19,6 +22,9 @@ const ROUTE_SUPPORT_MATRIX = Object.freeze({
   "work-order": Object.freeze(["/toolbox-talk", "/receipt", "/as-built"]),
   "dispatch-board": Object.freeze(["/walk", "/phantoms", "/change-order", "/control-rods"]),
   "ticket-system": Object.freeze(["/receipt", "/walk", "/phantoms", "/change-order"]),
+  "daily-log": Object.freeze(["/toolbox-talk", "/receipt", "/as-built", "/walk"]),
+  "repair-order": Object.freeze(["/receipt", "/as-built"]),
+  "kitchen-ticket": Object.freeze(["/walk", "/phantoms", "/change-order"]),
 });
 
 const ROUTE_LABELS = Object.freeze({
@@ -235,6 +241,91 @@ const SKIN_DEFINITIONS = Object.freeze({
       "evidence-detail": "Evidence Detail",
     }),
   }),
+  "daily-log": Object.freeze({
+    skinLabel: "Daily Log",
+    layoutTemplate: Object.freeze({
+      "/toolbox-talk": Object.freeze([
+        "daily-header",
+        "work-notes",
+        "safety-notes",
+        "daily-notes",
+      ]),
+      "/receipt": Object.freeze([
+        "daily-header",
+        "work-notes",
+        "issue-notes",
+        "daily-notes",
+      ]),
+      "/as-built": Object.freeze([
+        "daily-header",
+        "work-notes",
+        "issue-notes",
+        "daily-notes",
+      ]),
+      "/walk": Object.freeze([
+        "daily-header",
+        "issue-log",
+        "count-snapshot",
+        "daily-notes",
+      ]),
+    }),
+    labelMap: Object.freeze({
+      "daily-header": "Daily Header",
+      "work-notes": "Work Notes",
+      "safety-notes": "Safety And Hazards",
+      "issue-notes": "Issues And Delays",
+      "issue-log": "Issue Log",
+      "count-snapshot": "Count Snapshot",
+      "daily-notes": "Daily Notes",
+    }),
+  }),
+  "repair-order": Object.freeze({
+    skinLabel: "Repair Order",
+    layoutTemplate: Object.freeze({
+      "/receipt": Object.freeze([
+        "reported-condition",
+        "diagnostic-findings",
+        "performed-work",
+      ]),
+      "/as-built": Object.freeze([
+        "reported-condition",
+        "diagnostic-findings",
+        "performed-work",
+        "unresolved-exceptions",
+      ]),
+    }),
+    labelMap: Object.freeze({
+      "reported-condition": "Reported Condition",
+      "diagnostic-findings": "Diagnostic Findings",
+      "performed-work": "Performed Work",
+      "unresolved-exceptions": "Unresolved Exceptions",
+    }),
+  }),
+  "kitchen-ticket": Object.freeze({
+    skinLabel: "Kitchen Ticket",
+    layoutTemplate: Object.freeze({
+      "/walk": Object.freeze([
+        "ticket-rail",
+        "short-items",
+        "pass-notes",
+      ]),
+      "/phantoms": Object.freeze([
+        "ticket-rail",
+        "short-items",
+        "pass-notes",
+      ]),
+      "/change-order": Object.freeze([
+        "ticket-rail",
+        "short-items",
+        "pass-notes",
+      ]),
+    }),
+    labelMap: Object.freeze({
+      "ticket-rail": "Ticket Rail",
+      "short-items": "Short Items",
+      "pass-notes": "Pass Notes",
+    }),
+  }),
 });
 
 function makeValidationError(code, message) {
@@ -447,6 +538,35 @@ function formatChangeOrderEvidence(entry) {
 function formatDomainCard(rule) {
   return `${rule.domainId} | ${rule.label} | ${rule.autonomyLevel} | ${rule.justification}`;
 }
+
+function mapObjectLines(value) {
+  if (!isPlainObject(value) || Object.keys(value).length === 0) {
+    return [];
+  }
+
+  return Object.entries(value).map(([key, entry]) => makeLine(labelizeKey(key), entry));
+}
+
+function mapTaggedList(tag, value) {
+  if (!Array.isArray(value) || value.length === 0) {
+    return [];
+  }
+
+  return value.map((entry) => `${tag}: ${entry}`);
+}
+
+function withFallbackLines(lines, fallbackText) {
+  return Array.isArray(lines) && lines.length > 0 ? lines : [fallbackText];
+}
+
+function formatCompactFindingLine(finding) {
+  return `${finding.issueRef} | ${finding.findingType} | ${finding.summary}`;
+}
+
+function formatChangeOrderPassNote(entry) {
+  return `${entry.changeOrderId} | Decision By: ${formatScalar(entry.decisionBy)} | Source Refs: ${joinListOrNone(entry.sourceRefs)} | Evidence Refs: ${joinListOrNone(entry.evidenceRefs)}`;
+}
+
 function renderWhiteboard(rawView) {
   switch (rawView.route) {
     case "/toolbox-talk":
@@ -1098,6 +1218,247 @@ function renderTicketSystem(rawView) {
   }
 }
 
+function renderDailyLog(rawView) {
+  switch (rawView.route) {
+    case "/toolbox-talk": {
+      const safetyLines = [
+        ...mapTaggedList("Hazard", rawView.currentHazards),
+        ...formatOptionalTaggedLine("Permit / Lockout", rawView.permitLockoutSummary),
+        ...formatOptionalTaggedLine("Standing Risk", rawView.continuityStandingRiskSummary),
+      ];
+
+      return buildPresentation("daily-log", rawView, {
+        "daily-header": [
+          makeLine("Brief", rawView.briefId),
+          makeLine("Available", rawView.available),
+          makeLine("Summary", rawView.summary),
+        ],
+        "work-notes": withFallbackLines(
+          [
+            ...mapObjectLines(rawView.counts),
+            ...formatOptionalTaggedLine(
+              "Deferred Change Order",
+              rawView.activeDeferredChangeOrderSummary
+            ),
+          ],
+          "No work notes in canonical view."
+        ),
+        "safety-notes": withFallbackLines(
+          safetyLines,
+          "No safety or hazard notes in canonical view."
+        ),
+        "daily-notes": withFallbackLines(
+          mapTaggedList("Ref", rawView.refs),
+          "No daily notes in canonical view."
+        ),
+      });
+    }
+    case "/receipt":
+      return buildPresentation("daily-log", rawView, {
+        "daily-header": [
+          makeLine("Receipt", rawView.receiptId),
+          makeLine("Brief Ref", rawView.briefRef),
+          makeLine("Outcome", rawView.outcome),
+        ],
+        "work-notes": withFallbackLines(
+          [
+            makeLine("Summary", rawView.summary),
+            ...mapTaggedList("Artifact", rawView.artifactsChanged),
+            ...mapTaggedList("Approved Drift", rawView.approvedDrift),
+          ],
+          "No work notes in canonical view."
+        ),
+        "issue-notes": withFallbackLines(
+          [
+            ...mapTaggedList("Hold", rawView.holdsRaised),
+            ...mapTaggedList("Excluded Work", rawView.excludedWork),
+          ],
+          "No issues or delays in canonical view."
+        ),
+        "daily-notes": [
+          makeLine("Signoff Required", rawView.signoffRequired),
+          makeLine("Created By", rawView.createdBy),
+          makeLine("Created At", rawView.createdAt),
+          makeLine("Updated At", rawView.updatedAt),
+        ],
+      });
+    case "/as-built":
+      return buildPresentation("daily-log", rawView, {
+        "daily-header": [
+          makeLine("Receipt", rawView.receiptId),
+          makeLine("Outcome", rawView.outcome),
+          makeLine("Summary", rawView.summary),
+        ],
+        "work-notes": withFallbackLines(
+          [
+            ...mapTaggedList("Unplanned Completed", rawView.unplannedCompleted),
+            ...mapTaggedList("Approved Drift", rawView.approvedDrift),
+          ],
+          "No work notes in canonical view."
+        ),
+        "issue-notes": withFallbackLines(
+          [
+            ...mapTaggedList("Planned But Incomplete", rawView.plannedButIncomplete),
+            ...mapTaggedList("Hold", rawView.holdsRaised),
+            ...mapTaggedList("Excluded Work", rawView.excludedWork),
+          ],
+          "No issues or delays in canonical view."
+        ),
+        "daily-notes": [makeLine("Signoff Required", rawView.signoffRequired)],
+      });
+    case "/walk":
+      return buildPresentation("daily-log", rawView, {
+        "daily-header": [
+          makeLine("Finding Count", rawView.findingCount),
+          makeLine("Session Of Record Ref", rawView.sessionOfRecordRef),
+        ],
+        "issue-log": formatMappedList(
+          rawView.findings,
+          (finding) => formatWalkObservation(finding),
+          "No issue log entries in canonical walk view."
+        ),
+        "count-snapshot": withFallbackLines(
+          [
+            ...mapObjectLines(rawView.findingSummary),
+            ...mapObjectLines(rawView.asBuiltStatusCounts),
+          ],
+          "No count snapshot in canonical walk view."
+        ),
+        "daily-notes": formatMappedList(
+          rawView.findings,
+          (finding) => formatWalkCorrection(finding),
+          "No daily notes in canonical walk view."
+        ),
+      });
+    default:
+      throw makeValidationError("ERR_INVALID_INPUT", `'rawView.route' is unsupported for skin rendering`);
+  }
+}
+
+function renderRepairOrder(rawView) {
+  switch (rawView.route) {
+    case "/receipt":
+      return buildPresentation("repair-order", rawView, {
+        "reported-condition": [
+          makeLine("Receipt", rawView.receiptId),
+          makeLine("Brief Ref", rawView.briefRef),
+          makeLine("Summary", rawView.summary),
+        ],
+        "diagnostic-findings": withFallbackLines(
+          [
+            makeLine("Outcome", rawView.outcome),
+            makeLine("Signoff Required", rawView.signoffRequired),
+            ...mapTaggedList("Hold", rawView.holdsRaised),
+            ...mapTaggedList("Excluded Work", rawView.excludedWork),
+          ],
+          "No diagnostic findings in canonical view."
+        ),
+        "performed-work": withFallbackLines(
+          [
+            ...mapTaggedList("Artifact", rawView.artifactsChanged),
+            ...mapTaggedList("Approved Drift", rawView.approvedDrift),
+            makeLine("Created By", rawView.createdBy),
+            makeLine("Created At", rawView.createdAt),
+            makeLine("Updated At", rawView.updatedAt),
+          ],
+          "No performed work in canonical view."
+        ),
+      });
+    case "/as-built":
+      return buildPresentation("repair-order", rawView, {
+        "reported-condition": [
+          makeLine("Receipt", rawView.receiptId),
+          makeLine("Outcome", rawView.outcome),
+          makeLine("Summary", rawView.summary),
+        ],
+        "diagnostic-findings": withFallbackLines(
+          [
+            makeLine("Signoff Required", rawView.signoffRequired),
+            ...mapTaggedList("Planned But Incomplete", rawView.plannedButIncomplete),
+          ],
+          "No diagnostic findings in canonical view."
+        ),
+        "performed-work": withFallbackLines(
+          [
+            ...mapTaggedList("Unplanned Completed", rawView.unplannedCompleted),
+            ...mapTaggedList("Approved Drift", rawView.approvedDrift),
+          ],
+          "No performed work in canonical view."
+        ),
+        "unresolved-exceptions": withFallbackLines(
+          [
+            ...mapTaggedList("Hold", rawView.holdsRaised),
+            ...mapTaggedList("Excluded Work", rawView.excludedWork),
+          ],
+          "No unresolved exceptions in canonical view."
+        ),
+      });
+    default:
+      throw makeValidationError("ERR_INVALID_INPUT", `'rawView.route' is unsupported for skin rendering`);
+  }
+}
+
+function renderKitchenTicket(rawView) {
+  switch (rawView.route) {
+    case "/walk":
+      return buildPresentation("kitchen-ticket", rawView, {
+        "ticket-rail": [
+          makeLine("Finding Count", rawView.findingCount),
+          makeLine("Session Of Record Ref", rawView.sessionOfRecordRef),
+        ],
+        "short-items": formatMappedList(
+          rawView.findings,
+          (finding) => formatCompactFindingLine(finding),
+          "No short items in canonical walk view."
+        ),
+        "pass-notes": withFallbackLines(
+          [
+            ...formatMappedList(rawView.findings, (finding) => formatWalkCorrection(finding), ""),
+            ...mapObjectLines(rawView.findingSummary),
+            ...mapObjectLines(rawView.asBuiltStatusCounts),
+          ].filter((line) => line !== ""),
+          "No pass notes in canonical walk view."
+        ),
+      });
+    case "/phantoms":
+      return buildPresentation("kitchen-ticket", rawView, {
+        "ticket-rail": [
+          makeLine("Finding Count", rawView.findingCount),
+          ...formatObjectLines(rawView.findingSummary, "No phantom totals in canonical view."),
+        ],
+        "short-items": formatMappedList(
+          rawView.findings,
+          (finding) => formatCompactFindingLine(finding),
+          "No short items in canonical phantoms view."
+        ),
+        "pass-notes": formatMappedList(
+          rawView.findings,
+          (finding) => formatWalkCorrection(finding),
+          "No pass notes in canonical phantoms view."
+        ),
+      });
+    case "/change-order":
+      return buildPresentation("kitchen-ticket", rawView, {
+        "ticket-rail": [
+          makeLine("Change Order Count", rawView.changeOrderCount),
+          makeLine("Snapshot State", rawView.snapshotState),
+        ],
+        "short-items": formatMappedList(
+          rawView.changeOrders,
+          (entry) => formatChangeOrderCard(entry),
+          "No short items in canonical change-order view."
+        ),
+        "pass-notes": formatMappedList(
+          rawView.changeOrders,
+          (entry) => formatChangeOrderPassNote(entry),
+          "No pass notes in canonical change-order view."
+        ),
+      });
+    default:
+      throw makeValidationError("ERR_INVALID_INPUT", `'rawView.route' is unsupported for skin rendering`);
+  }
+}
+
 function renderSupportedPresentation(skinId, rawView) {
   switch (skinId) {
     case "whiteboard":
@@ -1112,6 +1473,12 @@ function renderSupportedPresentation(skinId, rawView) {
       return renderDispatchBoard(rawView);
     case "ticket-system":
       return renderTicketSystem(rawView);
+    case "daily-log":
+      return renderDailyLog(rawView);
+    case "repair-order":
+      return renderRepairOrder(rawView);
+    case "kitchen-ticket":
+      return renderKitchenTicket(rawView);
     default:
       throw makeValidationError("ERR_INVALID_INPUT", `'options.skinId' is unsupported`);
   }

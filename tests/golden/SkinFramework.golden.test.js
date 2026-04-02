@@ -204,7 +204,7 @@ function buildControlRodsView() {
   });
 }
 
-test("SkinFramework exposes the locked tranche 1-2 skin ids and support matrix", () => {
+test("SkinFramework exposes the locked tranche 1-3 skin ids and support matrix", () => {
   assert.deepEqual(SUPPORTED_SKINS, [
     "whiteboard",
     "punch-list",
@@ -212,6 +212,9 @@ test("SkinFramework exposes the locked tranche 1-2 skin ids and support matrix",
     "work-order",
     "dispatch-board",
     "ticket-system",
+    "daily-log",
+    "repair-order",
+    "kitchen-ticket",
   ]);
   assert.equal(DEFAULT_SKIN_ID, "whiteboard");
   assert.deepEqual(ROUTE_SUPPORT_MATRIX, {
@@ -221,6 +224,9 @@ test("SkinFramework exposes the locked tranche 1-2 skin ids and support matrix",
     "work-order": ["/toolbox-talk", "/receipt", "/as-built"],
     "dispatch-board": ["/walk", "/phantoms", "/change-order", "/control-rods"],
     "ticket-system": ["/receipt", "/walk", "/phantoms", "/change-order"],
+    "daily-log": ["/toolbox-talk", "/receipt", "/as-built", "/walk"],
+    "repair-order": ["/receipt", "/as-built"],
+    "kitchen-ticket": ["/walk", "/phantoms", "/change-order"],
   });
 });
 
@@ -423,6 +429,159 @@ test("SkinFramework renders Ticket System on the locked tranche 2 routes", () =>
     );
   }
 });
+
+test("SkinFramework renders Daily Log on the locked tranche 3 routes", () => {
+  const framework = new SkinFramework();
+  const cases = [
+    {
+      rawView: buildToolboxTalkView(),
+      route: "/toolbox-talk",
+      headings: ["Daily Header", "Work Notes", "Safety And Hazards", "Daily Notes"],
+    },
+    {
+      rawView: buildReceiptView(),
+      route: "/receipt",
+      headings: ["Daily Header", "Work Notes", "Issues And Delays", "Daily Notes"],
+    },
+    {
+      rawView: buildAsBuiltView(),
+      route: "/as-built",
+      headings: ["Daily Header", "Work Notes", "Issues And Delays", "Daily Notes"],
+    },
+    {
+      rawView: buildWalkView(),
+      route: "/walk",
+      headings: ["Daily Header", "Issue Log", "Count Snapshot", "Daily Notes"],
+    },
+  ];
+
+  for (const { rawView, route, headings } of cases) {
+    const snapshot = structuredClone(rawView);
+    const skinned = framework.render(rawView, { skinId: "daily-log" });
+
+    assert.deepEqual(rawView, snapshot);
+    assert.equal(skinned.route, route);
+    assert.equal(skinned.supported, true);
+    assert.equal(skinned.appliedSkinId, "daily-log");
+    assert.deepEqual(skinned.rawView, rawView);
+    assert.equal(skinned.presentation.skinLabel, "Daily Log");
+    assert.deepEqual(
+      skinned.presentation.sections.map((section) => section.heading),
+      headings
+    );
+  }
+});
+
+test("SkinFramework renders Repair Order on the locked tranche 3 routes", () => {
+  const framework = new SkinFramework();
+  const cases = [
+    {
+      rawView: buildReceiptView(),
+      route: "/receipt",
+      headings: ["Reported Condition", "Diagnostic Findings", "Performed Work"],
+    },
+    {
+      rawView: buildAsBuiltView(),
+      route: "/as-built",
+      headings: [
+        "Reported Condition",
+        "Diagnostic Findings",
+        "Performed Work",
+        "Unresolved Exceptions",
+      ],
+    },
+  ];
+
+  for (const { rawView, route, headings } of cases) {
+    const snapshot = structuredClone(rawView);
+    const skinned = framework.render(rawView, { skinId: "repair-order" });
+
+    assert.deepEqual(rawView, snapshot);
+    assert.equal(skinned.route, route);
+    assert.equal(skinned.supported, true);
+    assert.equal(skinned.appliedSkinId, "repair-order");
+    assert.deepEqual(skinned.rawView, rawView);
+    assert.equal(skinned.presentation.skinLabel, "Repair Order");
+    assert.deepEqual(
+      skinned.presentation.sections.map((section) => section.heading),
+      headings
+    );
+  }
+});
+
+test("SkinFramework renders Kitchen Ticket on the locked tranche 3 routes", () => {
+  const framework = new SkinFramework();
+  const cases = [
+    {
+      rawView: buildWalkView(),
+      route: "/walk",
+      headings: ["Ticket Rail", "Short Items", "Pass Notes"],
+    },
+    {
+      rawView: buildPhantomsView(),
+      route: "/phantoms",
+      headings: ["Ticket Rail", "Short Items", "Pass Notes"],
+    },
+    {
+      rawView: buildChangeOrderView(),
+      route: "/change-order",
+      headings: ["Ticket Rail", "Short Items", "Pass Notes"],
+    },
+  ];
+
+  for (const { rawView, route, headings } of cases) {
+    const snapshot = structuredClone(rawView);
+    const skinned = framework.render(rawView, { skinId: "kitchen-ticket" });
+
+    assert.deepEqual(rawView, snapshot);
+    assert.equal(skinned.route, route);
+    assert.equal(skinned.supported, true);
+    assert.equal(skinned.appliedSkinId, "kitchen-ticket");
+    assert.deepEqual(skinned.rawView, rawView);
+    assert.equal(skinned.presentation.skinLabel, "Kitchen Ticket");
+    assert.deepEqual(
+      skinned.presentation.sections.map((section) => section.heading),
+      headings
+    );
+  }
+});
+
+test("SkinFramework keeps Daily Log, Repair Order, and Kitchen Ticket structurally distinct", () => {
+  const framework = new SkinFramework();
+
+  const dailyLog = framework.render(buildReceiptView(), { skinId: "daily-log" });
+  const workOrder = framework.render(buildReceiptView(), { skinId: "work-order" });
+  const repairOrder = framework.render(buildReceiptView(), { skinId: "repair-order" });
+  const ticketReceipt = framework.render(buildReceiptView(), { skinId: "ticket-system" });
+  const kitchenTicket = framework.render(buildChangeOrderView(), { skinId: "kitchen-ticket" });
+  const ticketChange = framework.render(buildChangeOrderView(), { skinId: "ticket-system" });
+  const dispatchChange = framework.render(buildChangeOrderView(), { skinId: "dispatch-board" });
+
+  assert.notDeepEqual(
+    dailyLog.presentation.sections.map((section) => section.heading),
+    workOrder.presentation.sections.map((section) => section.heading)
+  );
+  assert.notDeepEqual(
+    repairOrder.presentation.sections.map((section) => section.heading),
+    ticketReceipt.presentation.sections.map((section) => section.heading)
+  );
+  assert.notDeepEqual(
+    kitchenTicket.presentation.sections.map((section) => section.heading),
+    ticketChange.presentation.sections.map((section) => section.heading)
+  );
+  assert.equal(
+    dispatchChange.presentation.sections.some((section) => /Lane/.test(section.heading)),
+    true
+  );
+  assert.equal(
+    kitchenTicket.presentation.sections.some((section) => /Lane/.test(section.heading)),
+    false
+  );
+  assert.equal(
+    kitchenTicket.presentation.sections.some((section) => /Lifecycle|Evidence Detail/.test(section.heading)),
+    false
+  );
+});
 test("SkinFramework fails closed to raw canonical render for unsupported Inspection Report /toolbox-talk", () => {
   const framework = new SkinFramework();
   const rawView = buildToolboxTalkView();
@@ -441,12 +600,15 @@ test("SkinFramework fails closed to raw canonical render for unsupported Inspect
   );
 });
 
-test("SkinFramework fails closed to raw canonical render for unsupported tranche 2 combinations", () => {
+test("SkinFramework fails closed to raw canonical render for unsupported tranche 2-3 combinations", () => {
   const framework = new SkinFramework();
   const cases = [
     { rawView: buildWalkView(), skinId: "work-order", route: "/walk" },
     { rawView: buildReceiptView(), skinId: "dispatch-board", route: "/receipt" },
     { rawView: buildControlRodsView(), skinId: "ticket-system", route: "/control-rods" },
+    { rawView: buildPhantomsView(), skinId: "daily-log", route: "/phantoms" },
+    { rawView: buildWalkView(), skinId: "repair-order", route: "/walk" },
+    { rawView: buildControlRodsView(), skinId: "kitchen-ticket", route: "/control-rods" },
   ];
 
   for (const { rawView, skinId, route } of cases) {
@@ -528,13 +690,16 @@ test("SkinFramework keeps Work Order, Dispatch Board, and Ticket System structur
   );
 });
 
-test("SkinFramework does not introduce fake fields or widen raw route outputs across tranche 1-2", () => {
+test("SkinFramework does not introduce fake fields or widen raw route outputs across tranche 1-3", () => {
   const framework = new SkinFramework();
   const views = [
     framework.render(buildAsBuiltView(), { skinId: "inspection-report" }),
     framework.render(buildReceiptView(), { skinId: "work-order" }),
     framework.render(buildControlRodsView(), { skinId: "dispatch-board" }),
     framework.render(buildChangeOrderView(), { skinId: "ticket-system" }),
+    framework.render(buildWalkView(), { skinId: "daily-log" }),
+    framework.render(buildReceiptView(), { skinId: "repair-order" }),
+    framework.render(buildChangeOrderView(), { skinId: "kitchen-ticket" }),
   ];
 
   const forbiddenFields = [
@@ -548,17 +713,38 @@ test("SkinFramework does not introduce fake fields or widen raw route outputs ac
     "evaluationColor",
     "syntheticSeverity",
     "ageBadge",
+    "ageColor",
+    "overdueBadge",
     "sla",
     "eta",
     "assignedTech",
     "assignedCrew",
     "duration",
     "laborTotal",
+    "laborHours",
+    "laborRate",
     "pricing",
+    "partsCost",
+    "partsInventory",
+    "roNumber",
+    "approvalSignature",
+    "customerApprovalSignature",
+    "technicianAssignment",
+    "invoiceStatus",
+    "checkoutState",
     "gps",
     "fleetTelemetry",
     "dispatchTimestamp",
     "scheduleWindow",
+    "prepTimer",
+    "stationTimer",
+    "stationRoute",
+    "bumpState",
+    "rushFlag",
+    "ticketPriority",
+    "incidentRecord",
+    "dualSignoff",
+    "superintendentReview",
   ];
 
   for (const skinned of views) {
@@ -609,7 +795,7 @@ test("SkinFramework validates inputs and keeps a render-only method surface", ()
   expectValidationError(
     () => framework.render(buildReceiptView(), { skinId: "military-brief" }),
     "ERR_INVALID_INPUT",
-    "'options.skinId' must be one of whiteboard, punch-list, inspection-report, work-order, dispatch-board, ticket-system"
+    "'options.skinId' must be one of whiteboard, punch-list, inspection-report, work-order, dispatch-board, ticket-system, daily-log, repair-order, kitchen-ticket"
   );
 
   const methodNames = Object.getOwnPropertyNames(SkinFramework.prototype).sort();
