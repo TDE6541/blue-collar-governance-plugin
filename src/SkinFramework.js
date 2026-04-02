@@ -10,6 +10,8 @@ const SUPPORTED_SKINS = Object.freeze([
   "daily-log",
   "repair-order",
   "kitchen-ticket",
+  "farm-ledger",
+  "safety-loto-log",
 ]);
 const SUPPORTED_SKIN_SET = new Set(SUPPORTED_SKINS);
 
@@ -25,6 +27,8 @@ const ROUTE_SUPPORT_MATRIX = Object.freeze({
   "daily-log": Object.freeze(["/toolbox-talk", "/receipt", "/as-built", "/walk"]),
   "repair-order": Object.freeze(["/receipt", "/as-built"]),
   "kitchen-ticket": Object.freeze(["/walk", "/phantoms", "/change-order"]),
+  "farm-ledger": Object.freeze(["/toolbox-talk", "/receipt", "/as-built", "/walk", "/change-order"]),
+  "safety-loto-log": Object.freeze(["/permit", "/lockout"]),
 });
 
 const ROUTE_LABELS = Object.freeze({
@@ -35,6 +39,8 @@ const ROUTE_LABELS = Object.freeze({
   "/phantoms": "Phantoms",
   "/change-order": "Change Order",
   "/control-rods": "Control Rods",
+  "/permit": "Permit",
+  "/lockout": "Lockout",
 });
 
 const SKIN_DEFINITIONS = Object.freeze({
@@ -326,6 +332,70 @@ const SKIN_DEFINITIONS = Object.freeze({
       "pass-notes": "Pass Notes",
     }),
   }),
+  "farm-ledger": Object.freeze({
+    skinLabel: "Farm Ledger",
+    layoutTemplate: Object.freeze({
+      "/toolbox-talk": Object.freeze([
+        "ledger-header",
+        "recorded-rows",
+        "carry-forward-rows",
+      ]),
+      "/receipt": Object.freeze([
+        "ledger-header",
+        "recorded-rows",
+        "open-rows",
+        "record-stamp",
+      ]),
+      "/as-built": Object.freeze([
+        "ledger-header",
+        "recorded-rows",
+        "open-rows",
+        "record-stamp",
+      ]),
+      "/walk": Object.freeze([
+        "ledger-header",
+        "recorded-rows",
+        "open-rows",
+        "carry-forward-rows",
+      ]),
+      "/change-order": Object.freeze([
+        "ledger-header",
+        "recorded-rows",
+        "record-stamp",
+        "carry-forward-rows",
+      ]),
+    }),
+    labelMap: Object.freeze({
+      "ledger-header": "Ledger Header",
+      "recorded-rows": "Recorded Rows",
+      "open-rows": "Open Rows",
+      "carry-forward-rows": "Carry-Forward Rows",
+      "record-stamp": "Record Stamp",
+    }),
+  }),
+  "safety-loto-log": Object.freeze({
+    skinLabel: "Safety / LOTO Log",
+    layoutTemplate: Object.freeze({
+      "/permit": Object.freeze([
+        "control-record",
+        "authority-state",
+        "conditions-and-scope",
+        "record-links",
+      ]),
+      "/lockout": Object.freeze([
+        "control-record",
+        "authority-state",
+        "conditions-and-scope",
+        "record-links",
+      ]),
+    }),
+    labelMap: Object.freeze({
+      "control-record": "Control Record",
+      "authority-state": "Authority State",
+      "conditions-and-scope": "Conditions And Scope",
+      "record-links": "Record Links",
+    }),
+  }),
 });
 
 function makeValidationError(code, message) {
@@ -565,6 +635,10 @@ function formatCompactFindingLine(finding) {
 
 function formatChangeOrderPassNote(entry) {
   return `${entry.changeOrderId} | Decision By: ${formatScalar(entry.decisionBy)} | Source Refs: ${joinListOrNone(entry.sourceRefs)} | Evidence Refs: ${joinListOrNone(entry.evidenceRefs)}`;
+}
+
+function formatChangeOrderLedgerEntry(entry) {
+  return `${formatScalar(entry.decidedAt)} | ${entry.changeOrderId} | ${entry.status} | ${entry.decisionReason}`;
 }
 
 function renderWhiteboard(rawView) {
@@ -1459,6 +1533,206 @@ function renderKitchenTicket(rawView) {
   }
 }
 
+function renderFarmLedger(rawView) {
+  switch (rawView.route) {
+    case "/toolbox-talk":
+      return buildPresentation("farm-ledger", rawView, {
+        "ledger-header": [
+          makeLine("Brief", rawView.briefId),
+          makeLine("Available", rawView.available),
+          makeLine("Summary", rawView.summary),
+        ],
+        "recorded-rows": withFallbackLines(
+          [
+            ...mapObjectLines(rawView.counts),
+            ...mapTaggedList("Recorded Ref", rawView.refs),
+          ],
+          "No recorded rows in canonical view."
+        ),
+        "carry-forward-rows": withFallbackLines(
+          [
+            ...mapTaggedList("Open Hazard", rawView.currentHazards),
+            ...formatOptionalTaggedLine(
+              "Carry-Forward Change Order",
+              rawView.activeDeferredChangeOrderSummary
+            ),
+            ...formatOptionalTaggedLine("Permit / Lockout", rawView.permitLockoutSummary),
+            ...formatOptionalTaggedLine(
+              "Standing Risk",
+              rawView.continuityStandingRiskSummary
+            ),
+          ],
+          "No carry-forward rows in canonical view."
+        ),
+      });
+    case "/receipt":
+      return buildPresentation("farm-ledger", rawView, {
+        "ledger-header": [
+          makeLine("Receipt", rawView.receiptId),
+          makeLine("Brief Ref", rawView.briefRef),
+          makeLine("Outcome", rawView.outcome),
+        ],
+        "recorded-rows": withFallbackLines(
+          [
+            makeLine("Summary", rawView.summary),
+            ...mapTaggedList("Recorded Artifact", rawView.artifactsChanged),
+            ...mapTaggedList("Recorded Drift", rawView.approvedDrift),
+          ],
+          "No recorded rows in canonical view."
+        ),
+        "open-rows": withFallbackLines(
+          [
+            ...mapTaggedList("Open Hold", rawView.holdsRaised),
+            ...mapTaggedList("Excluded Work", rawView.excludedWork),
+            makeLine("Signoff Required", rawView.signoffRequired),
+          ],
+          "No open rows in canonical view."
+        ),
+        "record-stamp": [
+          makeLine("Created By", rawView.createdBy),
+          makeLine("Created At", rawView.createdAt),
+          makeLine("Updated At", rawView.updatedAt),
+        ],
+      });
+    case "/as-built":
+      return buildPresentation("farm-ledger", rawView, {
+        "ledger-header": [
+          makeLine("Receipt", rawView.receiptId),
+          makeLine("Outcome", rawView.outcome),
+          makeLine("Summary", rawView.summary),
+        ],
+        "recorded-rows": withFallbackLines(
+          [
+            ...mapTaggedList("Recorded Completion", rawView.unplannedCompleted),
+            ...mapTaggedList("Recorded Drift", rawView.approvedDrift),
+          ],
+          "No recorded rows in canonical view."
+        ),
+        "open-rows": withFallbackLines(
+          [
+            ...mapTaggedList("Open Planned Item", rawView.plannedButIncomplete),
+            ...mapTaggedList("Open Hold", rawView.holdsRaised),
+            ...mapTaggedList("Excluded Work", rawView.excludedWork),
+          ],
+          "No open rows in canonical view."
+        ),
+        "record-stamp": [makeLine("Signoff Required", rawView.signoffRequired)],
+      });
+    case "/walk":
+      return buildPresentation("farm-ledger", rawView, {
+        "ledger-header": [
+          makeLine("Finding Count", rawView.findingCount),
+          makeLine("Session Of Record Ref", rawView.sessionOfRecordRef),
+        ],
+        "recorded-rows": formatMappedList(
+          rawView.findings,
+          (finding) => formatWalkObservation(finding),
+          "No recorded rows in canonical walk view."
+        ),
+        "open-rows": withFallbackLines(
+          [
+            ...mapObjectLines(rawView.findingSummary),
+            ...mapObjectLines(rawView.asBuiltStatusCounts),
+          ],
+          "No open rows in canonical walk view."
+        ),
+        "carry-forward-rows": formatMappedList(
+          rawView.findings,
+          (finding) => formatWalkCorrection(finding),
+          "No carry-forward rows in canonical walk view."
+        ),
+      });
+    case "/change-order":
+      return buildPresentation("farm-ledger", rawView, {
+        "ledger-header": [
+          makeLine("Change Order Count", rawView.changeOrderCount),
+          makeLine("Snapshot State", rawView.snapshotState),
+        ],
+        "recorded-rows": formatMappedList(
+          rawView.changeOrders,
+          (entry) => formatChangeOrderLedgerEntry(entry),
+          "No recorded rows in canonical change-order view."
+        ),
+        "record-stamp": formatMappedList(
+          rawView.changeOrders,
+          (entry) => formatChangeOrderLifecycle(entry),
+          "No record stamp in canonical change-order view."
+        ),
+        "carry-forward-rows": formatMappedList(
+          rawView.changeOrders,
+          (entry) => formatChangeOrderPassNote(entry),
+          "No carry-forward rows in canonical change-order view."
+        ),
+      });
+    default:
+      throw makeValidationError("ERR_INVALID_INPUT", "'rawView.route' is unsupported for skin rendering");
+  }
+}
+
+function renderSafetyLotoLog(rawView) {
+  switch (rawView.route) {
+    case "/permit":
+      return buildPresentation("safety-loto-log", rawView, {
+        "control-record": [
+          makeLine("Profile Id", rawView.profileId),
+          makeLine("Domain Id", rawView.domainId),
+          makeLine("Session Id", rawView.sessionId),
+          makeLine("Evaluated At", rawView.evaluatedAt),
+        ],
+        "authority-state": [
+          makeLine("Evaluated", rawView.evaluated),
+          makeLine("Autonomy Level", rawView.autonomyLevel),
+          makeLine("Requires LOTO", rawView.requiresLoto),
+          makeLine("Requires Permit", rawView.requiresPermit),
+          makeLine("May Proceed", rawView.mayProceed),
+          makeLine("Constrained", rawView.constrained),
+          makeLine("Status Code", rawView.statusCode),
+          makeLine("Permit Decision", rawView.permitDecision),
+          makeLine("Summary", rawView.summary),
+          makeLine("Evaluation State", rawView.evaluationState),
+        ],
+        "conditions-and-scope": withFallbackLines(
+          mapTaggedList("Condition", rawView.conditions),
+          "No control conditions in canonical permit view."
+        ),
+        "record-links": [
+          makeLine("Authorization Ref", rawView.authorizationRef),
+          makeLine("Permit Ref", rawView.permitRef),
+          makeLine("Chain Refs", joinListOrNone(rawView.chainRefs)),
+          makeLine("Render Note", rawView.renderNote),
+        ],
+      });
+    case "/lockout":
+      return buildPresentation("safety-loto-log", rawView, {
+        "control-record": [
+          makeLine("Authorization Id", rawView.authorizationId),
+          makeLine("Domain Id", rawView.domainId),
+          makeLine("Authorized By", rawView.authorizedBy),
+          makeLine("Authorized At", rawView.authorizedAt),
+        ],
+        "authority-state": [
+          makeLine("Evaluated", rawView.evaluated),
+          makeLine("Authorization Valid", rawView.authorizationValid),
+          makeLine("Reason", rawView.reason),
+          makeLine("Evaluation State", rawView.evaluationState),
+        ],
+        "conditions-and-scope": withFallbackLines(
+          [
+            ...mapObjectLines(rawView.scope),
+            ...mapTaggedList("Condition", rawView.conditions),
+          ],
+          "No scope or conditions in canonical lockout view."
+        ),
+        "record-links": [
+          makeLine("Chain Ref", rawView.chainRef),
+          makeLine("Render Note", rawView.renderNote),
+        ],
+      });
+    default:
+      throw makeValidationError("ERR_INVALID_INPUT", "'rawView.route' is unsupported for skin rendering");
+  }
+}
+
 function renderSupportedPresentation(skinId, rawView) {
   switch (skinId) {
     case "whiteboard":
@@ -1479,6 +1753,10 @@ function renderSupportedPresentation(skinId, rawView) {
       return renderRepairOrder(rawView);
     case "kitchen-ticket":
       return renderKitchenTicket(rawView);
+    case "farm-ledger":
+      return renderFarmLedger(rawView);
+    case "safety-loto-log":
+      return renderSafetyLotoLog(rawView);
     default:
       throw makeValidationError("ERR_INVALID_INPUT", `'options.skinId' is unsupported`);
   }

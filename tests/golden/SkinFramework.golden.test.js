@@ -13,6 +13,9 @@ const { SessionLifecycleSkills } = require("../../src/SessionLifecycleSkills");
 const { CompressedIntelligenceSkills } = require("../../src/CompressedIntelligenceSkills");
 const { ChangeOrderSkill } = require("../../src/ChangeOrderSkill");
 const { ControlRodPostureSkill } = require("../../src/ControlRodPostureSkill");
+const { ControlRodMode } = require("../../src/ControlRodMode");
+const { PermitSkill } = require("../../src/PermitSkill");
+const { LockoutSkill } = require("../../src/LockoutSkill");
 
 const CREATED_AT = "2026-04-02T08:30:00Z";
 
@@ -147,6 +150,60 @@ function buildChangeOrderRecord(overrides = {}) {
   };
 }
 
+function buildPermitAuthorization(overrides = {}) {
+  return {
+    authorizationId: "loto_permit_001",
+    domainId: "pricing_quote_logic",
+    authorizedBy: "architect",
+    authorizedAt: "2026-03-31T12:00:00Z",
+    reason: "HARD_STOP gate requires explicit authorization.",
+    scope: { scopeType: "SESSION", sessionId: "wave5_permit_s01" },
+    chainRef: "chain_loto_permit_001",
+    ...overrides,
+  };
+}
+
+function buildPermitDecision(overrides = {}) {
+  return {
+    permitId: "permit_wave5_001",
+    sessionId: "wave5_permit_s01",
+    requestedDomains: ["pricing_quote_logic"],
+    scopeJustification: "Bounded domain work for approved session scope.",
+    riskAssessment: "Known risk bounded to pricing domain.",
+    rollbackPlan: "Revert pricing rules to previous snapshot.",
+    operatorDecision: "GRANTED",
+    chainRef: "chain_permit_wave5_001",
+    ...overrides,
+  };
+}
+
+function buildPermitInput(overrides = {}) {
+  const mode = new ControlRodMode();
+  return {
+    profile: mode.resolveProfile("conservative"),
+    domainId: "pricing_quote_logic",
+    sessionId: "wave5_permit_s01",
+    evaluatedAt: "2026-03-31T12:05:00Z",
+    authorization: buildPermitAuthorization(),
+    permit: buildPermitDecision(),
+    ...overrides,
+  };
+}
+
+function buildLockoutAuthorization(overrides = {}) {
+  return {
+    authorizationId: "loto_lockout_001",
+    domainId: "protected_destructive_ops",
+    authorizedBy: "architect",
+    authorizedAt: "2026-03-31T14:00:00Z",
+    reason: "Explicit lockout authorization for protected destructive operation.",
+    scope: { scopeType: "SESSION", sessionId: "wave5_lockout_s01" },
+    conditions: ["operator-present", "single-domain-only"],
+    chainRef: "chain_loto_lockout_001",
+    ...overrides,
+  };
+}
+
 function expectValidationError(action, code, message) {
   let error;
 
@@ -204,7 +261,17 @@ function buildControlRodsView() {
   });
 }
 
-test("SkinFramework exposes the locked tranche 1-3 skin ids and support matrix", () => {
+function buildPermitView() {
+  const skill = new PermitSkill();
+  return skill.renderPermit(buildPermitInput());
+}
+
+function buildLockoutView() {
+  const skill = new LockoutSkill();
+  return skill.renderLockout({ authorization: buildLockoutAuthorization() });
+}
+
+test("SkinFramework exposes the locked tranche 1-4 skin ids and support matrix", () => {
   assert.deepEqual(SUPPORTED_SKINS, [
     "whiteboard",
     "punch-list",
@@ -215,6 +282,8 @@ test("SkinFramework exposes the locked tranche 1-3 skin ids and support matrix",
     "daily-log",
     "repair-order",
     "kitchen-ticket",
+    "farm-ledger",
+    "safety-loto-log",
   ]);
   assert.equal(DEFAULT_SKIN_ID, "whiteboard");
   assert.deepEqual(ROUTE_SUPPORT_MATRIX, {
@@ -227,6 +296,8 @@ test("SkinFramework exposes the locked tranche 1-3 skin ids and support matrix",
     "daily-log": ["/toolbox-talk", "/receipt", "/as-built", "/walk"],
     "repair-order": ["/receipt", "/as-built"],
     "kitchen-ticket": ["/walk", "/phantoms", "/change-order"],
+    "farm-ledger": ["/toolbox-talk", "/receipt", "/as-built", "/walk", "/change-order"],
+    "safety-loto-log": ["/permit", "/lockout"],
   });
 });
 
@@ -546,6 +617,131 @@ test("SkinFramework renders Kitchen Ticket on the locked tranche 3 routes", () =
   }
 });
 
+test("SkinFramework renders Farm Ledger on the locked tranche 4 routes", () => {
+  const framework = new SkinFramework();
+  const cases = [
+    {
+      rawView: buildToolboxTalkView(),
+      route: "/toolbox-talk",
+      headings: ["Ledger Header", "Recorded Rows", "Carry-Forward Rows"],
+    },
+    {
+      rawView: buildReceiptView(),
+      route: "/receipt",
+      headings: ["Ledger Header", "Recorded Rows", "Open Rows", "Record Stamp"],
+    },
+    {
+      rawView: buildAsBuiltView(),
+      route: "/as-built",
+      headings: ["Ledger Header", "Recorded Rows", "Open Rows", "Record Stamp"],
+    },
+    {
+      rawView: buildWalkView(),
+      route: "/walk",
+      headings: ["Ledger Header", "Recorded Rows", "Open Rows", "Carry-Forward Rows"],
+    },
+    {
+      rawView: buildChangeOrderView(),
+      route: "/change-order",
+      headings: ["Ledger Header", "Recorded Rows", "Record Stamp", "Carry-Forward Rows"],
+    },
+  ];
+
+  for (const { rawView, route, headings } of cases) {
+    const snapshot = structuredClone(rawView);
+    const skinned = framework.render(rawView, { skinId: "farm-ledger" });
+
+    assert.deepEqual(rawView, snapshot);
+    assert.equal(skinned.route, route);
+    assert.equal(skinned.supported, true);
+    assert.equal(skinned.appliedSkinId, "farm-ledger");
+    assert.deepEqual(skinned.rawView, rawView);
+    assert.equal(skinned.presentation.skinLabel, "Farm Ledger");
+    assert.deepEqual(
+      skinned.presentation.sections.map((section) => section.heading),
+      headings
+    );
+  }
+});
+
+test("SkinFramework renders Safety / LOTO Log on the locked tranche 4 routes", () => {
+  const framework = new SkinFramework();
+  const cases = [
+    {
+      rawView: buildPermitView(),
+      route: "/permit",
+      headings: [
+        "Control Record",
+        "Authority State",
+        "Conditions And Scope",
+        "Record Links",
+      ],
+    },
+    {
+      rawView: buildLockoutView(),
+      route: "/lockout",
+      headings: [
+        "Control Record",
+        "Authority State",
+        "Conditions And Scope",
+        "Record Links",
+      ],
+    },
+  ];
+
+  for (const { rawView, route, headings } of cases) {
+    const snapshot = structuredClone(rawView);
+    const skinned = framework.render(rawView, { skinId: "safety-loto-log" });
+
+    assert.deepEqual(rawView, snapshot);
+    assert.equal(skinned.route, route);
+    assert.equal(skinned.supported, true);
+    assert.equal(skinned.appliedSkinId, "safety-loto-log");
+    assert.deepEqual(skinned.rawView, rawView);
+    assert.equal(skinned.presentation.skinLabel, "Safety / LOTO Log");
+    assert.deepEqual(
+      skinned.presentation.sections.map((section) => section.heading),
+      headings
+    );
+  }
+});
+
+test("SkinFramework keeps Farm Ledger and Safety / LOTO Log structurally distinct", () => {
+  const framework = new SkinFramework();
+
+  const farmLedger = framework.render(buildReceiptView(), { skinId: "farm-ledger" });
+  const dailyLog = framework.render(buildReceiptView(), { skinId: "daily-log" });
+  const workOrder = framework.render(buildReceiptView(), { skinId: "work-order" });
+  const safetyPermit = framework.render(buildPermitView(), { skinId: "safety-loto-log" });
+  const dispatch = framework.render(buildControlRodsView(), { skinId: "dispatch-board" });
+  const ticketChange = framework.render(buildChangeOrderView(), { skinId: "ticket-system" });
+
+  assert.notDeepEqual(
+    farmLedger.presentation.sections.map((section) => section.heading),
+    dailyLog.presentation.sections.map((section) => section.heading)
+  );
+  assert.notDeepEqual(
+    farmLedger.presentation.sections.map((section) => section.heading),
+    workOrder.presentation.sections.map((section) => section.heading)
+  );
+  assert.notDeepEqual(
+    safetyPermit.presentation.sections.map((section) => section.heading),
+    dispatch.presentation.sections.map((section) => section.heading)
+  );
+  assert.notDeepEqual(
+    safetyPermit.presentation.sections.map((section) => section.heading),
+    ticketChange.presentation.sections.map((section) => section.heading)
+  );
+  assert.equal(
+    farmLedger.presentation.sections.some((section) => /Daily Header|Issue Log|Scope Of Work/.test(section.heading)),
+    false
+  );
+  assert.equal(
+    safetyPermit.presentation.sections.some((section) => /Lane|Ticket|Lifecycle|Rail/.test(section.heading)),
+    false
+  );
+});
+
 test("SkinFramework keeps Daily Log, Repair Order, and Kitchen Ticket structurally distinct", () => {
   const framework = new SkinFramework();
 
@@ -600,7 +796,7 @@ test("SkinFramework fails closed to raw canonical render for unsupported Inspect
   );
 });
 
-test("SkinFramework fails closed to raw canonical render for unsupported tranche 2-3 combinations", () => {
+test("SkinFramework fails closed to raw canonical render for unsupported tranche 2-4 combinations", () => {
   const framework = new SkinFramework();
   const cases = [
     { rawView: buildWalkView(), skinId: "work-order", route: "/walk" },
@@ -609,6 +805,17 @@ test("SkinFramework fails closed to raw canonical render for unsupported tranche
     { rawView: buildPhantomsView(), skinId: "daily-log", route: "/phantoms" },
     { rawView: buildWalkView(), skinId: "repair-order", route: "/walk" },
     { rawView: buildControlRodsView(), skinId: "kitchen-ticket", route: "/control-rods" },
+    { rawView: buildPhantomsView(), skinId: "farm-ledger", route: "/phantoms" },
+    { rawView: buildControlRodsView(), skinId: "farm-ledger", route: "/control-rods" },
+    { rawView: buildPermitView(), skinId: "farm-ledger", route: "/permit" },
+    { rawView: buildLockoutView(), skinId: "farm-ledger", route: "/lockout" },
+    { rawView: buildToolboxTalkView(), skinId: "safety-loto-log", route: "/toolbox-talk" },
+    { rawView: buildReceiptView(), skinId: "safety-loto-log", route: "/receipt" },
+    { rawView: buildAsBuiltView(), skinId: "safety-loto-log", route: "/as-built" },
+    { rawView: buildWalkView(), skinId: "safety-loto-log", route: "/walk" },
+    { rawView: buildPhantomsView(), skinId: "safety-loto-log", route: "/phantoms" },
+    { rawView: buildChangeOrderView(), skinId: "safety-loto-log", route: "/change-order" },
+    { rawView: buildControlRodsView(), skinId: "safety-loto-log", route: "/control-rods" },
   ];
 
   for (const { rawView, skinId, route } of cases) {
@@ -690,16 +897,30 @@ test("SkinFramework keeps Work Order, Dispatch Board, and Ticket System structur
   );
 });
 
-test("SkinFramework does not introduce fake fields or widen raw route outputs across tranche 1-3", () => {
+test("SkinFramework does not introduce fake fields or widen raw route outputs across tranche 1-4", () => {
   const framework = new SkinFramework();
+  const inspection = framework.render(buildAsBuiltView(), { skinId: "inspection-report" });
+  const workOrder = framework.render(buildReceiptView(), { skinId: "work-order" });
+  const dispatch = framework.render(buildControlRodsView(), { skinId: "dispatch-board" });
+  const ticket = framework.render(buildChangeOrderView(), { skinId: "ticket-system" });
+  const dailyLog = framework.render(buildWalkView(), { skinId: "daily-log" });
+  const repairOrder = framework.render(buildReceiptView(), { skinId: "repair-order" });
+  const kitchenTicket = framework.render(buildChangeOrderView(), { skinId: "kitchen-ticket" });
+  const farmLedger = framework.render(buildChangeOrderView(), { skinId: "farm-ledger" });
+  const safetyPermit = framework.render(buildPermitView(), { skinId: "safety-loto-log" });
+  const safetyLockout = framework.render(buildLockoutView(), { skinId: "safety-loto-log" });
+
   const views = [
-    framework.render(buildAsBuiltView(), { skinId: "inspection-report" }),
-    framework.render(buildReceiptView(), { skinId: "work-order" }),
-    framework.render(buildControlRodsView(), { skinId: "dispatch-board" }),
-    framework.render(buildChangeOrderView(), { skinId: "ticket-system" }),
-    framework.render(buildWalkView(), { skinId: "daily-log" }),
-    framework.render(buildReceiptView(), { skinId: "repair-order" }),
-    framework.render(buildChangeOrderView(), { skinId: "kitchen-ticket" }),
+    inspection,
+    workOrder,
+    dispatch,
+    ticket,
+    dailyLog,
+    repairOrder,
+    kitchenTicket,
+    farmLedger,
+    safetyPermit,
+    safetyLockout,
   ];
 
   const forbiddenFields = [
@@ -745,6 +966,32 @@ test("SkinFramework does not introduce fake fields or widen raw route outputs ac
     "incidentRecord",
     "dualSignoff",
     "superintendentReview",
+    "acreage",
+    "cropType",
+    "cropName",
+    "weather",
+    "soilConditions",
+    "equipmentUsed",
+    "seedData",
+    "chemicalData",
+    "fertilizerData",
+    "yield",
+    "seasonTotals",
+    "geospatialFieldId",
+    "fieldGpsId",
+    "farmOwner",
+    "customerFarm",
+    "lockNumber",
+    "tagNumber",
+    "equipmentId",
+    "equipmentSerial",
+    "checklistSteps",
+    "permitId",
+    "signature",
+    "signatures",
+    "releaseAuthorizer",
+    "workOrderId",
+    "incidentNarrative",
   ];
 
   for (const skinned of views) {
@@ -755,7 +1002,7 @@ test("SkinFramework does not introduce fake fields or widen raw route outputs ac
     }
   }
 
-  assert.deepEqual(Object.keys(views[0].rawView).sort(), [
+  assert.deepEqual(Object.keys(inspection.rawView).sort(), [
     "approvedDrift",
     "excludedWork",
     "holdsRaised",
@@ -767,19 +1014,56 @@ test("SkinFramework does not introduce fake fields or widen raw route outputs ac
     "summary",
     "unplannedCompleted",
   ]);
-  assert.deepEqual(Object.keys(views[2].rawView).sort(), [
+  assert.deepEqual(Object.keys(dispatch.rawView).sort(), [
     "domains",
     "profile",
     "route",
     "starterProfileIds",
     "summary",
   ]);
-  assert.deepEqual(Object.keys(views[3].rawView).sort(), [
+  assert.deepEqual(Object.keys(ticket.rawView).sort(), [
     "changeOrderCount",
     "changeOrders",
     "renderNote",
     "route",
     "snapshotState",
+  ]);
+  assert.deepEqual(Object.keys(safetyPermit.rawView).sort(), [
+    "authorizationRef",
+    "autonomyLevel",
+    "chainRefs",
+    "conditions",
+    "constrained",
+    "domainId",
+    "evaluated",
+    "evaluatedAt",
+    "evaluationState",
+    "mayProceed",
+    "permitDecision",
+    "permitRef",
+    "profileId",
+    "renderNote",
+    "requiresLoto",
+    "requiresPermit",
+    "route",
+    "sessionId",
+    "statusCode",
+    "summary",
+  ]);
+  assert.deepEqual(Object.keys(safetyLockout.rawView).sort(), [
+    "authorizationId",
+    "authorizationValid",
+    "authorizedAt",
+    "authorizedBy",
+    "chainRef",
+    "conditions",
+    "domainId",
+    "evaluated",
+    "evaluationState",
+    "reason",
+    "renderNote",
+    "route",
+    "scope",
   ]);
 });
 
@@ -795,7 +1079,7 @@ test("SkinFramework validates inputs and keeps a render-only method surface", ()
   expectValidationError(
     () => framework.render(buildReceiptView(), { skinId: "military-brief" }),
     "ERR_INVALID_INPUT",
-    "'options.skinId' must be one of whiteboard, punch-list, inspection-report, work-order, dispatch-board, ticket-system, daily-log, repair-order, kitchen-ticket"
+    "'options.skinId' must be one of whiteboard, punch-list, inspection-report, work-order, dispatch-board, ticket-system, daily-log, repair-order, kitchen-ticket, farm-ledger, safety-loto-log"
   );
 
   const methodNames = Object.getOwnPropertyNames(SkinFramework.prototype).sort();

@@ -1,5 +1,5 @@
 # SKIN_FRAMEWORK.md
-**Status:** Wave 5 skins contract baseline (v3: tranches 1-3)
+**Status:** Wave 5 skins contract baseline (v4: tranches 1-4)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -19,7 +19,7 @@ Same engine data, different rendering.
 - the Whiteboard default rule for supported routes
 - deterministic translation of existing canonical route views into skin display sections
 - explicit fail-closed behavior for unsupported skin/route combinations
-- structural distinction rules for Whiteboard, Punch List, Inspection Report, Work Order, Dispatch Board, Ticket System, Daily Log, Repair Order, and Kitchen Ticket
+- structural distinction rules for Whiteboard, Punch List, Inspection Report, Work Order, Dispatch Board, Ticket System, Daily Log, Repair Order, Kitchen Ticket, Farm Ledger, and Safety / LOTO Log
 
 This spec does not define:
 
@@ -30,13 +30,13 @@ This spec does not define:
 - any `/skin` slash route
 - any skin editor, customization UI, or generalized template engine
 - onboarding, package, install, runtime-hook, compatibility, or marketplace behavior
-- Military Brief, Estimate / Bid, or later skin tranches beyond tranche 3
+- Military Brief, Estimate / Bid, or later skin tranches beyond tranche 4
 
 ## Public And Internal Names
 
 - Public/operator-facing tranche label: `Skin Framework`
 - Internal build name: `SkinFramework`
-- Supported skins: `whiteboard`, `punch-list`, `inspection-report`, `work-order`, `dispatch-board`, `ticket-system`, `daily-log`, `repair-order`, `kitchen-ticket`
+- Supported skins: `whiteboard`, `punch-list`, `inspection-report`, `work-order`, `dispatch-board`, `ticket-system`, `daily-log`, `repair-order`, `kitchen-ticket`, `farm-ledger`, `safety-loto-log`
 
 ## Core Rule
 
@@ -58,8 +58,10 @@ This spec does not define:
 | `daily-log` | `/toolbox-talk`, `/receipt`, `/as-built`, `/walk` |
 | `repair-order` | `/receipt`, `/as-built` |
 | `kitchen-ticket` | `/walk`, `/phantoms`, `/change-order` |
+| `farm-ledger` | `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, `/change-order` |
+| `safety-loto-log` | `/permit`, `/lockout` |
 
-Tranche 1-3 limits:
+Tranche 1-4 limits:
 
 - `inspection-report` does not support `/toolbox-talk`.
 - `work-order` does not support `/walk`, `/phantoms`, `/change-order`, or `/control-rods`.
@@ -68,6 +70,8 @@ Tranche 1-3 limits:
 - `daily-log` does not support `/phantoms`, `/change-order`, or `/control-rods`.
 - `repair-order` does not support `/toolbox-talk`, `/walk`, `/phantoms`, `/change-order`, or `/control-rods`.
 - `kitchen-ticket` does not support `/toolbox-talk`, `/receipt`, `/as-built`, or `/control-rods`.
+- `farm-ledger` does not support `/phantoms`, `/control-rods`, `/permit`, or `/lockout`.
+- `safety-loto-log` does not support `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, `/phantoms`, `/change-order`, or `/control-rods`.
 - Routes outside this matrix remain raw canonical views in shipped skin behavior.
 
 ## Default Rule
@@ -93,6 +97,8 @@ Tranche 1-3 limits:
 - `daily-log` is a category-organized project-memory / work / issues / notes view and may render safety or hazard sections only when the canonical route already carries that truth.
 - `repair-order` is a diagnostic request / findings / performed-work or unresolved-exception view.
 - `kitchen-ticket` is a terse item-first operational ticket stack.
+- `farm-ledger` is a chronological ledger / carry-forward record and must collapse to a plain domain or area ledger when field semantics are not honestly present in canonical route truth.
+- `safety-loto-log` is an authorization / control record over shipped `/permit` and `/lockout` truth only and must not cosplay a fuller industrial form than the route data supports.
 - No two skins may ship as near-duplicates with renamed headings only.
 - `inspection-report` must not invent green/yellow/red or other evaluative semantics where the canonical route view does not honestly support them.
 - `dispatch-board` must not invent GPS, fleet telemetry, dispatch timing, or crew-ownership fields not present in canonical route truth.
@@ -100,6 +106,8 @@ Tranche 1-3 limits:
 - `daily-log` must not invent safety incidents, attendance logs, superintendent review chains, or dual-signoff records where the canonical route view does not honestly support them.
 - `repair-order` must not invent RO numbers, labor hours, labor rate, parts cost, parts inventory, technician assignment, invoice state, checkout state, or approval signatures where the canonical route view does not honestly support them.
 - `kitchen-ticket` must not invent prep timers, age colors, overdue badges, ETA, station timers, station routing, bump workflow semantics, or derived rush flags where the canonical route view does not honestly support them.
+- `farm-ledger` must not invent acreage, crop names, weather, soil conditions, equipment tracking, seed / chemical / fertilizer data, yield, season totals, geospatial field ids, or owner/customer farm metadata where the canonical route view does not honestly support them.
+- `safety-loto-log` must not invent lock numbers, tag numbers, equipment ids, checklist steps, permit ids, signatures, release authorizers, work-order ids, or safety incident narrative where the canonical route view does not honestly support them.
 
 ## No-Fake-Field Rule
 
@@ -108,6 +116,7 @@ Tranche 1-3 limits:
 - Skin rendering must not invent workflow state, severity, approval state, or evaluation state not present in canonical route truth.
 - Skin rendering must not invent labor totals, pricing, GPS / fleet telemetry, ETA, age badges, SLA markers, duration, or assignment metadata not present in canonical route truth.
 - Skin rendering must not invent repair-cost, labor-hour, parts, timer, kitchen-station, incident, or approval-signature metadata not present in canonical route truth.
+- Skin rendering must not invent acreage, crop, weather, soil, equipment-tracking, yield, geospatial, lock-id, tag-id, signature, release-authority, or checklist metadata not present in canonical route truth.
 - Skin rendering must not widen raw route objects with skin-only fields.
 
 ## Runtime Contract
@@ -160,4 +169,4 @@ Output object:
 
 - Runtime framework implementation exists at `src/SkinFramework.js`.
 - Golden proof exists at `tests/golden/SkinFramework.golden.test.js`.
-- This contract is the sole tranche 1-3 skin behavior owner.
+- This contract is the sole tranche 1-4 skin behavior owner.
