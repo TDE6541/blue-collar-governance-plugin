@@ -1,7 +1,7 @@
 > 🚧 **ACTIVE BUILD** — 5 waves shipped, 260+ tests passing, crew still on site. README reflects real-time build state, not final documentation.
 # Blue Collar Governance Plugin
 
-**Status:** Wave 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is implemented locally; later Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; install/package/compatibility claims remain unverified
+**Status:** Wave 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; onboarding/runtime-proof and Wave 5 closeout canon surfaces are shipped; later Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; install/package/compatibility claims remain explicitly unverified
 **Repo type:** Private runtime/control layer  
 **Implementation state:** All six Wave 1 systems now have runtime implementations (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 
@@ -66,10 +66,12 @@ Governed Workflow is the methodology spine behind the work. This repository is n
 - Shipped skill tranches remain deterministic route adapters with no hidden engine behavior.
 - Wave 5 skins tranche 4 is now implemented as an optional rendering layer at `docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, and `tests/golden/SkinFramework.golden.test.js`.
 - Wave 5 hook/runtime Slice 2 enforcement spine is now implemented at `.claude/settings.json`, `.claude/hooks/run-governance-hook.js`, `src/HookRuntime.js`, `src/HookRuntimeSlice2.js`, `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`, `tests/golden/HookRuntime.golden.test.js`, and `tests/live/wave5.hook-runtime.live.test.js`.
-- Slice 2 keeps Slice 1 command-hook enforcement over `Bash`, `Write`, and `Edit`, and adds compaction-safe `PreCompact` preservation plus bounded `SessionStart` re-injection for `startup`, `compact`, and `resume`; Agent coverage, HTTP hooks, LLM hook decisions, onboarding/package/install, and later compatibility work remain later slices.
+- Slice 2 keeps Slice 1 command-hook enforcement over `Bash`, `Write`, and `Edit`, and adds compaction-safe `PreCompact` preservation plus bounded `SessionStart` re-injection for `startup`, `compact`, and `resume`; Agent coverage, HTTP hooks, LLM hook decisions, and later hook/runtime compatibility work remain later slices.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime work beyond Slice 2, onboarding/package work, and later proof/integration work, remains pending.
-- Not yet claimed / not verified: no installable plugin package, compatibility layer, marketplace/install command surface, or end-to-end runtime setup sequence is implemented yet.
+- Wave 5 onboarding/runtime proof artifact is now shipped at `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`.
+- Wave 5 closeout evidence map is now shipped at `docs/WAVE5_CLOSEOUT.md`.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime work beyond Slice 2, and later proof/integration work, remains pending.
+- Not yet claimed / not verified: `package.json` is absent; no installable plugin package, compatibility layer, marketplace/install command surface, or end-to-end runtime setup sequence is implemented yet.
 
 ## Wave 1 Focus
 
@@ -140,9 +142,11 @@ Read these in order:
 
 ## Working In This Repo
 
-There is no end-to-end runtime setup sequence yet. Runtime and proof surfaces exist for Waves 1-5 through the currently shipped `/lockout` slice, the local hook/runtime Slice 2 enforcement spine, and tranche 4 skins rendering for supported routes, with canon under `docs/specs/`, project hook registration under `.claude/`, runtime under `src/`, golden proof under `tests/golden/`, and live integration proof under `tests/live/` for Waves 1, 3, 4, and the new hook/runtime slice.
+There is no end-to-end runtime setup sequence yet. Runtime and proof surfaces exist for Waves 1-5 through the currently shipped `/lockout` slice, the shipped hook/runtime Slice 2 enforcement spine, and tranche 4 skins rendering for supported routes, with canon under `docs/specs/`, project hook registration under `.claude/`, runtime under `src/`, golden proof under `tests/golden/`, and live integration proof under `tests/live/` for Waves 1, 3, 4, and the hook/runtime slice.
 
-Later Wave 5 skins beyond tranche 4, later hook/runtime work beyond Slice 2, onboarding/package work, and install/package/compatibility claims remain pending or unverified; see `docs/specs/WAVE5_OPERATOR_PRODUCT.md` for the current shipped-vs-later cut.
+`docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md` is the canonical onboarding/runtime-proof surface for current Wave 5 startup and compaction-survival truth.
+
+Later Wave 5 skins beyond tranche 4, later hook/runtime work beyond Slice 2, and install/package/compatibility claims remain pending or unverified; see `docs/specs/WAVE5_OPERATOR_PRODUCT.md` for the current shipped-vs-later cut.
 
 ## Contributing
 

@@ -33,6 +33,8 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/WAVE5_OPERATOR_PRODUCT.md` - authoritative Wave 5 umbrella truth (one narrative wave executed as 5A / 5B)
 - `docs/specs/SKIN_FRAMEWORK.md` - authoritative Wave 5 skins rendering contract baseline
 - `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` - authoritative Wave 5A Block 0 substrate merit-gate memo
+- `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md` - canonical Wave 5 onboarding/runtime-proof truth surface
+- `docs/WAVE5_CLOSEOUT.md` - durable Wave 5 closeout evidence map
 - `docs/specs/OPERATOR_TRUST_LEDGER.md` - authoritative Wave 5A Block A Operator Trust Ledger v1 contract baseline
 - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` - authoritative Wave 5A Block A Journeyman Trust Engine v1 contract baseline
 - `docs/specs/WARRANTY_MONITOR.md` - authoritative Wave 5A Block B Warranty Monitor v1 derived-only contract baseline
@@ -74,9 +76,11 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 5 skins tranche 4 is implemented at `docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, and `tests/golden/SkinFramework.golden.test.js`.
 - Wave 5 hook/runtime Slice 2 enforcement spine is implemented at `.claude/settings.json`, `.claude/hooks/run-governance-hook.js`, `src/HookRuntime.js`, `src/HookRuntimeSlice2.js`, `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`, `tests/golden/HookRuntime.golden.test.js`, and `tests/live/wave5.hook-runtime.live.test.js`.
 - Slice 2 keeps fail-closed command hooks over `Bash`, `Write`, and `Edit`, and adds bounded `SessionStart` re-injection plus `PreCompact` preservation for compaction survival while retaining the session-local `Stop`/`ForemansWalk` gate.
+- Wave 5 onboarding/runtime-proof artifact is implemented at `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`.
+- Wave 5 closeout evidence map is implemented at `docs/WAVE5_CLOSEOUT.md`.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, onboarding/package work, and later proof/integration work, remains pending.
-- Not claimed / not verified: no installable plugin package, compatibility layer, or end-to-end runtime setup sequence is implemented yet.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, and later proof/integration work, remains pending.
+- Not claimed / not verified: `package.json` is absent; no installable plugin package, compatibility layer, or end-to-end runtime setup sequence is implemented yet.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
 - `docs/learning-notes/` is not present because no exploration lane is needed for the current repo state.

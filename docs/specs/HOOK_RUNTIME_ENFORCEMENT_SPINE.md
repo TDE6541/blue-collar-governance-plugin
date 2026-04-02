@@ -139,3 +139,5 @@ Hook runtime behavior remains an adapter over existing truth.
 - Deterministic runtime adapter exists at `src/HookRuntime.js` with Slice 2 helper logic at `src/HookRuntimeSlice2.js`.
 - Golden proof exists at `tests/golden/HookRuntime.golden.test.js`.
 - Live proof exists at `tests/live/wave5.hook-runtime.live.test.js`.
+- Canonical onboarding/runtime-proof artifact exists at `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`.
+- Wave 5 closeout evidence map exists at `docs/WAVE5_CLOSEOUT.md`.

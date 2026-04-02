@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is implemented locally; later Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; install/package/compatibility claims remain unverified
+- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; canonical onboarding/runtime-proof and Wave 5 closeout artifacts are shipped; later Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; install/package/compatibility claims remain unverified
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -107,9 +107,9 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Wave 5 skill topology is now 37 skills across 10 groups.
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, onboarding/package work, and later proof/integration work, remains pending.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, and later proof/integration work, remains pending.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
-- Package metadata or publishing surfaces are not implemented yet.
+- `package.json` is absent; package metadata or publishing surfaces are not implemented.
 - Canon specs for current scope:
   - `docs/specs/WAVE1_TRUST_KERNEL.md`
   - `docs/specs/HOLD_ENGINE.md`
@@ -151,6 +151,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/PERMIT_SKILL.md`
   - `docs/specs/LOCKOUT_SKILL.md`
 - Wave 5 Block 0 substrate-gate memo: `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
+- Wave 5 onboarding/runtime-proof artifact: `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`
+- Wave 5 closeout evidence map: `docs/WAVE5_CLOSEOUT.md`
 
 ## Canon And Reference Boundary
 

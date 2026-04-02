@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 shipped; Wave 5A Blocks A-C and Wave 5B Blocks A-D-E1 plus `/control-rods` through `/lockout` are implemented; tranche 4 skins rendering over the approved route matrix is implemented; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is implemented locally; additional Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; package/install/compatibility claims remain unverified
+**Status:** Wave 5A Block 0 shipped; Wave 5A Blocks A-C and Wave 5B Blocks A-D-E1 plus `/control-rods` through `/lockout` are implemented; tranche 4 skins rendering over the approved route matrix is implemented; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; canonical onboarding/runtime-proof and Wave 5 closeout artifacts are shipped; additional Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; package/install/compatibility claims remain unverified
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -209,10 +209,14 @@ Wave 5 starts with a governance-first gate:
   - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`
   - `tests/golden/HookRuntime.golden.test.js`
   - `tests/live/wave5.hook-runtime.live.test.js`
+- Wave 5 onboarding/runtime-proof artifact is now implemented at:
+  - `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`
+- Wave 5 closeout evidence map is now implemented at:
+  - `docs/WAVE5_CLOSEOUT.md`
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, onboarding/package work, and later proof/integration work, remains pending.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, and later proof/integration work, remains pending.
 - Skills outside the current shipped set remain unimplemented.
-- Not claimed / not verified: no installable plugin package, compatibility layer, or end-to-end runtime setup sequence is implemented yet.
+- Not claimed / not verified: `package.json` is absent; no installable plugin package, compatibility layer, or end-to-end runtime setup sequence is implemented yet.
 
 ## Substrate Merit Rule
 
@@ -298,3 +302,5 @@ Wave 5 Block 0 truth and decision proof is anchored in:
 - `docs/indexes/WHERE_TO_CHANGE_X.md`
 - `TEAM_CHARTER.md`
 - `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
+- `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`
+- `docs/WAVE5_CLOSEOUT.md`
