@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Bash(rm *)",
+      "Bash(del *)",
+      "Bash(rd *)",
+      "Bash(rmdir *)",
+      "Bash(Remove-Item *)",
+      "Bash(git clean *)",
+      "Bash(git reset --hard *)",
+      "Edit(/**/*pricing*.*)",
+      "Edit(/**/*quote*.*)",
+      "Edit(/**/*customer*.*)",
+      "Edit(/**/*pii*.*)",
+      "Edit(/**/*schema*.*)",
+      "Edit(/migrations/**)",
+      "Edit(/**/*auth*.*)",
+      "Edit(/**/*security*.*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "Bash|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ]
+  },
+  "blueCollarGovernance": {
+    "hookRuntime": {
+      "profileId": "conservative",
+      "matchedTools": [
+        "Bash",
+        "Write",
+        "Edit"
+      ],
+      "stateDirectory": ".claude/runtime",
+      "blockingSeverities": [
+        "CRITICAL",
+        "HIGH"
+      ]
+    }
+  }
+}
+

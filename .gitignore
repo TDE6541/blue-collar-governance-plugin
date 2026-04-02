@@ -40,6 +40,7 @@ coverage/
 *.log
 npm-debug.log*
 .claude/settings.local.json
+.claude/runtime/
 
 # Lock files (uncomment the one you DON'T use)
 # package-lock.json
