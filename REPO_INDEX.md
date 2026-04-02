@@ -16,6 +16,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 
 ## Canonical Directories
 
+- `.claude/` — project hook registration and session-local hook runtime state path
 - `docs/specs/` — promoted product and runtime specs
 - `docs/indexes/` — maintenance and navigation indexes
 - `skills/` — operator-facing skill artifacts
@@ -46,6 +47,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/FORENSIC_CHAIN.md` — Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` — Control Rod Mode v2 deterministic HARD_STOP LOTO + Permit contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` — Foreman's Walk Engine v1 post-session verification contract baseline
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` — Wave 5 hook/runtime Slice 1 fail-closed enforcement spine contract baseline
 - `docs/specs/CHANGE_ORDER_ENGINE.md` — Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` — Buddy System v1 watcher-only live oversight contract baseline
 - `docs/WAVE2_CLOSEOUT.md` — durable Wave 2 closeout evidence map
@@ -171,6 +173,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - A Wave 5B `/permit` gate decision surface is implemented at `docs/specs/PERMIT_SKILL.md`, `skills/permit-SKILL.md`, `src/PermitSkill.js`, and `tests/golden/PermitSkill.golden.test.js`.
 - A Wave 5B `/lockout` LOTO validation surface is implemented at `docs/specs/LOCKOUT_SKILL.md`, `skills/lockout-SKILL.md`, `src/LockoutSkill.js`, and `tests/golden/LockoutSkill.golden.test.js`.
 - Wave 5 skins tranche 4 is implemented at `docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, and `tests/golden/SkinFramework.golden.test.js`.
+- Wave 5 hook/runtime Slice 1 enforcement spine is implemented at `.claude/settings.json`, `.claude/hooks/run-governance-hook.js`, `src/HookRuntime.js`, `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`, `tests/golden/HookRuntime.golden.test.js`, and `tests/live/wave5.hook-runtime.live.test.js`.
+- Slice 1 is bounded to fail-closed command hooks over `Bash`, `Write`, and `Edit`, aligns persistent deny rules to current HARD_STOP posture, and uses a session-local `Stop`/`ForemansWalk` gate only.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
@@ -179,8 +183,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, onboarding/package work, and later proof/integration work, remains pending.
-- Not claimed / not verified: no installable plugin package, runtime hook path, or compatibility layer is implemented yet.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 1, onboarding/package work, and later proof/integration work, remains pending.
+- Not claimed / not verified: no installable plugin package, compatibility layer, or end-to-end runtime setup sequence is implemented yet.
 - No multi-agent control room behavior is implemented.
 - `origin` remote is configured.
 - The repo remains governed/spec-led; live integration proof exists at `tests/live/wave1.operator-flow.live.test.js`, and final Wave 1 evidence is captured in `docs/WAVE1_CLOSEOUT.md`.

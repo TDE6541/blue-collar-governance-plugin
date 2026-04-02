@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 shipped; Wave 5A Blocks A-C and Wave 5B Blocks A-D-E1 plus `/control-rods` through `/lockout` are implemented; tranche 4 skins rendering over the approved route matrix is implemented; additional Wave 5 work outside the current shipped set remains pending; package/install/runtime-hook/compatibility claims remain unverified
+**Status:** Wave 5A Block 0 shipped; Wave 5A Blocks A-C and Wave 5B Blocks A-D-E1 plus `/control-rods` through `/lockout` are implemented; tranche 4 skins rendering over the approved route matrix is implemented; hook/runtime Slice 1 enforcement spine is implemented locally; additional Wave 5 work outside the current shipped set, including later hook/runtime slices, remains pending; package/install/compatibility claims remain unverified
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -67,6 +67,8 @@ Wave 5 starts with a governance-first gate:
 - Skill topology now includes exactly 37 skills across 10 groups.
 - Skills are deterministic route adapters only; no hidden engine behavior is allowed inside skills.
 - Wave 5 skins tranche 4 implements `SkinFramework` as an optional rendering layer over existing canonical route views with no route-output contract widening.
+- Wave 5 hook/runtime Slice 1 implements a fail-closed command-hook enforcement spine over existing `ControlRodMode` and `ForemansWalk` truth with no HTTP hooks and no LLM involvement in hook decisions.
+- Slice 1 is bounded to `PreToolUse`, `PermissionRequest`, and `Stop` over the current `Bash`, `Write`, and `Edit` matched tool set only.
 - Whiteboard and Punch List support `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`.
 - Inspection Report supports `/receipt`, `/as-built`, and `/walk` and fails closed to raw canonical render for unsupported routes such as `/toolbox-talk`.
 - Work Order supports `/toolbox-talk`, `/receipt`, and `/as-built`.
@@ -199,10 +201,17 @@ Wave 5 starts with a governance-first gate:
   - `docs/specs/SKIN_FRAMEWORK.md`
   - `src/SkinFramework.js`
   - `tests/golden/SkinFramework.golden.test.js`
+- Wave 5 hook/runtime Slice 1 enforcement spine is now implemented at:
+  - `.claude/settings.json`
+  - `.claude/hooks/run-governance-hook.js`
+  - `src/HookRuntime.js`
+  - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`
+  - `tests/golden/HookRuntime.golden.test.js`
+  - `tests/live/wave5.hook-runtime.live.test.js`
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, onboarding/package work, and later proof/integration work, remains pending.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 1, onboarding/package work, and later proof/integration work, remains pending.
 - Skills outside the current shipped set remain unimplemented.
-- Not claimed / not verified: no installable plugin package, runtime hook path, or compatibility layer is implemented yet.
+- Not claimed / not verified: no installable plugin package, compatibility layer, or end-to-end runtime setup sequence is implemented yet.
 
 ## Substrate Merit Rule
 

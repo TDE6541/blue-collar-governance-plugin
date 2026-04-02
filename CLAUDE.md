@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; later Wave 5 work outside the current shipped set remains pending; install/package/runtime-hook/compatibility claims remain unverified
+- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 1 enforcement spine is implemented locally; later Wave 5 work outside the current shipped set, including later hook/runtime slices, remains pending; install/package/compatibility claims remain unverified
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -100,14 +100,15 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - A Wave 5B `/lockout` LOTO validation surface is implemented (`docs/specs/LOCKOUT_SKILL.md`, `skills/lockout-SKILL.md`, `src/LockoutSkill.js`, `tests/golden/LockoutSkill.golden.test.js`).
 - Wave 5 skins tranche 4 is implemented (`docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, `tests/golden/SkinFramework.golden.test.js`).
 - Whiteboard and Punch List support `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report supports `/receipt`, `/as-built`, and `/walk`; Work Order supports `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board supports `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System supports `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log supports `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order supports `/receipt` and `/as-built`; Kitchen Ticket supports `/walk`, `/phantoms`, and `/change-order`; Farm Ledger supports `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log supports `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
+- Wave 5 hook/runtime Slice 1 enforcement spine is implemented at `.claude/settings.json`, `.claude/hooks/run-governance-hook.js`, `src/HookRuntime.js`, `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`, `tests/golden/HookRuntime.golden.test.js`, and `tests/live/wave5.hook-runtime.live.test.js`.
+- Slice 1 is bounded to fail-closed command hooks over `Bash`, `Write`, and `Edit`, aligns persistent deny rules to the current HARD_STOP posture, and uses a session-local `Stop`/`ForemansWalk` gate only.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
 - Wave 5 skill topology is now 37 skills across 10 groups.
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, onboarding/package work, and later proof/integration work, remains pending.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 1, onboarding/package work, and later proof/integration work, remains pending.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
-- Hook/runtime compatibility paths are not implemented yet.
 - Package metadata or publishing surfaces are not implemented yet.
 - Canon specs for current scope:
   - `docs/specs/WAVE1_TRUST_KERNEL.md`
@@ -126,6 +127,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/CONTROL_ROD_MODE.md`
   - `docs/specs/FOREMANS_WALK_ENGINE.md`
   - `docs/specs/WAVE5_OPERATOR_PRODUCT.md`
+  - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`
   - `docs/specs/SKIN_FRAMEWORK.md`
   - `docs/specs/OPERATOR_TRUST_LEDGER.md`
   - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md`

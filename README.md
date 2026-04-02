@@ -1,7 +1,7 @@
 > 🚧 **ACTIVE BUILD** — 5 waves shipped, 260+ tests passing, crew still on site. README reflects real-time build state, not final documentation.
 # Blue Collar Governance Plugin
 
-**Status:** Wave 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; later Wave 5 work outside the current shipped set remains pending; install/package/runtime-hook/compatibility claims remain unverified
+**Status:** Wave 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 1 enforcement spine is implemented locally; later Wave 5 work outside the current shipped set, including later hook/runtime slices, remains pending; install/package/compatibility claims remain unverified
 **Repo type:** Private runtime/control layer  
 **Implementation state:** All six Wave 1 systems now have runtime implementations (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 
@@ -65,9 +65,11 @@ Governed Workflow is the methodology spine behind the work. This repository is n
 - Warranty remains derived-first in Wave 5 and HoldEngine Scarcity Signal remains derived-only enrichment.
 - Shipped skill tranches remain deterministic route adapters with no hidden engine behavior.
 - Wave 5 skins tranche 4 is now implemented as an optional rendering layer at `docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, and `tests/golden/SkinFramework.golden.test.js`.
+- Wave 5 hook/runtime Slice 1 enforcement spine is now implemented at `.claude/settings.json`, `.claude/hooks/run-governance-hook.js`, `src/HookRuntime.js`, `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`, `tests/golden/HookRuntime.golden.test.js`, and `tests/live/wave5.hook-runtime.live.test.js`.
+- Slice 1 is bounded to command hooks over `Bash`, `Write`, and `Edit`, runs fail closed, aligns project deny rules to the current HARD_STOP posture, and uses a session-local Stop/Walk gate only; compaction survival, startup re-injection, Agent coverage, package/install, and compatibility work remain later slices.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, onboarding/package work, and later proof/integration work, remains pending.
-- Not yet claimed / not verified: no installable plugin package, runtime hook path, compatibility layer, marketplace/install command surface, or end-to-end runtime setup sequence is implemented yet.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime work beyond Slice 1, onboarding/package work, and later proof/integration work, remains pending.
+- Not yet claimed / not verified: no installable plugin package, compatibility layer, marketplace/install command surface, or end-to-end runtime setup sequence is implemented yet.
 
 ## Wave 1 Focus
 
@@ -106,6 +108,7 @@ Read these in order:
 
 ```text
 .
+├── .claude/                       # Project hook registration plus session-local hook runtime state path
 ├── src/                           # Runtime implementation area (Wave 1 systems implemented)
 ├── tests/
 │   ├── golden/                    # Golden cases for trust-kernel behavior
@@ -137,9 +140,9 @@ Read these in order:
 
 ## Working In This Repo
 
-There is no end-to-end runtime setup sequence yet. Runtime and proof surfaces exist for Waves 1-5 through the currently shipped `/lockout` slice plus tranche 4 skins rendering for supported routes, with canon under `docs/specs/`, runtime under `src/`, golden proof under `tests/golden/`, and live integration proof under `tests/live/` for Waves 1, 3, and 4.
+There is no end-to-end runtime setup sequence yet. Runtime and proof surfaces exist for Waves 1-5 through the currently shipped `/lockout` slice, the local hook/runtime Slice 1 enforcement spine, and tranche 4 skins rendering for supported routes, with canon under `docs/specs/`, project hook registration under `.claude/`, runtime under `src/`, golden proof under `tests/golden/`, and live integration proof under `tests/live/` for Waves 1, 3, 4, and the new hook/runtime slice.
 
-Later Wave 5 skins beyond tranche 4, onboarding/package work, and install/runtime-hook/compatibility claims remain pending or unverified; see `docs/specs/WAVE5_OPERATOR_PRODUCT.md` for the current shipped-vs-later cut.
+Later Wave 5 skins beyond tranche 4, later hook/runtime work beyond Slice 1, onboarding/package work, and install/package/compatibility claims remain pending or unverified; see `docs/specs/WAVE5_OPERATOR_PRODUCT.md` for the current shipped-vs-later cut.
 
 ## Contributing
 
