@@ -8,6 +8,7 @@ const path = require("node:path");
 
 const {
   createEmptySessionState,
+  getCompactionStateFilePath,
   resolveRuntimeConfig,
   runHookEvent,
   saveSessionState,
@@ -28,8 +29,40 @@ function makeTempProject() {
   return projectDir;
 }
 
+function forceHardStopObservedAction(state, timestamp = "2026-04-02T12:32:00Z") {
+  state.observedActions.push({
+    fingerprint: "forced-violation",
+    toolName: "Edit",
+    workItem: "Edit src/pricing-engine.js",
+    domainId: "pricing_quote_logic",
+    domainLabel: "Pricing / quote logic",
+    autonomyLevel: "HARD_STOP",
+    operationType: "change_rules",
+    relativePath: "src/pricing-engine.js",
+    approvalState: "permission_user_review",
+    firstObservedAt: timestamp,
+    lastObservedAt: timestamp,
+  });
+}
+
 test("Wave5 hook runtime live proof: shipped settings and runtime enforce deny/allow/stop truth together", () => {
   const projectDir = makeTempProject();
+
+  const sessionStart = runHookEvent(
+    "SessionStart",
+    {
+      session_id: "wave5_hook_live",
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "startup",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:29:00Z",
+    }
+  );
+
+  assert.match(sessionStart.hookSpecificOutput.additionalContext, /Source=startup/);
 
   const preToolResult = runHookEvent(
     "PreToolUse",
@@ -74,19 +107,7 @@ test("Wave5 hook runtime live proof: shipped settings and runtime enforce deny/a
 
   const config = resolveRuntimeConfig(projectDir);
   const state = createEmptySessionState("wave5_hook_live", config.profile);
-  state.observedActions.push({
-    fingerprint: "forced-violation",
-    toolName: "Edit",
-    workItem: "Edit src/pricing-engine.js",
-    domainId: "pricing_quote_logic",
-    domainLabel: "Pricing / quote logic",
-    autonomyLevel: "HARD_STOP",
-    operationType: "change_rules",
-    relativePath: "src/pricing-engine.js",
-    approvalState: "permission_user_review",
-    firstObservedAt: "2026-04-02T12:32:00Z",
-    lastObservedAt: "2026-04-02T12:32:00Z",
-  });
+  forceHardStopObservedAction(state);
   saveSessionState(config, "wave5_hook_live", state);
 
   const firstStop = runHookEvent(
@@ -122,6 +143,66 @@ test("Wave5 hook runtime live proof: shipped settings and runtime enforce deny/a
   );
 
   assert.deepEqual(secondStop, {});
+});
+
+test("Wave5 hook runtime live proof: PreCompact snapshot rehydrates compact SessionStart", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+
+  const sourceState = createEmptySessionState("wave5_hook_compact_source", config.profile);
+  forceHardStopObservedAction(sourceState, "2026-04-02T12:40:00Z");
+  saveSessionState(config, "wave5_hook_compact_source", sourceState);
+
+  runHookEvent(
+    "PreCompact",
+    {
+      session_id: "wave5_hook_compact_source",
+      cwd: projectDir,
+      hook_event_name: "PreCompact",
+      trigger: "manual",
+      custom_instructions: "",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:41:00Z",
+    }
+  );
+
+  assert.equal(fs.existsSync(getCompactionStateFilePath(config)), true);
+
+  const sessionStart = runHookEvent(
+    "SessionStart",
+    {
+      session_id: "wave5_hook_compact_target",
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "compact",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:42:00Z",
+    }
+  );
+
+  assert.match(sessionStart.hookSpecificOutput.additionalContext, /Source=compact/);
+  assert.match(sessionStart.hookSpecificOutput.additionalContext, /Recovery=Rehydrated/);
+
+  const stopResult = runHookEvent(
+    "Stop",
+    {
+      session_id: "wave5_hook_compact_target",
+      cwd: projectDir,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+      last_assistant_message: "closeout after compact",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:43:00Z",
+    }
+  );
+
+  assert.equal(stopResult.decision, "block");
 });
 
 test("Wave5 hook runtime live proof: malformed hook posture throws before any allow path can proceed", () => {

@@ -10,6 +10,7 @@ const {
   DEFAULT_PROFILE_ID,
   PROJECT_HARD_STOP_DENY_RULES,
   createEmptySessionState,
+  getCompactionStateFilePath,
   getStateFilePath,
   loadSessionState,
   resolveRuntimeConfig,
@@ -45,6 +46,22 @@ function makeTempProject() {
   return projectDir;
 }
 
+function forceHardStopObservedAction(state, timestamp = "2026-04-02T12:15:00Z") {
+  state.observedActions.push({
+    fingerprint: "forced-hard-stop-action",
+    toolName: "Edit",
+    workItem: "Edit src/pricing-engine.js",
+    domainId: "pricing_quote_logic",
+    domainLabel: "Pricing / quote logic",
+    autonomyLevel: "HARD_STOP",
+    operationType: "change_rules",
+    relativePath: "src/pricing-engine.js",
+    approvalState: "permission_user_review",
+    firstObservedAt: timestamp,
+    lastObservedAt: timestamp,
+  });
+}
+
 test("HookRuntime resolves conservative runtime config by default", () => {
   const projectDir = makeTempProject();
   const config = resolveRuntimeConfig(projectDir);
@@ -68,6 +85,32 @@ test("HookRuntime resolves conservative runtime config by default", () => {
     "Edit(/**/*auth*.*)",
     "Edit(/**/*security*.*)",
   ]);
+});
+
+test("HookRuntime SessionStart startup injects bounded governance context", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "SessionStart",
+    {
+      session_id: "session-startup",
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "startup",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T11:59:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "SessionStart");
+  assert.match(result.hookSpecificOutput.additionalContext, /Source=startup/);
+  assert.match(result.hookSpecificOutput.additionalContext, /Profile=conservative/);
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-startup");
+  assert.equal(state.sessionStart.source, "startup");
+  assert.equal(state.recovery.status, "not_required");
 });
 
 test("HookRuntime PreToolUse denies HARD_STOP pricing edits and records blocked attempt", () => {
@@ -161,25 +204,174 @@ test("HookRuntime PermissionRequest preserves SUPERVISED approval flow for exist
   assert.equal(state.observedActions[0].approvalState, "permission_user_review");
 });
 
+test("HookRuntime PreCompact preserves state and SessionStart compact rehydrates it", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+
+  const sourceState = createEmptySessionState("session-before-compact", config.profile);
+  forceHardStopObservedAction(sourceState, "2026-04-02T12:15:00Z");
+  sourceState.lastWalk = {
+    evaluatedAt: "2026-04-02T12:16:00Z",
+    findingSummary: {
+      CRITICAL: 1,
+    },
+    findings: [
+      {
+        issueRef: "hook_action_1",
+        findingType: "OUT_OF_SCOPE",
+        severity: "CRITICAL",
+        summary: "Forced recovery finding.",
+      },
+    ],
+  };
+  saveSessionState(config, "session-before-compact", sourceState);
+
+  const preCompact = runHookEvent(
+    "PreCompact",
+    {
+      session_id: "session-before-compact",
+      cwd: projectDir,
+      hook_event_name: "PreCompact",
+      trigger: "manual",
+      custom_instructions: "",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:17:00Z",
+    }
+  );
+
+  assert.deepEqual(preCompact, {});
+  assert.equal(fs.existsSync(getCompactionStateFilePath(config)), true);
+
+  const sessionStart = runHookEvent(
+    "SessionStart",
+    {
+      session_id: "session-after-compact",
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "compact",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:18:00Z",
+    }
+  );
+
+  assert.match(sessionStart.hookSpecificOutput.additionalContext, /Source=compact/);
+  assert.match(sessionStart.hookSpecificOutput.additionalContext, /Recovery=Rehydrated/);
+
+  const rehydratedState = loadSessionState(config, "session-after-compact");
+  assert.equal(rehydratedState.recovery.status, "ok");
+  assert.equal(rehydratedState.observedActions.length, 1);
+  assert.equal(rehydratedState.observedActions[0].domainId, "pricing_quote_logic");
+
+  const stopResult = runHookEvent(
+    "Stop",
+    {
+      session_id: "session-after-compact",
+      cwd: projectDir,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:19:00Z",
+    }
+  );
+
+  assert.equal(stopResult.decision, "block");
+});
+
+test("HookRuntime SessionStart compact without preserved state enters recovery HOLD and Stop blocks", () => {
+  const projectDir = makeTempProject();
+
+  const sessionStart = runHookEvent(
+    "SessionStart",
+    {
+      session_id: "session-compact-missing",
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "compact",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:22:00Z",
+    }
+  );
+
+  assert.match(sessionStart.hookSpecificOutput.additionalContext, /RecoveryHOLD=missing/);
+
+  const config = resolveRuntimeConfig(projectDir);
+  const state = loadSessionState(config, "session-compact-missing");
+  assert.equal(state.recovery.status, "missing");
+
+  const stopResult = runHookEvent(
+    "Stop",
+    {
+      session_id: "session-compact-missing",
+      cwd: projectDir,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:23:00Z",
+    }
+  );
+
+  assert.equal(stopResult.decision, "block");
+  assert.match(stopResult.reason, /Foreman's Walk gate blocked closeout/);
+});
+
+test("HookRuntime SessionStart compact with malformed preserved state enters recovery HOLD", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  fs.mkdirSync(path.dirname(getCompactionStateFilePath(config)), { recursive: true });
+  fs.writeFileSync(getCompactionStateFilePath(config), "{bad json", "utf8");
+
+  const sessionStart = runHookEvent(
+    "SessionStart",
+    {
+      session_id: "session-compact-malformed",
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "compact",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:24:00Z",
+    }
+  );
+
+  assert.match(sessionStart.hookSpecificOutput.additionalContext, /RecoveryHOLD=malformed/);
+
+  const state = loadSessionState(config, "session-compact-malformed");
+  assert.equal(state.recovery.status, "malformed");
+
+  const stopResult = runHookEvent(
+    "Stop",
+    {
+      session_id: "session-compact-malformed",
+      cwd: projectDir,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:25:00Z",
+    }
+  );
+
+  assert.equal(stopResult.decision, "block");
+});
+
 test("HookRuntime Stop blocks once on blocking Walk findings and then respects stop loop guard", () => {
   const projectDir = makeTempProject();
   const config = resolveRuntimeConfig(projectDir);
   const state = createEmptySessionState("session-stop-block", config.profile);
 
-  state.observedActions.push({
-    fingerprint: "forced-hard-stop-action",
-    toolName: "Edit",
-    workItem: "Edit src/pricing-engine.js",
-    domainId: "pricing_quote_logic",
-    domainLabel: "Pricing / quote logic",
-    autonomyLevel: "HARD_STOP",
-    operationType: "change_rules",
-    relativePath: "src/pricing-engine.js",
-    approvalState: "permission_user_review",
-    firstObservedAt: "2026-04-02T12:15:00Z",
-    lastObservedAt: "2026-04-02T12:15:00Z",
-  });
-
+  forceHardStopObservedAction(state, "2026-04-02T12:15:00Z");
   saveSessionState(config, "session-stop-block", state);
 
   const first = runHookEvent(
