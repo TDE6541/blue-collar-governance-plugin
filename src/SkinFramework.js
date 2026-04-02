@@ -4,6 +4,9 @@ const SUPPORTED_SKINS = Object.freeze([
   "whiteboard",
   "punch-list",
   "inspection-report",
+  "work-order",
+  "dispatch-board",
+  "ticket-system",
 ]);
 const SUPPORTED_SKIN_SET = new Set(SUPPORTED_SKINS);
 
@@ -13,6 +16,9 @@ const ROUTE_SUPPORT_MATRIX = Object.freeze({
   whiteboard: Object.freeze(["/toolbox-talk", "/receipt", "/as-built", "/walk"]),
   "punch-list": Object.freeze(["/toolbox-talk", "/receipt", "/as-built", "/walk"]),
   "inspection-report": Object.freeze(["/receipt", "/as-built", "/walk"]),
+  "work-order": Object.freeze(["/toolbox-talk", "/receipt", "/as-built"]),
+  "dispatch-board": Object.freeze(["/walk", "/phantoms", "/change-order", "/control-rods"]),
+  "ticket-system": Object.freeze(["/receipt", "/walk", "/phantoms", "/change-order"]),
 });
 
 const ROUTE_LABELS = Object.freeze({
@@ -20,6 +26,9 @@ const ROUTE_LABELS = Object.freeze({
   "/receipt": "Receipt",
   "/as-built": "As-Built",
   "/walk": "Walk",
+  "/phantoms": "Phantoms",
+  "/change-order": "Change Order",
+  "/control-rods": "Control Rods",
 });
 
 const SKIN_DEFINITIONS = Object.freeze({
@@ -124,6 +133,106 @@ const SKIN_DEFINITIONS = Object.freeze({
       "evaluation-totals": "Evaluation Totals",
       observations: "Observations",
       "corrections-required": "Corrections Required",
+    }),
+  }),
+  "work-order": Object.freeze({
+    skinLabel: "Work Order",
+    layoutTemplate: Object.freeze({
+      "/toolbox-talk": Object.freeze([
+        "work-order-header",
+        "scope-of-work",
+        "blockers-and-do-notes",
+      ]),
+      "/receipt": Object.freeze([
+        "work-order-header",
+        "scope-of-work",
+        "blockers-and-do-notes",
+        "document-record",
+      ]),
+      "/as-built": Object.freeze([
+        "work-order-header",
+        "scope-of-work",
+        "blockers-and-do-notes",
+      ]),
+    }),
+    labelMap: Object.freeze({
+      "work-order-header": "Work Order Header",
+      "scope-of-work": "Scope Of Work",
+      "blockers-and-do-notes": "Blockers And Do-Not Notes",
+      "document-record": "Document Record",
+    }),
+  }),
+  "dispatch-board": Object.freeze({
+    skinLabel: "Dispatch Board",
+    layoutTemplate: Object.freeze({
+      "/walk": Object.freeze([
+        "dispatch-overview",
+        "finding-queue",
+        "status-queue",
+      ]),
+      "/phantoms": Object.freeze([
+        "dispatch-overview",
+        "phantom-lane",
+        "ghost-lane",
+        "partial-verification-lane",
+      ]),
+      "/change-order": Object.freeze([
+        "dispatch-overview",
+        "deferred-lane",
+        "approved-lane",
+        "rejected-lane",
+      ]),
+      "/control-rods": Object.freeze([
+        "dispatch-overview",
+        "hard-stop-lane",
+        "supervised-lane",
+        "full-auto-lane",
+      ]),
+    }),
+    labelMap: Object.freeze({
+      "dispatch-overview": "Board Overview",
+      "finding-queue": "Finding Queue",
+      "status-queue": "Status Queue",
+      "phantom-lane": "Phantom Lane",
+      "ghost-lane": "Ghost Lane",
+      "partial-verification-lane": "Partial Verification Lane",
+      "deferred-lane": "Deferred Lane",
+      "approved-lane": "Approved Lane",
+      "rejected-lane": "Rejected Lane",
+      "hard-stop-lane": "Hard Stop Lane",
+      "supervised-lane": "Supervised Lane",
+      "full-auto-lane": "Full Auto Lane",
+    }),
+  }),
+  "ticket-system": Object.freeze({
+    skinLabel: "Ticket System",
+    layoutTemplate: Object.freeze({
+      "/receipt": Object.freeze([
+        "ticket-record",
+        "lifecycle-detail",
+        "ticket-detail",
+      ]),
+      "/walk": Object.freeze([
+        "ticket-record",
+        "lifecycle-detail",
+        "evidence-detail",
+      ]),
+      "/phantoms": Object.freeze([
+        "ticket-record",
+        "lifecycle-detail",
+        "evidence-detail",
+      ]),
+      "/change-order": Object.freeze([
+        "ticket-record",
+        "lifecycle-detail",
+        "evidence-detail",
+      ]),
+    }),
+    labelMap: Object.freeze({
+      "ticket-record": "Ticket Record",
+      "lifecycle-detail": "Lifecycle Detail",
+      "ticket-detail": "Ticket Detail",
+      "evidence-detail": "Evidence Detail",
     }),
   }),
 });
@@ -260,6 +369,28 @@ function formatOptionalTaggedLine(tag, value) {
   return [makeLine(tag, value)];
 }
 
+function formatMappedList(value, formatter, emptyText) {
+  if (!Array.isArray(value) || value.length === 0) {
+    return [emptyText];
+  }
+
+  return value.map((entry) => formatter(entry));
+}
+
+function filterEntries(value, fieldName, expectedValue) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter(
+    (entry) => isPlainObject(entry) && entry[fieldName] === expectedValue
+  );
+}
+
+function joinListOrNone(values) {
+  return Array.isArray(values) && values.length > 0 ? values.join(", ") : "None";
+}
+
 function buildSections(skinId, route, sectionLinesById) {
   const definition = SKIN_DEFINITIONS[skinId];
   const sectionIds = definition.layoutTemplate[route];
@@ -301,6 +432,21 @@ function formatWalkCorrection(finding) {
   }`;
 }
 
+function formatChangeOrderCard(entry) {
+  return `${entry.changeOrderId} | ${entry.status} | ${entry.decisionReason}`;
+}
+
+function formatChangeOrderLifecycle(entry) {
+  return `${entry.changeOrderId} | Decision By: ${formatScalar(entry.decisionBy)} | Decided At: ${formatScalar(entry.decidedAt)}`;
+}
+
+function formatChangeOrderEvidence(entry) {
+  return `${entry.changeOrderId} | Source Refs: ${joinListOrNone(entry.sourceRefs)} | Evidence Refs: ${joinListOrNone(entry.evidenceRefs)}`;
+}
+
+function formatDomainCard(rule) {
+  return `${rule.domainId} | ${rule.label} | ${rule.autonomyLevel} | ${rule.justification}`;
+}
 function renderWhiteboard(rawView) {
   switch (rawView.route) {
     case "/toolbox-talk":
@@ -645,6 +791,313 @@ function renderInspectionReport(rawView) {
   }
 }
 
+function renderWorkOrder(rawView) {
+  switch (rawView.route) {
+    case "/toolbox-talk":
+      return buildPresentation("work-order", rawView, {
+        "work-order-header": [
+          makeLine("Brief", rawView.briefId),
+          makeLine("Available", rawView.available),
+          makeLine("Summary", rawView.summary),
+        ],
+        "scope-of-work": [
+          ...formatObjectLines(rawView.counts, "No scope counts in canonical view."),
+          ...formatTaggedList("Ref", rawView.refs, "No refs in canonical view."),
+        ],
+        "blockers-and-do-notes": [
+          ...formatTaggedList(
+            "Hazard",
+            rawView.currentHazards,
+            "No current hazards in canonical view."
+          ),
+          ...formatOptionalTaggedLine(
+            "Deferred Change Order",
+            rawView.activeDeferredChangeOrderSummary
+          ),
+          ...formatOptionalTaggedLine("Permit / Lockout", rawView.permitLockoutSummary),
+          ...formatOptionalTaggedLine(
+            "Standing Risk",
+            rawView.continuityStandingRiskSummary
+          ),
+        ],
+      });
+    case "/receipt":
+      return buildPresentation("work-order", rawView, {
+        "work-order-header": [
+          makeLine("Receipt", rawView.receiptId),
+          makeLine("Brief Ref", rawView.briefRef),
+          makeLine("Outcome", rawView.outcome),
+          makeLine("Signoff Required", rawView.signoffRequired),
+        ],
+        "scope-of-work": [
+          makeLine("Summary", rawView.summary),
+          ...formatTaggedList(
+            "Artifact",
+            rawView.artifactsChanged,
+            "No artifacts changed in canonical view."
+          ),
+          ...formatTaggedList(
+            "Approved Drift",
+            rawView.approvedDrift,
+            "No approved drift in canonical view."
+          ),
+        ],
+        "blockers-and-do-notes": [
+          ...formatTaggedList("Hold", rawView.holdsRaised, "No holds raised in canonical view."),
+          ...formatTaggedList(
+            "Excluded Work",
+            rawView.excludedWork,
+            "No excluded work in canonical view."
+          ),
+        ],
+        "document-record": [
+          makeLine("Created By", rawView.createdBy),
+          makeLine("Created At", rawView.createdAt),
+          makeLine("Updated At", rawView.updatedAt),
+        ],
+      });
+    case "/as-built":
+      return buildPresentation("work-order", rawView, {
+        "work-order-header": [
+          makeLine("Receipt", rawView.receiptId),
+          makeLine("Outcome", rawView.outcome),
+          makeLine("Signoff Required", rawView.signoffRequired),
+          makeLine("Summary", rawView.summary),
+        ],
+        "scope-of-work": [
+          ...formatTaggedList(
+            "Planned But Incomplete",
+            rawView.plannedButIncomplete,
+            "No planned-but-incomplete scope items in canonical view."
+          ),
+          ...formatTaggedList(
+            "Unplanned Completed",
+            rawView.unplannedCompleted,
+            "No unplanned-completed scope items in canonical view."
+          ),
+          ...formatTaggedList(
+            "Approved Drift",
+            rawView.approvedDrift,
+            "No approved drift in canonical view."
+          ),
+        ],
+        "blockers-and-do-notes": [
+          ...formatTaggedList(
+            "Hold",
+            rawView.holdsRaised,
+            "No holds raised in canonical view."
+          ),
+          ...formatTaggedList(
+            "Excluded Work",
+            rawView.excludedWork,
+            "No excluded work in canonical view."
+          ),
+        ],
+      });
+    default:
+      throw makeValidationError("ERR_INVALID_INPUT", `'rawView.route' is unsupported for skin rendering`);
+  }
+}
+function renderDispatchBoard(rawView) {
+  switch (rawView.route) {
+    case "/walk":
+      return buildPresentation("dispatch-board", rawView, {
+        "dispatch-overview": [
+          makeLine("Finding Count", rawView.findingCount),
+          makeLine("Session Of Record Ref", rawView.sessionOfRecordRef),
+        ],
+        "finding-queue": formatMappedList(
+          rawView.findings,
+          (finding) => formatWalkObservation(finding),
+          "No finding cards in canonical walk view."
+        ),
+        "status-queue": [
+          ...formatObjectLines(rawView.findingSummary, "No finding totals in canonical view."),
+          ...formatObjectLines(
+            rawView.asBuiltStatusCounts,
+            "No As-Built status counts in canonical view."
+          ),
+        ],
+      });
+    case "/phantoms":
+      return buildPresentation("dispatch-board", rawView, {
+        "dispatch-overview": [
+          makeLine("Finding Count", rawView.findingCount),
+          ...formatObjectLines(rawView.findingSummary, "No phantom totals in canonical view."),
+        ],
+        "phantom-lane": formatMappedList(
+          filterEntries(rawView.findings, "findingType", "PHANTOM"),
+          (finding) => formatWalkObservation(finding),
+          "No phantom cards in canonical view."
+        ),
+        "ghost-lane": formatMappedList(
+          filterEntries(rawView.findings, "findingType", "GHOST"),
+          (finding) => formatWalkObservation(finding),
+          "No ghost cards in canonical view."
+        ),
+        "partial-verification-lane": formatMappedList(
+          filterEntries(rawView.findings, "findingType", "PARTIAL_VERIFICATION"),
+          (finding) => formatWalkObservation(finding),
+          "No partial-verification cards in canonical view."
+        ),
+      });
+    case "/change-order":
+      return buildPresentation("dispatch-board", rawView, {
+        "dispatch-overview": [
+          makeLine("Change Order Count", rawView.changeOrderCount),
+          makeLine("Snapshot State", rawView.snapshotState),
+        ],
+        "deferred-lane": formatMappedList(
+          filterEntries(rawView.changeOrders, "status", "DEFERRED"),
+          (entry) => formatChangeOrderCard(entry),
+          "No deferred change orders in canonical view."
+        ),
+        "approved-lane": formatMappedList(
+          filterEntries(rawView.changeOrders, "status", "APPROVED"),
+          (entry) => formatChangeOrderCard(entry),
+          "No approved change orders in canonical view."
+        ),
+        "rejected-lane": formatMappedList(
+          filterEntries(rawView.changeOrders, "status", "REJECTED"),
+          (entry) => formatChangeOrderCard(entry),
+          "No rejected change orders in canonical view."
+        ),
+      });
+    case "/control-rods":
+      return buildPresentation("dispatch-board", rawView, {
+        "dispatch-overview": [
+          makeLine("Profile Id", rawView.profile && rawView.profile.profileId),
+          makeLine("Profile Label", rawView.profile && rawView.profile.profileLabel),
+          makeLine("Starter Profiles", joinListOrNone(rawView.starterProfileIds)),
+          ...formatObjectLines(rawView.summary, "No control-rod summary in canonical view."),
+        ],
+        "hard-stop-lane": formatMappedList(
+          filterEntries(rawView.domains, "autonomyLevel", "HARD_STOP"),
+          (rule) => formatDomainCard(rule),
+          "No HARD_STOP domains in canonical view."
+        ),
+        "supervised-lane": formatMappedList(
+          filterEntries(rawView.domains, "autonomyLevel", "SUPERVISED"),
+          (rule) => formatDomainCard(rule),
+          "No SUPERVISED domains in canonical view."
+        ),
+        "full-auto-lane": formatMappedList(
+          filterEntries(rawView.domains, "autonomyLevel", "FULL_AUTO"),
+          (rule) => formatDomainCard(rule),
+          "No FULL_AUTO domains in canonical view."
+        ),
+      });
+    default:
+      throw makeValidationError("ERR_INVALID_INPUT", `'rawView.route' is unsupported for skin rendering`);
+  }
+}
+
+function renderTicketSystem(rawView) {
+  switch (rawView.route) {
+    case "/receipt":
+      return buildPresentation("ticket-system", rawView, {
+        "ticket-record": [
+          makeLine("Receipt", rawView.receiptId),
+          makeLine("Brief Ref", rawView.briefRef),
+          makeLine("Summary", rawView.summary),
+        ],
+        "lifecycle-detail": [
+          makeLine("Outcome", rawView.outcome),
+          makeLine("Signoff Required", rawView.signoffRequired),
+          makeLine("Created By", rawView.createdBy),
+          makeLine("Created At", rawView.createdAt),
+          makeLine("Updated At", rawView.updatedAt),
+        ],
+        "ticket-detail": [
+          ...formatTaggedList("Hold", rawView.holdsRaised, "No holds raised in canonical view."),
+          ...formatTaggedList(
+            "Approved Drift",
+            rawView.approvedDrift,
+            "No approved drift in canonical view."
+          ),
+          ...formatTaggedList(
+            "Excluded Work",
+            rawView.excludedWork,
+            "No excluded work in canonical view."
+          ),
+          ...formatTaggedList(
+            "Artifact",
+            rawView.artifactsChanged,
+            "No artifacts changed in canonical view."
+          ),
+        ],
+      });
+    case "/walk":
+      return buildPresentation("ticket-system", rawView, {
+        "ticket-record": [
+          makeLine("Finding Count", rawView.findingCount),
+          makeLine("Session Of Record Ref", rawView.sessionOfRecordRef),
+          ...formatMappedList(
+            rawView.findings,
+            (finding) => formatWalkObservation(finding),
+            "No ticket records in canonical walk view."
+          ),
+        ],
+        "lifecycle-detail": [
+          ...formatObjectLines(rawView.findingSummary, "No lifecycle counts in canonical view."),
+          ...formatObjectLines(
+            rawView.asBuiltStatusCounts,
+            "No As-Built status counts in canonical view."
+          ),
+        ],
+        "evidence-detail": formatMappedList(
+          rawView.findings,
+          (finding) => formatWalkCorrection(finding),
+          "No evidence detail in canonical walk view."
+        ),
+      });
+    case "/phantoms":
+      return buildPresentation("ticket-system", rawView, {
+        "ticket-record": [
+          makeLine("Finding Count", rawView.findingCount),
+          ...formatMappedList(
+            rawView.findings,
+            (finding) => formatWalkObservation(finding),
+            "No ticket records in canonical phantoms view."
+          ),
+        ],
+        "lifecycle-detail": formatObjectLines(
+          rawView.findingSummary,
+          "No lifecycle counts in canonical view."
+        ),
+        "evidence-detail": formatMappedList(
+          rawView.findings,
+          (finding) => formatWalkCorrection(finding),
+          "No evidence detail in canonical phantoms view."
+        ),
+      });
+    case "/change-order":
+      return buildPresentation("ticket-system", rawView, {
+        "ticket-record": [
+          makeLine("Change Order Count", rawView.changeOrderCount),
+          makeLine("Snapshot State", rawView.snapshotState),
+          ...formatMappedList(
+            rawView.changeOrders,
+            (entry) => formatChangeOrderCard(entry),
+            "No ticket records in canonical change-order view."
+          ),
+        ],
+        "lifecycle-detail": formatMappedList(
+          rawView.changeOrders,
+          (entry) => formatChangeOrderLifecycle(entry),
+          "No lifecycle detail in canonical change-order view."
+        ),
+        "evidence-detail": formatMappedList(
+          rawView.changeOrders,
+          (entry) => formatChangeOrderEvidence(entry),
+          "No evidence detail in canonical change-order view."
+        ),
+      });
+    default:
+      throw makeValidationError("ERR_INVALID_INPUT", `'rawView.route' is unsupported for skin rendering`);
+  }
+}
+
 function renderSupportedPresentation(skinId, rawView) {
   switch (skinId) {
     case "whiteboard":
@@ -653,6 +1106,12 @@ function renderSupportedPresentation(skinId, rawView) {
       return renderPunchList(rawView);
     case "inspection-report":
       return renderInspectionReport(rawView);
+    case "work-order":
+      return renderWorkOrder(rawView);
+    case "dispatch-board":
+      return renderDispatchBoard(rawView);
+    case "ticket-system":
+      return renderTicketSystem(rawView);
     default:
       throw makeValidationError("ERR_INVALID_INPUT", `'options.skinId' is unsupported`);
   }
