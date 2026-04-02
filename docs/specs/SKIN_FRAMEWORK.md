@@ -1,5 +1,5 @@
 # SKIN_FRAMEWORK.md
-**Status:** Wave 5 skins contract baseline (v2: tranches 1-2)
+**Status:** Wave 5 skins contract baseline (v3: tranches 1-3)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -19,7 +19,7 @@ Same engine data, different rendering.
 - the Whiteboard default rule for supported routes
 - deterministic translation of existing canonical route views into skin display sections
 - explicit fail-closed behavior for unsupported skin/route combinations
-- structural distinction rules for Whiteboard, Punch List, Inspection Report, Work Order, Dispatch Board, and Ticket System
+- structural distinction rules for Whiteboard, Punch List, Inspection Report, Work Order, Dispatch Board, Ticket System, Daily Log, Repair Order, and Kitchen Ticket
 
 This spec does not define:
 
@@ -30,13 +30,13 @@ This spec does not define:
 - any `/skin` slash route
 - any skin editor, customization UI, or generalized template engine
 - onboarding, package, install, runtime-hook, compatibility, or marketplace behavior
-- Military Brief, Estimate / Bid, or later skin tranches beyond tranche 2
+- Military Brief, Estimate / Bid, or later skin tranches beyond tranche 3
 
 ## Public And Internal Names
 
 - Public/operator-facing tranche label: `Skin Framework`
 - Internal build name: `SkinFramework`
-- Supported skins: `whiteboard`, `punch-list`, `inspection-report`, `work-order`, `dispatch-board`, `ticket-system`
+- Supported skins: `whiteboard`, `punch-list`, `inspection-report`, `work-order`, `dispatch-board`, `ticket-system`, `daily-log`, `repair-order`, `kitchen-ticket`
 
 ## Core Rule
 
@@ -55,13 +55,19 @@ This spec does not define:
 | `work-order` | `/toolbox-talk`, `/receipt`, `/as-built` |
 | `dispatch-board` | `/walk`, `/phantoms`, `/change-order`, `/control-rods` |
 | `ticket-system` | `/receipt`, `/walk`, `/phantoms`, `/change-order` |
+| `daily-log` | `/toolbox-talk`, `/receipt`, `/as-built`, `/walk` |
+| `repair-order` | `/receipt`, `/as-built` |
+| `kitchen-ticket` | `/walk`, `/phantoms`, `/change-order` |
 
-Tranche 1-2 limits:
+Tranche 1-3 limits:
 
 - `inspection-report` does not support `/toolbox-talk`.
 - `work-order` does not support `/walk`, `/phantoms`, `/change-order`, or `/control-rods`.
 - `dispatch-board` does not support `/toolbox-talk`, `/receipt`, or `/as-built`.
 - `ticket-system` does not support `/toolbox-talk`, `/as-built`, or `/control-rods`.
+- `daily-log` does not support `/phantoms`, `/change-order`, or `/control-rods`.
+- `repair-order` does not support `/toolbox-talk`, `/walk`, `/phantoms`, `/change-order`, or `/control-rods`.
+- `kitchen-ticket` does not support `/toolbox-talk`, `/receipt`, `/as-built`, or `/control-rods`.
 - Routes outside this matrix remain raw canonical views in shipped skin behavior.
 
 ## Default Rule
@@ -84,10 +90,16 @@ Tranche 1-2 limits:
 - `work-order` is a job-start / scope-of-work document view.
 - `dispatch-board` is a grouped operational overview / board-lane view.
 - `ticket-system` is a record-detail / lifecycle view.
+- `daily-log` is a category-organized project-memory / work / issues / notes view and may render safety or hazard sections only when the canonical route already carries that truth.
+- `repair-order` is a diagnostic request / findings / performed-work or unresolved-exception view.
+- `kitchen-ticket` is a terse item-first operational ticket stack.
 - No two skins may ship as near-duplicates with renamed headings only.
 - `inspection-report` must not invent green/yellow/red or other evaluative semantics where the canonical route view does not honestly support them.
 - `dispatch-board` must not invent GPS, fleet telemetry, dispatch timing, or crew-ownership fields not present in canonical route truth.
 - `ticket-system` must not invent age badges, SLA markers, ETA, assignment state, or duration fields not present in canonical route truth.
+- `daily-log` must not invent safety incidents, attendance logs, superintendent review chains, or dual-signoff records where the canonical route view does not honestly support them.
+- `repair-order` must not invent RO numbers, labor hours, labor rate, parts cost, parts inventory, technician assignment, invoice state, checkout state, or approval signatures where the canonical route view does not honestly support them.
+- `kitchen-ticket` must not invent prep timers, age colors, overdue badges, ETA, station timers, station routing, bump workflow semantics, or derived rush flags where the canonical route view does not honestly support them.
 
 ## No-Fake-Field Rule
 
@@ -95,6 +107,7 @@ Tranche 1-2 limits:
 - Skin rendering must not invent scores, ranks, badges, leaderboards, or other gamification fields.
 - Skin rendering must not invent workflow state, severity, approval state, or evaluation state not present in canonical route truth.
 - Skin rendering must not invent labor totals, pricing, GPS / fleet telemetry, ETA, age badges, SLA markers, duration, or assignment metadata not present in canonical route truth.
+- Skin rendering must not invent repair-cost, labor-hour, parts, timer, kitchen-station, incident, or approval-signature metadata not present in canonical route truth.
 - Skin rendering must not widen raw route objects with skin-only fields.
 
 ## Runtime Contract
@@ -147,4 +160,4 @@ Output object:
 
 - Runtime framework implementation exists at `src/SkinFramework.js`.
 - Golden proof exists at `tests/golden/SkinFramework.golden.test.js`.
-- This contract is the sole tranche 1-2 skin behavior owner.
+- This contract is the sole tranche 1-3 skin behavior owner.
