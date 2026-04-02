@@ -59,7 +59,7 @@ Use this index to find the right canon surface before making a change.
 ## Wave 5 Operator Product Truth
 
 - Change `docs/specs/WAVE5_OPERATOR_PRODUCT.md` for Wave 5 umbrella truth, locked decisions, 5A/5B split, anti-goals, and no-leakage fence.
-- Change `docs/specs/SKIN_FRAMEWORK.md` for tranche 1 skin ids, supported route matrix, fallback behavior, Whiteboard default rule, and structural distinction rules.
+- Change `docs/specs/SKIN_FRAMEWORK.md` for shipped skin ids, supported route matrix, fallback behavior, Whiteboard default rule, and structural distinction rules.
 - Change `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` for Block 0 substrate merit rubric and decisions (Operator Trust Ledger, Warranty, Scarcity Signal, SessionBrief no-widening).
 - Change `docs/specs/OPERATOR_TRUST_LEDGER.md` for Wave 5A Block A operator trust lifecycle substrate contract shape and invariants.
 - Change `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` for Wave 5A Block A deterministic trust decision contract shape and boundaries.
@@ -130,7 +130,7 @@ Use this index to find the right canon surface before making a change.
 - Change `src/RedTagSkill.js` for deterministic evaluate/render-only `/red-tag` interlock decision behavior over existing SafetyInterlocks truth.
 - Change `src/PermitSkill.js` for deterministic evaluate/render-only `/permit` gate decision behavior over existing ControlRodMode HARD_STOP permit-gate truth.
 - Change `src/LockoutSkill.js` for deterministic evaluate/render-only `/lockout` LOTO validation behavior over existing ControlRodMode authorization validation truth.
-- Change `src/SkinFramework.js` for tranche 1 skin rendering behavior over existing canonical route views and raw fallback on unsupported combinations.
+- Change `src/SkinFramework.js` for shipped skin rendering behavior over existing canonical route views and raw fallback on unsupported combinations.
 - Change `skills/toolbox-talk-SKILL.md` for Wave 5B Block A `/toolbox-talk` operator-facing skill behavior.
 - Change `skills/receipt-SKILL.md` for Wave 5B Block A `/receipt` operator-facing skill behavior.
 - Change `skills/as-built-SKILL.md` for Wave 5B Block A `/as-built` operator-facing skill behavior.
@@ -188,7 +188,7 @@ Use this index to find the right canon surface before making a change.
 - Add `tests/golden/RedTagSkill.golden.test.js` for `/red-tag` interlock decision surface skill adapter golden verification.
 - Add `tests/golden/PermitSkill.golden.test.js` for `/permit` gate decision surface skill adapter golden verification.
 - Add `tests/golden/LockoutSkill.golden.test.js` for `/lockout` LOTO validation surface skill adapter golden verification.
-- Add `tests/golden/SkinFramework.golden.test.js` for tranche 1 skin rendering verification and unsupported-route raw fallback proof.
+- Change `tests/golden/SkinFramework.golden.test.js` for shipped skin rendering verification, unsupported-route raw fallback proof, and no-fake-field coverage.
 - Add golden references under `tests/golden/`.
 - Add `tests/live/wave3.active-governance.live.test.js` for Wave 3 Block D integration proof.
 - Add `tests/live/wave4.live-oversight.live.test.js` for Wave 4 Block D integration proof.

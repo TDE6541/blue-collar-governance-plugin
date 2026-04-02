@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 1 skins rendering for supported routes; later Wave 5 work outside the current shipped set remains pending; install/package/runtime-hook/compatibility claims remain unverified
+- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 2 skins rendering for supported routes; later Wave 5 work outside the current shipped set remains pending; install/package/runtime-hook/compatibility claims remain unverified
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -98,14 +98,14 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - A Wave 5B `/red-tag` interlock decision surface is implemented (`docs/specs/RED_TAG_SKILL.md`, `skills/red-tag-SKILL.md`, `src/RedTagSkill.js`, `tests/golden/RedTagSkill.golden.test.js`).
 - A Wave 5B `/permit` gate decision surface is implemented (`docs/specs/PERMIT_SKILL.md`, `skills/permit-SKILL.md`, `src/PermitSkill.js`, `tests/golden/PermitSkill.golden.test.js`).
 - A Wave 5B `/lockout` LOTO validation surface is implemented (`docs/specs/LOCKOUT_SKILL.md`, `skills/lockout-SKILL.md`, `src/LockoutSkill.js`, `tests/golden/LockoutSkill.golden.test.js`).
-- Wave 5 skins tranche 1 is implemented (`docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, `tests/golden/SkinFramework.golden.test.js`).
-- Whiteboard and Punch List support `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report supports `/receipt`, `/as-built`, and `/walk`; unsupported combinations fail closed to raw canonical render.
+- Wave 5 skins tranche 2 is implemented (`docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, `tests/golden/SkinFramework.golden.test.js`).
+- Whiteboard and Punch List support `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report supports `/receipt`, `/as-built`, and `/walk`; Work Order supports `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board supports `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System supports `/receipt`, `/walk`, `/phantoms`, and `/change-order`; unsupported combinations fail closed to raw canonical render.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
 - Wave 5 skill topology is now 37 skills across 10 groups.
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 1, onboarding/package work, and later proof/integration work, remains pending.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 2, onboarding/package work, and later proof/integration work, remains pending.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
 - Hook/runtime compatibility paths are not implemented yet.
 - Package metadata or publishing surfaces are not implemented yet.

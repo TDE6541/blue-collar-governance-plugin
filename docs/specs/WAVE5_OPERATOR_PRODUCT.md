@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 shipped; Wave 5A Blocks A-C and Wave 5B Blocks A-D-E1 plus `/control-rods` through `/lockout` are implemented; tranche 1 skins rendering over the approved route matrix is implemented; additional Wave 5 work outside the current shipped set remains pending; package/install/runtime-hook/compatibility claims remain unverified
+**Status:** Wave 5A Block 0 shipped; Wave 5A Blocks A-C and Wave 5B Blocks A-D-E1 plus `/control-rods` through `/lockout` are implemented; tranche 2 skins rendering over the approved route matrix is implemented; additional Wave 5 work outside the current shipped set remains pending; package/install/runtime-hook/compatibility claims remain unverified
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -66,9 +66,12 @@ Wave 5 starts with a governance-first gate:
 - Journeyman trust reads state at query/render time.
 - Skill topology now includes exactly 37 skills across 10 groups.
 - Skills are deterministic route adapters only; no hidden engine behavior is allowed inside skills.
-- Wave 5 skins tranche 1 implements `SkinFramework` as an optional rendering layer over existing canonical route views with no route-output contract widening.
+- Wave 5 skins tranche 2 implements `SkinFramework` as an optional rendering layer over existing canonical route views with no route-output contract widening.
 - Whiteboard and Punch List support `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`.
 - Inspection Report supports `/receipt`, `/as-built`, and `/walk` and fails closed to raw canonical render for unsupported routes such as `/toolbox-talk`.
+- Work Order supports `/toolbox-talk`, `/receipt`, and `/as-built`.
+- Dispatch Board supports `/walk`, `/phantoms`, `/change-order`, and `/control-rods`.
+- Ticket System supports `/receipt`, `/walk`, `/phantoms`, and `/change-order`.
 - Whiteboard is the default skin only for supported routes.
 - Package/install/runtime hook/compatibility claims must remain explicit and honest until verified by real shipped surfaces.
 
@@ -187,11 +190,12 @@ Wave 5 starts with a governance-first gate:
   - `skills/lockout-SKILL.md`
   - `src/LockoutSkill.js`
   - `tests/golden/LockoutSkill.golden.test.js`
-- Wave 5 skins tranche 1 rendering layer is now implemented at:
+- Wave 5 skins tranche 2 rendering layer is now implemented at:
   - `docs/specs/SKIN_FRAMEWORK.md`
   - `src/SkinFramework.js`
   - `tests/golden/SkinFramework.golden.test.js`
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 1, onboarding/package work, and later proof/integration work, remains pending.
+- Tranche 2 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; unsupported combinations fail closed to raw canonical render.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 2, onboarding/package work, and later proof/integration work, remains pending.
 - Skills outside the current shipped set remain unimplemented.
 - Not claimed / not verified: no installable plugin package, runtime hook path, or compatibility layer is implemented yet.
 
@@ -234,7 +238,7 @@ Wave 5B:
 - post-callout runtime/spec/test baseline for `/red-tag` interlock decision surface
 - post-red-tag runtime/spec/test baseline for `/permit` gate decision surface
 - post-permit runtime/spec/test baseline for `/lockout` LOTO validation surface
-- tranche 1 skins rendering baseline for Whiteboard, Punch List, and Inspection Report over the approved route matrix with raw fallback for unsupported combinations
+- tranche 2 skins rendering baseline for Whiteboard, Punch List, Inspection Report, Work Order, Dispatch Board, and Ticket System over the approved route matrix with raw fallback for unsupported combinations
 - downstream implementation and integration work that depends on Wave 5A contract decisions
 
 ## Block 0 Scope
