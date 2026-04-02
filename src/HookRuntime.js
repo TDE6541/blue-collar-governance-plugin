@@ -766,7 +766,3 @@ module.exports = {
   runHookEvent,
   saveSessionState,
 };
-
-
-
-

@@ -123,4 +123,3 @@ Hook runtime behavior is an adapter over existing truth, not a replacement for t
 - Deterministic hook runtime adapter exists at `src/HookRuntime.js`.
 - Golden proof exists at `tests/golden/HookRuntime.golden.test.js`.
 - Live proof exists at `tests/live/wave5.hook-runtime.live.test.js`.
-

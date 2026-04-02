@@ -227,4 +227,3 @@ test("HookRuntime persists session state under the configured runtime directory"
 
   assert.equal(fs.existsSync(getStateFilePath(config, "session-state-path")), true);
 });
-
