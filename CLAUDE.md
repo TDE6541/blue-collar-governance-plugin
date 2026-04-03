@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; Wave 5 closeout and MIGRATIONS.md entries are awaiting Architect final signoff; Wave 6A Blocks 0, A, B, and C are shipped; the hook runtime now handles 10 lifecycle events and populates the forensic chain from blocked actions, PostToolUse, PostToolUseFailure, ConfigChange, and FileChanged; chain entries survive compaction and feed into Walk evaluation; marketplace/package/install claims remain unverified
+- Status: runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; Wave 5 closeout and MIGRATIONS.md entries are awaiting Architect final signoff; Wave 6A Blocks 0, A, B, C, and D are shipped; the hook runtime handles 10 lifecycle events, populates the forensic chain, and consults operator-authored permits for scoped HARD_STOP passage; marketplace/package/install claims remain unverified
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -164,6 +164,10 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Block C adds PostToolUse and PostToolUseFailure handlers and wires chain writes into blocked actions, ConfigChange, and FileChanged paths.
 - Chain entries use persisted monotonic counter IDs and survive compaction. Chain entries persist independently from Walk evaluation (self-standing evidence, not claim-linked).
 - TaskCreated and TaskCompleted are consciously deferred from chain writes as a noise-reduction decision.
+- Wave 6A Block D permit/lockout runtime closure is governed by the additive Block D section in `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`.
+- Block D wires ControlRodMode.evaluateHardStopGate into PreToolUse and PermissionRequest HARD_STOP paths. Operator-authored permits stored in session state allow scoped passage. Permitted actions write OPERATOR_ACTION chain entries.
+- Runtime consumption of permit/authorization state is shipped. Operator-facing permit creation UX is not shipped — permits enter session state through operator authoring only.
+- `/permit` and `/lockout` skills remain read/query/render-only evaluation and validation surfaces.
 - Config-mutation detection via ConfigChange is shipped. Instruction-integrity detection (InstructionsLoaded or equivalent) is not shipped and remains a HOLD.
 - Wave 6A does not introduce new skills, skins, engines, or contract widening.
 - Conservative control-rod profile posture is 5 HARD_STOP / 4 SUPERVISED / 1 FULL_AUTO (10 baseline domains).

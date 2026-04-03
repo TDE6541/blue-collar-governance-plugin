@@ -75,6 +75,8 @@ function createFallbackEmptyState(sessionId, profile) {
     blockedAttempts: [],
     chainEntries: [],
     nextChainCounter: 1,
+    activePermits: [],
+    activeAuthorizations: [],
     stopGate: {
       lastBlockedSignature: null,
       lastBlockedAt: null,
@@ -107,6 +109,12 @@ function ensureSessionStateShape(state, sessionId, profile, createEmptySessionSt
     typeof sourceState.nextChainCounter === "number" && sourceState.nextChainCounter >= 1
       ? sourceState.nextChainCounter
       : (base.chainEntries.length || 0) + 1;
+  base.activePermits = Array.isArray(sourceState.activePermits)
+    ? cloneJsonValue(sourceState.activePermits)
+    : [];
+  base.activeAuthorizations = Array.isArray(sourceState.activeAuthorizations)
+    ? cloneJsonValue(sourceState.activeAuthorizations)
+    : [];
   base.stopGate = normalizeStopGate(sourceState.stopGate);
   base.lastWalk =
     sourceState.lastWalk && typeof sourceState.lastWalk === "object" && !Array.isArray(sourceState.lastWalk)
@@ -382,6 +390,12 @@ function applyRecoveredState(state, recoveredState) {
     typeof recoveredState.nextChainCounter === "number" && recoveredState.nextChainCounter >= 1
       ? recoveredState.nextChainCounter
       : (Array.isArray(state.chainEntries) ? state.chainEntries.length : 0) + 1;
+  state.activePermits = Array.isArray(recoveredState.activePermits)
+    ? cloneJsonValue(recoveredState.activePermits)
+    : [];
+  state.activeAuthorizations = Array.isArray(recoveredState.activeAuthorizations)
+    ? cloneJsonValue(recoveredState.activeAuthorizations)
+    : [];
   state.stopGate = normalizeStopGate(recoveredState.stopGate);
   state.lastWalk =
     recoveredState.lastWalk &&
@@ -507,6 +521,12 @@ function handlePreCompactSlice({ input, config, options, loadSessionState, resol
         typeof state.nextChainCounter === "number" && state.nextChainCounter >= 1
           ? state.nextChainCounter
           : (Array.isArray(state.chainEntries) ? state.chainEntries.length : 0) + 1,
+      activePermits: Array.isArray(state.activePermits)
+        ? cloneJsonValue(state.activePermits)
+        : [],
+      activeAuthorizations: Array.isArray(state.activeAuthorizations)
+        ? cloneJsonValue(state.activeAuthorizations)
+        : [],
       stopGate: normalizeStopGate(state.stopGate),
       lastWalk:
         state.lastWalk && typeof state.lastWalk === "object" && !Array.isArray(state.lastWalk)

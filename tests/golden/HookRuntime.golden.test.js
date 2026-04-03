@@ -63,6 +63,47 @@ function forceHardStopObservedAction(state, timestamp = "2026-04-02T12:15:00Z") 
   });
 }
 
+function buildTestAuthorization(sessionId, domainId = "pricing_quote_logic") {
+  return {
+    authorizationId: `test_auth_${domainId}`,
+    domainId,
+    authorizedBy: "test-operator",
+    authorizedAt: "2026-04-03T09:00:00Z",
+    reason: "Test authorization for golden test",
+    scope: { scopeType: "SESSION", sessionId },
+    conditions: [],
+    chainRef: `chain_auth_${domainId}`,
+  };
+}
+
+function buildTestPermit(sessionId, domainId = "pricing_quote_logic", decision = "GRANTED") {
+  return {
+    permitId: `test_permit_${domainId}`,
+    sessionId,
+    requestedDomains: [domainId],
+    scopeJustification: "Test permit for golden test",
+    riskAssessment: "Low risk test scenario",
+    rollbackPlan: "Revert the change",
+    operatorDecision: decision,
+    conditions: decision === "CONDITIONAL" ? ["must verify after"] : [],
+    chainRef: `chain_permit_${domainId}`,
+  };
+}
+
+function seedPermitState(projectDir, sessionId, domainId, decision) {
+  const config = resolveRuntimeConfig(projectDir);
+  const state = loadSessionState(config, sessionId);
+  if (!Array.isArray(state.activeAuthorizations)) {
+    state.activeAuthorizations = [];
+  }
+  if (!Array.isArray(state.activePermits)) {
+    state.activePermits = [];
+  }
+  state.activeAuthorizations.push(buildTestAuthorization(sessionId, domainId));
+  state.activePermits.push(buildTestPermit(sessionId, domainId, decision));
+  saveSessionState(config, sessionId, state);
+}
+
 test("HookRuntime resolves conservative runtime config by default", () => {
   const projectDir = makeTempProject();
   const config = resolveRuntimeConfig(projectDir);
@@ -1126,4 +1167,212 @@ test("HookRuntime PostToolUse and PostToolUseFailure fail closed on corrupted st
   }, { projectDir, now: "2026-04-03T11:41:00Z" });
 
   assert.match(failResult.hookSpecificOutput.additionalContext, /FAIL_CLOSED/);
+});
+
+// --- Wave 6A Block D: Permit / Lockout Runtime Closure Tests ---
+
+test("HookRuntime HARD_STOP denied without permit preserves existing behavior", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-permit-none",
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    { projectDir, now: "2026-04-03T14:00:00Z" }
+  );
+
+  assert.equal(result.hookSpecificOutput.permissionDecision, "deny");
+  assert.match(result.hookSpecificOutput.permissionDecisionReason, /HARD_STOP/);
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-permit-none");
+  assert.equal(state.blockedAttempts.length, 1);
+  assert.equal((state.activePermits || []).length, 0);
+});
+
+test("HookRuntime HARD_STOP allowed with valid GRANTED permit", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-permit-granted";
+
+  seedPermitState(projectDir, sessionId, "pricing_quote_logic", "GRANTED");
+
+  const result = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    { projectDir, now: "2026-04-03T14:01:00Z" }
+  );
+
+  // Empty result means action is allowed
+  assert.deepEqual(result, {});
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.observedActions.length, 1);
+  assert.equal(state.observedActions[0].approvalState, "permitted_hard_stop");
+  assert.equal(state.blockedAttempts.length, 0);
+});
+
+test("HookRuntime HARD_STOP denied with DENIED permit", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-permit-denied";
+
+  seedPermitState(projectDir, sessionId, "pricing_quote_logic", "DENIED");
+
+  const result = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    { projectDir, now: "2026-04-03T14:02:00Z" }
+  );
+
+  assert.equal(result.hookSpecificOutput.permissionDecision, "deny");
+  assert.match(result.hookSpecificOutput.permissionDecisionReason, /PERMIT_DENIED/);
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.blockedAttempts.length, 1);
+});
+
+test("HookRuntime HARD_STOP allowed with CONDITIONAL permit", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-permit-conditional";
+
+  seedPermitState(projectDir, sessionId, "pricing_quote_logic", "CONDITIONAL");
+
+  const result = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    { projectDir, now: "2026-04-03T14:03:00Z" }
+  );
+
+  assert.deepEqual(result, {});
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.observedActions.length, 1);
+  assert.equal(state.observedActions[0].approvalState, "permitted_hard_stop");
+});
+
+test("HookRuntime permitted HARD_STOP action writes OPERATOR_ACTION chain entry", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-permit-chain";
+
+  seedPermitState(projectDir, sessionId, "pricing_quote_logic", "GRANTED");
+
+  runHookEvent(
+    "PreToolUse",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    { projectDir, now: "2026-04-03T14:04:00Z" }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  const permitted = state.chainEntries.find(
+    (e) => e.payload && e.payload.action === "permitted"
+  );
+  assert.ok(permitted, "Should have a permitted chain entry");
+  assert.equal(permitted.entryType, "OPERATOR_ACTION");
+  assert.equal(permitted.payload.statusCode, "PERMIT_GRANTED");
+  assert.equal(permitted.payload.permitRef, "test_permit_pricing_quote_logic");
+  assert.equal(permitted.payload.authorizationRef, "test_auth_pricing_quote_logic");
+});
+
+test("HookRuntime permit/authorization state survives compaction", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  const srcSession = "session-permit-compact-src";
+
+  seedPermitState(projectDir, srcSession, "pricing_quote_logic", "GRANTED");
+
+  runHookEvent("PreCompact", {
+    session_id: srcSession,
+    cwd: projectDir,
+    hook_event_name: "PreCompact",
+    trigger: "manual",
+  }, { projectDir, now: "2026-04-03T14:10:00Z" });
+
+  const dstSession = "session-permit-compact-dst";
+  runHookEvent("SessionStart", {
+    session_id: dstSession,
+    cwd: projectDir,
+    hook_event_name: "SessionStart",
+    source: "compact",
+  }, { projectDir, now: "2026-04-03T14:11:00Z" });
+
+  const rehydrated = loadSessionState(config, dstSession);
+  assert.equal(rehydrated.activePermits.length, 1);
+  assert.equal(rehydrated.activeAuthorizations.length, 1);
+  assert.equal(rehydrated.activePermits[0].operatorDecision, "GRANTED");
+  assert.equal(rehydrated.activeAuthorizations[0].domainId, "pricing_quote_logic");
+});
+
+test("HookRuntime PermissionRequest HARD_STOP allowed with valid permit", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-permit-permreq";
+
+  seedPermitState(projectDir, sessionId, "pricing_quote_logic", "GRANTED");
+
+  const result = runHookEvent(
+    "PermissionRequest",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PermissionRequest",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    { projectDir, now: "2026-04-03T14:05:00Z" }
+  );
+
+  assert.deepEqual(result, {});
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.observedActions[0].approvalState, "permitted_hard_stop");
 });

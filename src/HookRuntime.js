@@ -303,6 +303,8 @@ function createEmptySessionState(sessionId, profile) {
     blockedAttempts: [],
     chainEntries: [],
     nextChainCounter: 1,
+    activePermits: [],
+    activeAuthorizations: [],
     stopGate: {
       lastBlockedSignature: null,
       lastBlockedAt: null,
@@ -604,6 +606,89 @@ function resolveNow(options) {
   return (options && options.now) || new Date().toISOString();
 }
 
+function findMatchingAuthorization(state, domainId, sessionId, evaluatedAt) {
+  if (!Array.isArray(state.activeAuthorizations)) {
+    return null;
+  }
+
+  return state.activeAuthorizations.find((auth) => {
+    if (!auth || typeof auth !== "object" || auth.domainId !== domainId) {
+      return false;
+    }
+
+    if (!auth.scope || typeof auth.scope !== "object") {
+      return false;
+    }
+
+    if (auth.scope.scopeType === "SESSION") {
+      return auth.scope.sessionId === sessionId;
+    }
+
+    if (auth.scope.scopeType === "EXPIRY") {
+      return (
+        typeof auth.scope.expiresAt === "string" &&
+        Date.parse(evaluatedAt) <= Date.parse(auth.scope.expiresAt)
+      );
+    }
+
+    return false;
+  }) || null;
+}
+
+function findMatchingPermit(state, domainId, sessionId) {
+  if (!Array.isArray(state.activePermits)) {
+    return null;
+  }
+
+  return state.activePermits.find((permit) => {
+    if (!permit || typeof permit !== "object") {
+      return false;
+    }
+
+    if (permit.sessionId !== sessionId) {
+      return false;
+    }
+
+    if (!Array.isArray(permit.requestedDomains)) {
+      return false;
+    }
+
+    return permit.requestedDomains.includes(domainId);
+  }) || null;
+}
+
+function evaluatePermitGate(config, classification, state, sessionId, now) {
+  const authorization = findMatchingAuthorization(
+    state,
+    classification.domainId,
+    sessionId,
+    now
+  );
+
+  if (!authorization) {
+    return null;
+  }
+
+  const permit = findMatchingPermit(state, classification.domainId, sessionId);
+  if (!permit) {
+    return null;
+  }
+
+  const mode = new ControlRodMode();
+  try {
+    return mode.evaluateHardStopGate({
+      profile: config.profile,
+      domainId: classification.domainId,
+      sessionId,
+      evaluatedAt: now,
+      authorization,
+      permit,
+    });
+  } catch (_error) {
+    return null;
+  }
+}
+
 function handlePreToolUse(input, config, options) {
   try {
     const fingerprint = createToolFingerprint(input.tool_name, input.tool_input);
@@ -616,6 +701,33 @@ function handlePreToolUse(input, config, options) {
     const now = resolveNow(options);
 
     if (classification.autonomyLevel === "HARD_STOP") {
+      const gateResult = evaluatePermitGate(config, classification, state, input.session_id, now);
+
+      if (gateResult && gateResult.mayProceed) {
+        recordObservedAction(state, fingerprint, classification, "permitted_hard_stop", now);
+        appendChainEntry(state, {
+          eventType: "permitted",
+          entryType: "OPERATOR_ACTION",
+          sourceArtifact: "hook:PreToolUse",
+          sourceLocation: `domain:${classification.domainId}`,
+          payload: {
+            action: "permitted",
+            toolName: classification.toolName,
+            workItem: classification.workItem,
+            autonomyLevel: classification.autonomyLevel,
+            statusCode: gateResult.statusCode,
+            permitRef: gateResult.permitRef,
+            authorizationRef: gateResult.authorizationRef,
+            constrained: gateResult.constrained || false,
+            conditions: gateResult.conditions || [],
+          },
+          sessionId: input.session_id,
+          recordedAt: now,
+        });
+        saveSessionState(config, input.session_id, state);
+        return {};
+      }
+
       recordBlockedAttempt(state, fingerprint, classification, now);
       appendChainEntry(state, {
         eventType: "blocked",
@@ -628,20 +740,22 @@ function handlePreToolUse(input, config, options) {
           workItem: classification.workItem,
           autonomyLevel: classification.autonomyLevel,
           reason: describeAction(classification, config.profile),
+          gateStatusCode: gateResult ? gateResult.statusCode : undefined,
         },
         sessionId: input.session_id,
         recordedAt: now,
       });
       saveSessionState(config, input.session_id, state);
 
+      const denyReason = gateResult
+        ? `Control Rod HARD_STOP (${gateResult.statusCode}): ${gateResult.summary}`
+        : `Control Rod HARD_STOP: ${describeAction(classification, config.profile)}`;
+
       return {
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           permissionDecision: "deny",
-          permissionDecisionReason: `Control Rod HARD_STOP: ${describeAction(
-            classification,
-            config.profile
-          )}`,
+          permissionDecisionReason: denyReason,
         },
       };
     }
@@ -690,6 +804,14 @@ function handlePermissionRequest(input, config, options) {
     const now = resolveNow(options);
 
     if (classification.autonomyLevel === "HARD_STOP") {
+      const gateResult = evaluatePermitGate(config, classification, state, input.session_id, now);
+
+      if (gateResult && gateResult.mayProceed) {
+        recordObservedAction(state, fingerprint, classification, "permitted_hard_stop", now);
+        saveSessionState(config, input.session_id, state);
+        return {};
+      }
+
       recordBlockedAttempt(state, fingerprint, classification, now);
       saveSessionState(config, input.session_id, state);
 

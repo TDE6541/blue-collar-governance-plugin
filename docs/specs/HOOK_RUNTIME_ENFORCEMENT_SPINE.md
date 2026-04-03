@@ -278,3 +278,39 @@ Both fields are persisted through compaction and rehydrated on recovery. Missing
 Block C does not widen the ForensicChain contract. All entries use existing entry types (`EVIDENCE`, `OPERATOR_ACTION`). No new entry types are introduced. The ForensicChain class itself (`src/ForensicChain.js`) is not modified.
 
 Block C does not implement permit/lockout closure (Block D scope).
+
+## Block D: Permit / Lockout Runtime Closure (Wave 6A)
+
+Block D wires the existing `ControlRodMode.evaluateHardStopGate()` API into the hook runtime so that operator-authored permits allow scoped passage through HARD_STOP domains.
+
+### Runtime Behavior Change
+
+Before Block D, all HARD_STOP domain actions were flatly denied at PreToolUse and PermissionRequest time. After Block D, the HARD_STOP path consults session state for matching authorization and permit objects:
+
+1. Classification identifies HARD_STOP domain
+2. Look up `activeAuthorizations` for matching domain + valid scope (SESSION or non-expired EXPIRY)
+3. If no authorization: deny (same as pre-Block D behavior)
+4. Look up `activePermits` for matching domain + session
+5. If no permit: deny (same as pre-Block D behavior)
+6. Call `ControlRodMode.evaluateHardStopGate()` with matched authorization + permit
+7. If `mayProceed: true` (GRANTED or CONDITIONAL): allow action, record as `permitted_hard_stop`, write `OPERATOR_ACTION` chain entry
+8. If `mayProceed: false` (DENIED or AUTH_EXPIRED): deny with gate statusCode
+
+### Permit-Authoring Boundary
+
+The hook runtime **consumes** operator-authored permit/authorization state. It does not **create** permits. Permits and authorizations enter session state through operator action (pre-seeded state, direct state authoring, or future operator-facing creation paths). The `/permit` and `/lockout` skills remain read/query/render-only evaluation and validation surfaces.
+
+### Session State Additions
+
+- `activePermits: []` — array of operator-authored permit objects
+- `activeAuthorizations: []` — array of operator-authored LOTO authorization objects
+
+Both survive compaction and are rehydrated on recovery. Missing fields default to `[]`.
+
+### Chain Visibility
+
+Permitted HARD_STOP actions write `OPERATOR_ACTION` chain entries with `action: "permitted"`, the gate statusCode, permitRef, authorizationRef, constrained flag, and conditions.
+
+### Contract Boundaries
+
+Block D does not widen the ControlRodMode contract. The `evaluateHardStopGate` API is unchanged. Block D does not modify `src/ControlRodMode.js`. No new skills or engines are introduced.

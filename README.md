@@ -102,7 +102,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - 26 operator-facing skills under `skills/<name>/SKILL.md`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance engines under `src/`
-- 308 passing golden tests under `tests/golden/`
+- 315 passing golden tests under `tests/golden/`
 
 ## What This Does Not Do
 
