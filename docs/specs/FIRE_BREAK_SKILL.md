@@ -89,5 +89,5 @@ Route behavior:
 
 - Runtime adapter implementation exists at `src/FireBreakSkill.js`.
 - Golden proof exists at `tests/golden/FireBreakSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/fire-break-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/fire-break/SKILL.md`.
 

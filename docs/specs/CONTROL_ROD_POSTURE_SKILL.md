@@ -94,4 +94,4 @@ Route behavior:
 
 - Runtime adapter implementation exists at `src/ControlRodPostureSkill.js`.
 - Golden proof exists at `tests/golden/ControlRodPostureSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/control-rods-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/control-rods/SKILL.md`.

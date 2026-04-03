@@ -113,4 +113,4 @@ Rules:
 
 - Runtime adapter implementation exists at `src/CompressedGovernanceHealthSkills.js`.
 - Golden proof exists at `tests/golden/CompressedGovernanceHealthSkills.golden.test.js`.
-- Skill artifacts exist at `skills/prevention-record-SKILL.md` and `skills/rights-SKILL.md`.
+- Skill artifacts exist at `skills/prevention-record/SKILL.md` and `skills/rights/SKILL.md`.

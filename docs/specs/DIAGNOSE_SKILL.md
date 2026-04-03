@@ -117,4 +117,4 @@ Route behavior:
 
 - Runtime adapter implementation exists at `src/DiagnoseSkill.js`.
 - Golden proof exists at `tests/golden/DiagnoseSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/diagnose-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/diagnose/SKILL.md`.

@@ -96,4 +96,4 @@ Route behavior:
 
 - Runtime adapter implementation exists at `src/LockoutSkill.js`.
 - Golden proof exists at `tests/golden/LockoutSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/lockout-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/lockout/SKILL.md`.

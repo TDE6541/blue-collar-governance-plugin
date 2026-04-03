@@ -99,4 +99,4 @@ Deterministic clean rule:
 
 - Runtime adapter implementation exists at `src/KeystoneSkill.js`.
 - Golden proof exists at `tests/golden/KeystoneSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/keystone-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/keystone/SKILL.md`.

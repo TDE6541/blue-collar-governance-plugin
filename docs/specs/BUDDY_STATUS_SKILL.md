@@ -123,4 +123,4 @@ Route behavior:
 
 - Runtime adapter implementation exists at `src/BuddyStatusSkill.js`.
 - Golden proof exists at `tests/golden/BuddyStatusSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/buddy-status-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/buddy-status/SKILL.md`.

@@ -106,4 +106,4 @@ Route behavior:
 
 - Runtime adapter implementation exists at `src/PermitSkill.js`.
 - Golden proof exists at `tests/golden/PermitSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/permit-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/permit/SKILL.md`.

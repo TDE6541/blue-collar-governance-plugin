@@ -102,4 +102,4 @@ Route behavior:
 
 - Runtime adapter implementation exists at `src/RedTagSkill.js`.
 - Golden proof exists at `tests/golden/RedTagSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/red-tag-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/red-tag/SKILL.md`.

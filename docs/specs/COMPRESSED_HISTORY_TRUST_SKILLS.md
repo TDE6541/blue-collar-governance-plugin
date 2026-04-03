@@ -141,6 +141,6 @@ Compressed History & Trust skills must not emit:
 - Runtime adapter implementation exists at `src/CompressedHistoryTrustSkills.js`.
 - Golden proof exists at `tests/golden/CompressedHistoryTrustSkills.golden.test.js`.
 - Operator-facing skill artifacts exist at:
-  - `skills/chain-SKILL.md`
-  - `skills/warranty-SKILL.md`
-  - `skills/journeyman-SKILL.md`
+  - `skills/chain/SKILL.md`
+  - `skills/warranty/SKILL.md`
+  - `skills/journeyman/SKILL.md`

@@ -110,4 +110,4 @@ Route behavior:
 
 - Runtime adapter implementation exists at `src/ChangeOrderSkill.js`.
 - Golden proof exists at `tests/golden/ChangeOrderSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/change-order-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/change-order/SKILL.md`.

@@ -135,5 +135,4 @@ Deterministic clean rule:
 
 - Runtime adapter implementation exists at `src/EliminateSkill.js`.
 - Golden proof exists at `tests/golden/EliminateSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/eliminate-SKILL.md`.
-
+- Operator-facing skill artifact exists at `skills/eliminate/SKILL.md`.

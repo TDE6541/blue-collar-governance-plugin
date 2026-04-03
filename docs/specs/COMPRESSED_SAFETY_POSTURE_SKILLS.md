@@ -153,5 +153,5 @@ Compressed Safety posture skills must not emit:
 - Runtime adapter implementation exists at `src/CompressedSafetyPostureSkills.js`.
 - Golden proof exists at `tests/golden/CompressedSafetyPostureSkills.golden.test.js`.
 - Operator-facing skill artifacts exist at:
-  - `skills/constraints-SKILL.md`
-  - `skills/silence-map-SKILL.md`
+  - `skills/constraints/SKILL.md`
+  - `skills/silence-map/SKILL.md`

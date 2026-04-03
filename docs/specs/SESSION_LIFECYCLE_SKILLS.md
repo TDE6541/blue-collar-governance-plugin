@@ -149,7 +149,7 @@ Session Lifecycle skills must not emit:
 - Runtime adapter implementation exists at `src/SessionLifecycleSkills.js`.
 - Golden proof exists at `tests/golden/SessionLifecycleSkills.golden.test.js`.
 - Operator-facing skill artifacts exist at:
-  - `skills/toolbox-talk-SKILL.md`
-  - `skills/receipt-SKILL.md`
-  - `skills/as-built-SKILL.md`
-  - `skills/walk-SKILL.md`
+  - `skills/toolbox-talk/SKILL.md`
+  - `skills/receipt/SKILL.md`
+  - `skills/as-built/SKILL.md`
+  - `skills/walk/SKILL.md`

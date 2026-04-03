@@ -140,6 +140,6 @@ Compressed Intelligence skills must not emit:
 - Runtime adapter implementation exists at `src/CompressedIntelligenceSkills.js`.
 - Golden proof exists at `tests/golden/CompressedIntelligenceSkills.golden.test.js`.
 - Operator-facing skill artifacts exist at:
-  - `skills/phantoms-SKILL.md`
-  - `skills/ufo-SKILL.md`
-  - `skills/gaps-SKILL.md`
+  - `skills/phantoms/SKILL.md`
+  - `skills/ufo/SKILL.md`
+  - `skills/gaps/SKILL.md`

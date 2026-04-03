@@ -122,4 +122,4 @@ Route behavior:
 
 - Runtime adapter implementation exists at `src/CalloutSkill.js`.
 - Golden proof exists at `tests/golden/CalloutSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/callout-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/callout/SKILL.md`.

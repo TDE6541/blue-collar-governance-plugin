@@ -97,4 +97,4 @@ Route behavior:
 
 - Runtime adapter implementation exists at `src/CensusSkill.js`.
 - Golden proof exists at `tests/golden/CensusSkill.golden.test.js`.
-- Operator-facing skill artifact exists at `skills/census-SKILL.md`.
+- Operator-facing skill artifact exists at `skills/census/SKILL.md`.
