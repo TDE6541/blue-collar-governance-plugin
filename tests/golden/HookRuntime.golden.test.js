@@ -576,8 +576,8 @@ test("HookRuntime rejects unknown hook event names", () => {
   );
 });
 
-test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the ten governed events", () => {
-  assert.equal(KNOWN_HOOK_EVENTS.size, 10);
+test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the eleven governed events", () => {
+  assert.equal(KNOWN_HOOK_EVENTS.size, 11);
   assert.equal(KNOWN_HOOK_EVENTS.has("SessionStart"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PreCompact"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PreToolUse"), true);
@@ -588,6 +588,7 @@ test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the ten governed events", (
   assert.equal(KNOWN_HOOK_EVENTS.has("ConfigChange"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("CwdChanged"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("FileChanged"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("InstructionsLoaded"), true);
 });
 
 // --- Wave 6A Block B: Enforcement Matrix v1 Tests ---
@@ -1375,4 +1376,139 @@ test("HookRuntime PermissionRequest HARD_STOP allowed with valid permit", () => 
 
   const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
   assert.equal(state.observedActions[0].approvalState, "permitted_hard_stop");
+});
+
+// --- Wave 6B Block A: Instruction-Load Observability Tests ---
+
+test("HookRuntime InstructionsLoaded records observation and returns advisory", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "InstructionsLoaded",
+    {
+      session_id: "session-instr-load",
+      cwd: projectDir,
+      hook_event_name: "InstructionsLoaded",
+      file_path: "/project/CLAUDE.md",
+      memory_type: "Project",
+      load_reason: "session_start",
+    },
+    { projectDir, now: "2026-04-03T15:00:00Z" }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "InstructionsLoaded");
+  assert.match(result.hookSpecificOutput.additionalContext, /Instruction file loaded/);
+  assert.match(result.hookSpecificOutput.additionalContext, /CLAUDE\.md/);
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-instr-load");
+  assert.equal(state.loadedInstructions.length, 1);
+  assert.equal(state.loadedInstructions[0].filePath, "/project/CLAUDE.md");
+  assert.equal(state.loadedInstructions[0].memoryType, "Project");
+  assert.equal(state.loadedInstructions[0].loadReason, "session_start");
+});
+
+test("HookRuntime InstructionsLoaded writes OPERATOR_ACTION chain entry", () => {
+  const projectDir = makeTempProject();
+
+  runHookEvent(
+    "InstructionsLoaded",
+    {
+      session_id: "session-instr-chain",
+      cwd: projectDir,
+      hook_event_name: "InstructionsLoaded",
+      file_path: "/project/CLAUDE.md",
+      memory_type: "Project",
+      load_reason: "session_start",
+    },
+    { projectDir, now: "2026-04-03T15:01:00Z" }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-instr-chain");
+  const instrEntry = state.chainEntries.find(
+    (e) => e.sourceArtifact === "hook:InstructionsLoaded"
+  );
+  assert.ok(instrEntry, "Should have an InstructionsLoaded chain entry");
+  assert.equal(instrEntry.entryType, "OPERATOR_ACTION");
+  assert.equal(instrEntry.payload.action, "instruction_loaded");
+  assert.equal(instrEntry.payload.filePath, "/project/CLAUDE.md");
+  assert.equal(instrEntry.payload.memoryType, "Project");
+});
+
+test("HookRuntime InstructionsLoaded does not return blocking output", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "InstructionsLoaded",
+    {
+      session_id: "session-instr-noblock",
+      cwd: projectDir,
+      hook_event_name: "InstructionsLoaded",
+      file_path: "/project/CLAUDE.md",
+      memory_type: "Project",
+      load_reason: "session_start",
+    },
+    { projectDir, now: "2026-04-03T15:02:00Z" }
+  );
+
+  assert.equal(result.decision, undefined);
+  assert.equal(
+    result.hookSpecificOutput.permissionDecision,
+    undefined
+  );
+});
+
+test("HookRuntime InstructionsLoaded fails closed with advisory on corrupted state", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  const statePath = getStateFilePath(config, "session-instr-corrupt");
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, "{bad json", "utf8");
+
+  const result = runHookEvent(
+    "InstructionsLoaded",
+    {
+      session_id: "session-instr-corrupt",
+      cwd: projectDir,
+      hook_event_name: "InstructionsLoaded",
+      file_path: "/project/CLAUDE.md",
+      memory_type: "Project",
+      load_reason: "session_start",
+    },
+    { projectDir, now: "2026-04-03T15:03:00Z" }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "InstructionsLoaded");
+  assert.match(result.hookSpecificOutput.additionalContext, /FAIL_CLOSED/);
+});
+
+test("HookRuntime InstructionsLoaded state survives compaction", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+
+  runHookEvent("InstructionsLoaded", {
+    session_id: "session-instr-compact-src",
+    cwd: projectDir,
+    hook_event_name: "InstructionsLoaded",
+    file_path: "/project/CLAUDE.md",
+    memory_type: "Project",
+    load_reason: "session_start",
+  }, { projectDir, now: "2026-04-03T15:04:00Z" });
+
+  runHookEvent("PreCompact", {
+    session_id: "session-instr-compact-src",
+    cwd: projectDir,
+    hook_event_name: "PreCompact",
+    trigger: "manual",
+  }, { projectDir, now: "2026-04-03T15:05:00Z" });
+
+  runHookEvent("SessionStart", {
+    session_id: "session-instr-compact-dst",
+    cwd: projectDir,
+    hook_event_name: "SessionStart",
+    source: "compact",
+  }, { projectDir, now: "2026-04-03T15:06:00Z" });
+
+  const rehydrated = loadSessionState(config, "session-instr-compact-dst");
+  assert.equal(rehydrated.loadedInstructions.length, 1);
+  assert.equal(rehydrated.loadedInstructions[0].filePath, "/project/CLAUDE.md");
 });

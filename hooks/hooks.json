@@ -95,6 +95,16 @@
         ]
       }
     ],
+    "InstructionsLoaded": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
     "FileChanged": [
       {
         "matcher": ".claude/settings.json",

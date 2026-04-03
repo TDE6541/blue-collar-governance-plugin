@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; Wave 5 closeout and MIGRATIONS.md entries are signed off (2026-04-03); Wave 6A Blocks 0, A, B, C, and D are shipped; the hook runtime handles 10 lifecycle events, populates the forensic chain, and consults operator-authored permits for scoped HARD_STOP passage; marketplace/package/install claims remain unverified
+- Status: runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; Wave 5 closeout and MIGRATIONS.md entries are signed off (2026-04-03); Wave 6A Blocks 0, A, B, C, and D are shipped; Wave 6B Block 0 canon reconciliation and Block A instruction-load observability are shipped; the hook runtime handles 11 lifecycle events, populates the forensic chain, and consults operator-authored permits for scoped HARD_STOP passage; marketplace/package/install claims remain unverified
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -168,7 +168,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Block D wires ControlRodMode.evaluateHardStopGate into PreToolUse and PermissionRequest HARD_STOP paths. Operator-authored permits stored in session state allow scoped passage. Permitted actions write OPERATOR_ACTION chain entries.
 - Runtime consumption of permit/authorization state is shipped. Operator-facing permit creation UX is not shipped — permits enter session state through operator authoring only.
 - `/permit` and `/lockout` skills remain read/query/render-only evaluation and validation surfaces.
-- Config-mutation detection via ConfigChange is shipped. Instruction-integrity detection (InstructionsLoaded or equivalent) is not shipped and remains a HOLD.
+- Config-mutation detection via ConfigChange is shipped.
+- Instruction-load observability via InstructionsLoaded is shipped (Wave 6B Block A). Records which instruction files were loaded, when, and by what trigger. Does not hash or compare file contents — content-level integrity detection is not shipped.
 - Wave 6A does not introduce new skills, skins, engines, or contract widening.
 - Conservative control-rod profile posture is 5 HARD_STOP / 4 SUPERVISED / 1 FULL_AUTO (10 baseline domains).
 

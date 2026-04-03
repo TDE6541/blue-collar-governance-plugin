@@ -8,6 +8,7 @@ const COMPACTION_STATE_FILE = "_compaction-preserved.json";
 const MAX_OBSERVED_ACTIONS = 128;
 const MAX_BLOCKED_ATTEMPTS = 128;
 const MAX_CHAIN_ENTRIES = 128;
+const MAX_LOADED_INSTRUCTIONS = 64;
 const SESSION_START_SOURCES = new Set(["startup", "resume", "clear", "compact"]);
 const RECOVERY_SOURCES = new Set(["compact", "resume"]);
 
@@ -77,6 +78,7 @@ function createFallbackEmptyState(sessionId, profile) {
     nextChainCounter: 1,
     activePermits: [],
     activeAuthorizations: [],
+    loadedInstructions: [],
     stopGate: {
       lastBlockedSignature: null,
       lastBlockedAt: null,
@@ -114,6 +116,9 @@ function ensureSessionStateShape(state, sessionId, profile, createEmptySessionSt
     : [];
   base.activeAuthorizations = Array.isArray(sourceState.activeAuthorizations)
     ? cloneJsonValue(sourceState.activeAuthorizations)
+    : [];
+  base.loadedInstructions = Array.isArray(sourceState.loadedInstructions)
+    ? cloneJsonValue(sourceState.loadedInstructions).slice(-MAX_LOADED_INSTRUCTIONS)
     : [];
   base.stopGate = normalizeStopGate(sourceState.stopGate);
   base.lastWalk =
@@ -396,6 +401,9 @@ function applyRecoveredState(state, recoveredState) {
   state.activeAuthorizations = Array.isArray(recoveredState.activeAuthorizations)
     ? cloneJsonValue(recoveredState.activeAuthorizations)
     : [];
+  state.loadedInstructions = Array.isArray(recoveredState.loadedInstructions)
+    ? cloneJsonValue(recoveredState.loadedInstructions).slice(-MAX_LOADED_INSTRUCTIONS)
+    : [];
   state.stopGate = normalizeStopGate(recoveredState.stopGate);
   state.lastWalk =
     recoveredState.lastWalk &&
@@ -526,6 +534,9 @@ function handlePreCompactSlice({ input, config, options, loadSessionState, resol
         : [],
       activeAuthorizations: Array.isArray(state.activeAuthorizations)
         ? cloneJsonValue(state.activeAuthorizations)
+        : [],
+      loadedInstructions: Array.isArray(state.loadedInstructions)
+        ? cloneJsonValue(state.loadedInstructions).slice(-MAX_LOADED_INSTRUCTIONS)
         : [],
       stopGate: normalizeStopGate(state.stopGate),
       lastWalk:

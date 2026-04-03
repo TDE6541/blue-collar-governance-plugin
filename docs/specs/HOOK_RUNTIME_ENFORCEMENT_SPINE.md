@@ -314,3 +314,37 @@ Permitted HARD_STOP actions write `OPERATOR_ACTION` chain entries with `action: 
 ### Contract Boundaries
 
 Block D does not widen the ControlRodMode contract. The `evaluateHardStopGate` API is unchanged. Block D does not modify `src/ControlRodMode.js`. No new skills or engines are introduced.
+
+## Block A: Instruction-Load Observability v1 (Wave 6B)
+
+Block A extends the hook runtime from 10 handled events to 11 by adding an `InstructionsLoaded` handler that records when instruction files (CLAUDE.md, rules files) are loaded by Claude Code.
+
+### What This Does
+
+Records instruction-load events as observable governance-layer presence signals. Each load event is stored in session state and written to the forensic chain as an `OPERATOR_ACTION` entry.
+
+### What This Does Not Do
+
+- Does not hash or compare file contents — content-level integrity detection is out of scope
+- Does not block instruction loading — the `InstructionsLoaded` event cannot block per Claude Code API
+- Does not prove content-level integrity — it proves load-event presence only
+
+### Event Details
+
+| Field | Source |
+|-------|--------|
+| `file_path` | Absolute path to the instruction file |
+| `memory_type` | Scope: User, Project, Local, or Managed |
+| `load_reason` | Why loaded: session_start, nested_traversal, path_glob_match, include, compact |
+
+### Session State
+
+`loadedInstructions: []` — bounded array of instruction-load records (MAX_LOADED_INSTRUCTIONS = 64). Survives compaction. Missing field defaults to `[]`.
+
+### Fail-Closed Behavior
+
+On internal error, returns advisory context with `FAIL_CLOSED` prefix. Non-blocking (observation-only event).
+
+### Contract Boundaries
+
+Block A does not widen any shared contracts. `InstructionsLoaded` is observation-only. No new skills or engines.

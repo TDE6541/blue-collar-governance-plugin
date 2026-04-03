@@ -47,9 +47,11 @@ const KNOWN_HOOK_EVENTS = new Set([
   "ConfigChange",
   "CwdChanged",
   "FileChanged",
+  "InstructionsLoaded",
 ]);
 
 const MAX_CHAIN_ENTRIES = 128;
+const MAX_LOADED_INSTRUCTIONS = 64;
 
 const AUTONOMY_PRIORITY = Object.freeze({
   HARD_STOP: 3,
@@ -305,6 +307,7 @@ function createEmptySessionState(sessionId, profile) {
     nextChainCounter: 1,
     activePermits: [],
     activeAuthorizations: [],
+    loadedInstructions: [],
     stopGate: {
       lastBlockedSignature: null,
       lastBlockedAt: null,
@@ -1215,6 +1218,78 @@ function handleFileChanged(input, config, options) {
   }
 }
 
+function handleInstructionsLoaded(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+
+    const filePath =
+      typeof input.file_path === "string" && input.file_path.trim() !== ""
+        ? input.file_path
+        : "unknown";
+
+    const memoryType =
+      typeof input.memory_type === "string" && input.memory_type.trim() !== ""
+        ? input.memory_type
+        : "unknown";
+
+    const loadReason =
+      typeof input.load_reason === "string" && input.load_reason.trim() !== ""
+        ? input.load_reason
+        : "unknown";
+
+    if (!Array.isArray(state.loadedInstructions)) {
+      state.loadedInstructions = [];
+    }
+
+    state.loadedInstructions.push({
+      filePath,
+      memoryType,
+      loadReason,
+      recordedAt: now,
+    });
+
+    if (state.loadedInstructions.length > MAX_LOADED_INSTRUCTIONS) {
+      state.loadedInstructions = state.loadedInstructions.slice(
+        state.loadedInstructions.length - MAX_LOADED_INSTRUCTIONS
+      );
+    }
+
+    appendChainEntry(state, {
+      eventType: "instruction_loaded",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:InstructionsLoaded",
+      sourceLocation: `file:${filePath}`,
+      payload: {
+        action: "instruction_loaded",
+        filePath,
+        memoryType,
+        loadReason,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+
+    return {
+      hookSpecificOutput: {
+        hookEventName: "InstructionsLoaded",
+        additionalContext: `Instruction file loaded: ${filePath} (type=${memoryType}, reason=${loadReason}).`,
+      },
+    };
+  } catch (error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "InstructionsLoaded",
+        additionalContext: `FAIL_CLOSED: InstructionsLoaded internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
+      },
+    };
+  }
+}
+
 function runHookEvent(eventName, input, options = {}) {
   if (typeof eventName !== "string" || eventName.trim() === "") {
     throw new Error("Hook event name is required.");
@@ -1270,6 +1345,8 @@ function runHookEvent(eventName, input, options = {}) {
       return handleCwdChanged(input, config, options);
     case "FileChanged":
       return handleFileChanged(input, config, options);
+    case "InstructionsLoaded":
+      return handleInstructionsLoaded(input, config, options);
   }
 }
 
