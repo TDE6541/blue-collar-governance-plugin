@@ -109,6 +109,12 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `skills/red-tag/SKILL.md` - Wave 5B `/red-tag` interlock decision surface skill artifact
 - `skills/permit/SKILL.md` - Wave 5B `/permit` gate decision surface skill artifact
 - `skills/lockout/SKILL.md` - Wave 5B `/lockout` LOTO validation surface skill artifact
+- `docs/specs/LOTO_CLEARANCE_SKILL.md` - Wave 6B Block B `/loto-clearance` LOTO clearance authoring surface contract baseline
+- `docs/specs/PERMIT_ISSUANCE_SKILL.md` - Wave 6B Block B `/issue-permit` permit issuance authoring surface contract baseline
+- `skills/loto-clearance/SKILL.md` - Wave 6B `/loto-clearance` operator-facing LOTO clearance authoring skill artifact
+- `skills/issue-permit/SKILL.md` - Wave 6B `/issue-permit` operator-facing permit issuance skill artifact
+- `docs/WAVE6A_CLOSEOUT.md` - durable Wave 6A closeout evidence map
+- `docs/WAVE6B_CLOSEOUT.md` - durable Wave 6B closeout evidence map
 - `CLAUDE.md` - current session posture and closeout expectations
 - `README.md` - repo identity and current implementation truth
 
@@ -189,7 +195,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Wave 5 skill topology is now 26 skills.
+- Wave 5 skill topology shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, bringing the total to 28 skills.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.

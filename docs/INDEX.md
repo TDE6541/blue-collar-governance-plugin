@@ -70,7 +70,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 4 Buddy behavior is shipped as watcher-only; multi-agent control-room behavior is not shipped.
 - Wave 4 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave4.live-oversight.live.test.js` and closeout evidence exists at `docs/WAVE4_CLOSEOUT.md`.
 - Wave 5 is one narrative wave executed as 5A / 5B.
-- Wave 5 now includes 26 skills and keeps SessionBrief no-widening (`journeymanLevel` is not introduced).
+- Wave 5 shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, bringing the total to 28 skills. SessionBrief no-widening remains (`journeymanLevel` is not introduced).
 - Shipped now: Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub, Wave 5A Blocks A-C, Wave 5B Blocks A-D-E1, and the read-only or thin surfaces `/control-rods`, `/fire-break`, `/census`, `/diagnose`, `/keystone`, `/eliminate`, `/buddy-status`, `/change-order`, `/callout`, `/red-tag`, `/permit`, and `/lockout`.
 - Warranty remains derived-first in Wave 5 and HoldEngine Scarcity Signal remains derived-only enrichment.
 - Shipped skill tranches remain deterministic route adapters over existing engine truth with no hidden behavior.
@@ -105,3 +105,12 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` contains additive sections for Slice 3, Block B, Block C, and Block D.
 - `docs/WAVE6A_CLOSEOUT.md` is the durable Wave 6A closeout evidence map.
 - Waves 2/3/4/5 closeouts and MIGRATIONS.md entries are signed off as of 2026-04-03.
+
+## Wave 6B Addendum
+
+- Wave 6B shipped Blocks 0 through C: canon reconciliation (Block 0), instruction-load observability via InstructionsLoaded (Block A), operator-facing authoring surfaces `/loto-clearance` and `/issue-permit` (Block B), truth sync and closeout (Block C).
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` contains an additive Block A section for InstructionsLoaded.
+- `docs/specs/LOTO_CLEARANCE_SKILL.md` and `docs/specs/PERMIT_ISSUANCE_SKILL.md` are the Block B authoring surface contract baselines.
+- `docs/WAVE6B_CLOSEOUT.md` is the durable Wave 6B closeout evidence map.
+- `/permit` and `/lockout` remain unchanged evaluate/render-only and validate/render-only surfaces.
+- Route naming: `/loto-clearance` replaced the originally planned `/authorize` due to `*auth*` deny-pattern collision. Deny-pattern refinement is deferred.

@@ -107,7 +107,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Standalone and plugin hook registration should be treated as alternate modes until simultaneous loading is explicitly proven.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Wave 5 skill topology is now 26 skills.
+- Skill topology is now 28 skills (26 from Wave 5 + `/loto-clearance` and `/issue-permit` from Wave 6B).
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, and later proof/integration work, remains pending.

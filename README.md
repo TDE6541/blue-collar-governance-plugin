@@ -10,7 +10,7 @@ This plugin adds a runtime governance layer to Claude Code sessions:
 - **Control rod profiles** that classify every tool action against configurable domain rules (pricing, customer data, auth, destructive ops, and more)
 - **Session closeout gating** — the session cannot close cleanly if unresolved blocking findings exist
 - **Governance state preservation** — enforcement state survives context compaction and session restarts
-- **26 operator-facing skills** for inspecting governance posture, forensic history, safety interlocks, and session health during a live session
+- **28 operator-facing skills** for inspecting governance posture, forensic history, safety interlocks, and session health during a live session
 
 ## Why This Exists
 
@@ -65,7 +65,7 @@ Load the repo as a local Claude Code plugin:
 claude --plugin-dir /path/to/blue-collar-governance-plugin
 ```
 
-This registers the hooks and makes the 26 skills available as `/blue-collar-governance-plugin:<skill-name>`.
+This registers the hooks and makes the 28 skills available as `/blue-collar-governance-plugin:<skill-name>`.
 
 ### Standalone Repo Mode
 
@@ -100,10 +100,10 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Claude plugin manifest at `.claude-plugin/plugin.json`
 - Plugin hook registry at `hooks/hooks.json`
 - Fail-closed hook runtime at `src/HookRuntime.js` and `src/HookRuntimeSlice2.js`
-- 26 operator-facing skills under `skills/<name>/SKILL.md`
+- 28 operator-facing skills under `skills/<name>/SKILL.md`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance engines under `src/`
-- 320 passing golden tests under `tests/golden/`
+- 337 passing golden tests under `tests/golden/`
 
 ## What This Does Not Do
 
@@ -132,7 +132,7 @@ Detailed proof documentation:
 ├── .claude-plugin/        # Claude plugin manifest
 ├── hooks/                 # Plugin hook registry and wrapper
 ├── .claude/               # Standalone path, project settings, deny rules
-├── skills/                # 26 operator-facing skills
+├── skills/                # 28 operator-facing skills
 ├── src/                   # Runtime governance engines and hook runtime
 ├── tests/                 # Golden (290) and live verification
 ├── docs/                  # Specs, proof artifacts, and indexes

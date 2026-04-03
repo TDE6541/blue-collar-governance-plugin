@@ -94,6 +94,17 @@ Use this index to find the right canon surface before making a change.
 - Change `src/HookRuntimeSlice2.js` for Wave 6A compaction persistence of chainEntries, nextChainCounter, activePermits, and activeAuthorizations.
 - Change `docs/WAVE6A_CLOSEOUT.md` for Wave 6A closeout evidence.
 
+## Wave 6B Truth
+
+- Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for Wave 6B Block A InstructionsLoaded observability scope and contract.
+- Change `docs/specs/LOTO_CLEARANCE_SKILL.md` for Wave 6B Block B `/loto-clearance` LOTO clearance authoring contract.
+- Change `docs/specs/PERMIT_ISSUANCE_SKILL.md` for Wave 6B Block B `/issue-permit` permit issuance authoring contract.
+- Change `src/LotoClearanceSkill.js` for `/loto-clearance` create and revoke behavior.
+- Change `src/PermitIssuanceSkill.js` for `/issue-permit` create and revoke behavior.
+- Change `skills/loto-clearance/SKILL.md` for `/loto-clearance` operator-facing skill behavior.
+- Change `skills/issue-permit/SKILL.md` for `/issue-permit` operator-facing skill behavior.
+- Change `docs/WAVE6B_CLOSEOUT.md` for Wave 6B closeout evidence.
+
 ## Wave 4 Closeout Truth
 
 - Change `docs/WAVE4_CLOSEOUT.md` for Wave 4 Block D evidence map, no-leakage confirmation, and final signoff state.
