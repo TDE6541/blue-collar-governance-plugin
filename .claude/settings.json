@@ -71,6 +71,37 @@
           }
         ]
       }
+    ],
+    "ConfigChange": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
+    "CwdChanged": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
+    "FileChanged": [
+      {
+        "matcher": ".claude/settings.json",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
     ]
   },
   "blueCollarGovernance": {

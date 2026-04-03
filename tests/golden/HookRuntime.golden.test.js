@@ -535,11 +535,217 @@ test("HookRuntime rejects unknown hook event names", () => {
   );
 });
 
-test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the five governed events", () => {
-  assert.equal(KNOWN_HOOK_EVENTS.size, 5);
+test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the eight governed events", () => {
+  assert.equal(KNOWN_HOOK_EVENTS.size, 8);
   assert.equal(KNOWN_HOOK_EVENTS.has("SessionStart"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PreCompact"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PreToolUse"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PermissionRequest"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("Stop"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("ConfigChange"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("CwdChanged"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("FileChanged"), true);
+});
+
+// --- Wave 6A Block B: Enforcement Matrix v1 Tests ---
+
+test("HookRuntime ConfigChange records observation and returns advisory context", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "ConfigChange",
+    {
+      session_id: "session-config-change",
+      cwd: projectDir,
+      hook_event_name: "ConfigChange",
+      source: "settings.json",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T10:00:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "ConfigChange");
+  assert.match(result.hookSpecificOutput.additionalContext, /config change detected/i);
+  assert.match(result.hookSpecificOutput.additionalContext, /source=settings\.json/);
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-config-change");
+  const configAction = state.observedActions.find(
+    (a) => a.operationType === "config_change"
+  );
+  assert.ok(configAction, "Should record a config_change observation");
+  assert.equal(configAction.domainId, "auth_security_surfaces");
+});
+
+test("HookRuntime ConfigChange does not return a blocking decision", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "ConfigChange",
+    {
+      session_id: "session-config-no-block",
+      cwd: projectDir,
+      hook_event_name: "ConfigChange",
+      source: "settings.json",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T10:01:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "ConfigChange");
+  assert.equal(result.decision, undefined);
+  assert.equal(
+    result.hookSpecificOutput.permissionDecision,
+    undefined
+  );
+});
+
+test("HookRuntime ConfigChange fails closed with advisory on corrupted state", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  const statePath = getStateFilePath(config, "session-config-corrupt");
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, "{bad json", "utf8");
+
+  const result = runHookEvent(
+    "ConfigChange",
+    {
+      session_id: "session-config-corrupt",
+      cwd: projectDir,
+      hook_event_name: "ConfigChange",
+      source: "settings.json",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T10:02:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "ConfigChange");
+  assert.match(result.hookSpecificOutput.additionalContext, /FAIL_CLOSED/);
+});
+
+test("HookRuntime CwdChanged records directory change and returns advisory", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "CwdChanged",
+    {
+      session_id: "session-cwd-change",
+      cwd: projectDir,
+      hook_event_name: "CwdChanged",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T10:03:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "CwdChanged");
+  assert.match(result.hookSpecificOutput.additionalContext, /Working directory changed/);
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-cwd-change");
+  assert.ok(state.lastCwdChange, "Should record lastCwdChange");
+  assert.equal(state.lastCwdChange.changedAt, "2026-04-03T10:03:00Z");
+});
+
+test("HookRuntime CwdChanged notes when new directory is outside project root", () => {
+  const projectDir = makeTempProject();
+  const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), "bcgp-outside-"));
+
+  const result = runHookEvent(
+    "CwdChanged",
+    {
+      session_id: "session-cwd-outside",
+      cwd: outsideDir,
+      hook_event_name: "CwdChanged",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T10:04:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "CwdChanged");
+  assert.match(result.hookSpecificOutput.additionalContext, /outside project root/);
+});
+
+test("HookRuntime CwdChanged fails closed with advisory on corrupted state", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  const statePath = getStateFilePath(config, "session-cwd-corrupt");
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, "{bad json", "utf8");
+
+  const result = runHookEvent(
+    "CwdChanged",
+    {
+      session_id: "session-cwd-corrupt",
+      cwd: projectDir,
+      hook_event_name: "CwdChanged",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T10:05:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "CwdChanged");
+  assert.match(result.hookSpecificOutput.additionalContext, /FAIL_CLOSED/);
+});
+
+test("HookRuntime FileChanged records observation and returns advisory", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "FileChanged",
+    {
+      session_id: "session-file-change",
+      cwd: projectDir,
+      hook_event_name: "FileChanged",
+      source: ".claude/settings.json",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T10:06:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "FileChanged");
+  assert.match(result.hookSpecificOutput.additionalContext, /file changed externally/i);
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-file-change");
+  const fileAction = state.observedActions.find(
+    (a) => a.operationType === "external_file_change"
+  );
+  assert.ok(fileAction, "Should record an external_file_change observation");
+  assert.equal(fileAction.domainId, "auth_security_surfaces");
+});
+
+test("HookRuntime FileChanged fails closed with advisory on corrupted state", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  const statePath = getStateFilePath(config, "session-file-corrupt");
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, "{bad json", "utf8");
+
+  const result = runHookEvent(
+    "FileChanged",
+    {
+      session_id: "session-file-corrupt",
+      cwd: projectDir,
+      hook_event_name: "FileChanged",
+      source: ".claude/settings.json",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T10:07:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "FileChanged");
+  assert.match(result.hookSpecificOutput.additionalContext, /FAIL_CLOSED/);
 });

@@ -42,6 +42,9 @@ const KNOWN_HOOK_EVENTS = new Set([
   "PreToolUse",
   "PermissionRequest",
   "Stop",
+  "ConfigChange",
+  "CwdChanged",
+  "FileChanged",
 ]);
 
 const AUTONOMY_PRIORITY = Object.freeze({
@@ -773,6 +776,155 @@ function handleStop(input, config, options) {
   }
 }
 
+function handleConfigChange(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+
+    const source =
+      typeof input.source === "string" && input.source.trim() !== ""
+        ? input.source
+        : "unknown";
+
+    const fingerprint = createToolFingerprint("ConfigChange", {
+      source,
+      detectedAt: now,
+    });
+
+    upsertByFingerprint(state.observedActions, fingerprint, {
+      fingerprint,
+      toolName: "ConfigChange",
+      workItem: `ConfigChange source=${source}`,
+      domainId: "auth_security_surfaces",
+      domainLabel: "Auth / security surfaces",
+      autonomyLevel: "SUPERVISED",
+      operationType: "config_change",
+      relativePath: undefined,
+      command: undefined,
+      approvalState: "config_change_detected",
+      firstObservedAt: now,
+      lastObservedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+
+    return {
+      hookSpecificOutput: {
+        hookEventName: "ConfigChange",
+        additionalContext: `Governance config change detected (source=${source}). Profile=${config.profile.profileId}. Enforcement continues under active posture.`,
+      },
+    };
+  } catch (error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "ConfigChange",
+        additionalContext: `FAIL_CLOSED: ConfigChange internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
+      },
+    };
+  }
+}
+
+function handleCwdChanged(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+
+    const newCwd =
+      typeof input.cwd === "string" && input.cwd.trim() !== ""
+        ? input.cwd
+        : "unknown";
+
+    const previousCwd =
+      state.lastCwdChange && typeof state.lastCwdChange.to === "string"
+        ? state.lastCwdChange.to
+        : config.projectDir;
+
+    state.lastCwdChange = {
+      from: previousCwd,
+      to: newCwd,
+      changedAt: now,
+    };
+
+    saveSessionState(config, input.session_id, state);
+
+    const outsideProject =
+      newCwd !== "unknown" &&
+      !path.resolve(newCwd).startsWith(path.resolve(config.projectDir));
+
+    const advisory = outsideProject
+      ? `Working directory changed to ${newCwd} (outside project root). Governance enforcement continues under active profile but domain classification may not apply to external paths.`
+      : `Working directory changed. Governance enforcement continues under active profile.`;
+
+    return {
+      hookSpecificOutput: {
+        hookEventName: "CwdChanged",
+        additionalContext: advisory,
+      },
+    };
+  } catch (error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "CwdChanged",
+        additionalContext: `FAIL_CLOSED: CwdChanged internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
+      },
+    };
+  }
+}
+
+function handleFileChanged(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+
+    const source =
+      typeof input.source === "string" && input.source.trim() !== ""
+        ? input.source
+        : "unknown";
+
+    const fingerprint = createToolFingerprint("FileChanged", {
+      source,
+      detectedAt: now,
+    });
+
+    upsertByFingerprint(state.observedActions, fingerprint, {
+      fingerprint,
+      toolName: "FileChanged",
+      workItem: `FileChanged source=${source}`,
+      domainId: "auth_security_surfaces",
+      domainLabel: "Auth / security surfaces",
+      autonomyLevel: "SUPERVISED",
+      operationType: "external_file_change",
+      relativePath: undefined,
+      command: undefined,
+      approvalState: "file_change_detected",
+      firstObservedAt: now,
+      lastObservedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+
+    return {
+      hookSpecificOutput: {
+        hookEventName: "FileChanged",
+        additionalContext: `Governance-relevant file changed externally (source=${source}). Profile=${config.profile.profileId}. Review config posture if unexpected.`,
+      },
+    };
+  } catch (error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "FileChanged",
+        additionalContext: `FAIL_CLOSED: FileChanged internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
+      },
+    };
+  }
+}
+
 function runHookEvent(eventName, input, options = {}) {
   if (typeof eventName !== "string" || eventName.trim() === "") {
     throw new Error("Hook event name is required.");
@@ -818,6 +970,12 @@ function runHookEvent(eventName, input, options = {}) {
       return handlePermissionRequest(input, config, options);
     case "Stop":
       return handleStop(input, config, options);
+    case "ConfigChange":
+      return handleConfigChange(input, config, options);
+    case "CwdChanged":
+      return handleCwdChanged(input, config, options);
+    case "FileChanged":
+      return handleFileChanged(input, config, options);
   }
 }
 

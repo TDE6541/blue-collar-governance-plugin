@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; Wave 5 closeout and MIGRATIONS.md entries are awaiting Architect final signoff; Wave 6A Block 0 truth-sync and Block A fail-closed hook hardening are in progress; later Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; marketplace/package/install claims remain unverified
+- Status: runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; Wave 5 closeout and MIGRATIONS.md entries are awaiting Architect final signoff; Wave 6A Block 0 truth-sync, Block A fail-closed hook hardening, and Block B enforcement matrix are shipped; the hook runtime now handles 8 lifecycle events (SessionStart, PreCompact, PreToolUse, PermissionRequest, Stop, ConfigChange, CwdChanged, FileChanged); later Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; marketplace/package/install claims remain unverified
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -158,6 +158,9 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Plugin conversion proof artifact: `docs/PLUGIN_CONVERSION_PROOF.md`
 - Wave 5 closeout evidence map: `docs/WAVE5_CLOSEOUT.md`
 - Wave 6A Block A fail-closed hook hardening is governed by the additive Slice 3 section in `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`.
+- Wave 6A Block B enforcement matrix is governed by the additive Block B section in `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`.
+- Block B adds ConfigChange, CwdChanged, and FileChanged handlers as observational (non-blocking) event handlers with fail-closed advisory behavior.
+- Config-mutation detection via ConfigChange is shipped. Instruction-integrity detection (InstructionsLoaded or equivalent) is not shipped and remains a HOLD.
 - Wave 6A does not introduce new skills, skins, engines, or contract widening.
 - Conservative control-rod profile posture is 5 HARD_STOP / 4 SUPERVISED / 1 FULL_AUTO (10 baseline domains).
 

@@ -25,7 +25,7 @@ This plugin exists to make the load-bearing governance seams deterministic and l
 
 ## How It Works
 
-The plugin registers hooks for five Claude Code lifecycle events:
+The plugin registers hooks for eight Claude Code lifecycle events:
 
 | Event | What happens |
 |-------|-------------|
@@ -34,6 +34,9 @@ The plugin registers hooks for five Claude Code lifecycle events:
 | **PreToolUse** | Classifies the tool action; denies HARD_STOP domains; asks on SUPERVISED |
 | **PermissionRequest** | Resolves permission dialogs against the active control rod profile |
 | **Stop** | Evaluates a Foreman's Walk; blocks closeout if blocking findings exist |
+| **ConfigChange** | Detects governance config mutation; records and surfaces advisory |
+| **CwdChanged** | Records working-directory changes; notes when outside project root |
+| **FileChanged** | Detects external changes to governance-relevant files |
 
 Every hook path fails closed on internal error — a crash produces a deny/block decision, never a silent pass-through.
 
@@ -97,7 +100,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - 26 operator-facing skills under `skills/<name>/SKILL.md`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance engines under `src/`
-- 290 passing golden tests under `tests/golden/`
+- 298 passing golden tests under `tests/golden/`
 
 ## What This Does Not Do
 

@@ -189,3 +189,40 @@ Slice 3 does not widen:
 - `ConstraintsRegistry`
 
 Slice 3 does not add new hook event handlers, does not change classification logic, and does not change the normal-path behavior of any existing handler. Only error paths are affected.
+
+## Block B: Enforcement Matrix v1 (Wave 6A)
+
+Block B extends the hook runtime from 5 handled events to 8 by adding three observational event handlers.
+
+### New Events
+
+| Event | Can block? | Behavior |
+|-------|-----------|----------|
+| `ConfigChange` | No (observation only) | Records governance-config mutation as an observed action under `auth_security_surfaces`. Returns advisory context describing the change source and active profile. Does not block config edits. |
+| `CwdChanged` | No (observation only) | Records working-directory change in session state (`lastCwdChange`). Returns advisory context. Notes explicitly if new directory is outside the project root. |
+| `FileChanged` | No (observation only) | Fires on changes to governance-relevant files (`.claude/settings.json`). Records external file change as an observed action under `auth_security_surfaces`. Returns advisory context. |
+
+### Hook Registration
+
+Both `.claude/settings.json` and `hooks/hooks.json` register these three events. `FileChanged` uses a narrow matcher scoped to `.claude/settings.json` only.
+
+### Fail-Closed Behavior
+
+All three handlers follow the Slice 3 fail-closed pattern: internal errors produce advisory context with a `FAIL_CLOSED` prefix rather than crashing the process. Since none of these events return blocking decisions on the normal path, fail-closed means advisory degradation, not deny/block.
+
+### Session State
+
+Block B adds one optional field to session state: `lastCwdChange` (`{ from, to, changedAt } | null`). Missing field defaults to null. Existing state files remain compatible.
+
+### Contract Boundaries
+
+Block B does not widen:
+
+- `ControlRodMode`
+- `ForemansWalk`
+- `SessionBrief`
+- `SessionReceipt`
+- `ConstraintsRegistry`
+- `ForensicChain`
+
+Block B does not write to the forensic chain (that is Block C scope). Block B does not implement permit/lockout closure (that is Block D scope). Block B does not handle `InstructionsLoaded`, `PostToolUse`, `TaskCreated`, `TaskCompleted`, or any other events beyond the three listed above.
