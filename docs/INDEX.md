@@ -34,6 +34,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/SKIN_FRAMEWORK.md` - authoritative Wave 5 skins rendering contract baseline
 - `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` - authoritative Wave 5A Block 0 substrate merit-gate memo
 - `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md` - canonical Wave 5 onboarding/runtime-proof truth surface
+- `docs/PLUGIN_CONVERSION_PROOF.md` - canonical plugin conversion proof and smoke runbook
 - `docs/WAVE5_CLOSEOUT.md` - durable Wave 5 closeout evidence map
 - `docs/specs/OPERATOR_TRUST_LEDGER.md` - authoritative Wave 5A Block A Operator Trust Ledger v1 contract baseline
 - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` - authoritative Wave 5A Block A Journeyman Trust Engine v1 contract baseline
@@ -69,18 +70,31 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 4 Buddy behavior is shipped as watcher-only; multi-agent control-room behavior is not shipped.
 - Wave 4 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave4.live-oversight.live.test.js` and closeout evidence exists at `docs/WAVE4_CLOSEOUT.md`.
 - Wave 5 is one narrative wave executed as 5A / 5B.
-- Wave 5 now includes 37 skills across 10 groups and keeps SessionBrief no-widening (`journeymanLevel` is not introduced).
+- Wave 5 now includes 26 skills across 10 groups and keeps SessionBrief no-widening (`journeymanLevel` is not introduced).
 - Shipped now: Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub, Wave 5A Blocks A-C, Wave 5B Blocks A-D-E1, and the read-only or thin surfaces `/control-rods`, `/fire-break`, `/census`, `/diagnose`, `/keystone`, `/eliminate`, `/buddy-status`, `/change-order`, `/callout`, `/red-tag`, `/permit`, and `/lockout`.
 - Warranty remains derived-first in Wave 5 and HoldEngine Scarcity Signal remains derived-only enrichment.
 - Shipped skill tranches remain deterministic route adapters over existing engine truth with no hidden behavior.
 - Wave 5 skins tranche 4 is implemented at `docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, and `tests/golden/SkinFramework.golden.test.js`.
 - Wave 5 hook/runtime Slice 2 enforcement spine is implemented at `.claude/settings.json`, `.claude/hooks/run-governance-hook.js`, `src/HookRuntime.js`, `src/HookRuntimeSlice2.js`, `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`, `tests/golden/HookRuntime.golden.test.js`, and `tests/live/wave5.hook-runtime.live.test.js`.
+- Additive plugin conversion structure is implemented at `.claude-plugin/plugin.json`, `hooks/hooks.json`, `hooks/run-governance-hook.js`, and plugin-discoverable `skills/<name>/SKILL.md`.
+- Project `.claude/settings.json` remains the deny-layer and standalone compatibility surface; standalone and plugin hook loading should be treated as alternate modes until simultaneous loading is explicitly proven.
 - Slice 2 keeps fail-closed command hooks over `Bash`, `Write`, and `Edit`, and adds bounded `SessionStart` re-injection plus `PreCompact` preservation for compaction survival while retaining the session-local `Stop`/`ForemansWalk` gate.
 - Wave 5 onboarding/runtime-proof artifact is implemented at `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`.
+- Plugin conversion proof artifact is implemented at `docs/PLUGIN_CONVERSION_PROOF.md`.
 - Wave 5 closeout evidence map is implemented at `docs/WAVE5_CLOSEOUT.md`.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
 - Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, and later proof/integration work, remains pending.
-- Not claimed / not verified: `package.json` is absent; no installable plugin package, compatibility layer, or end-to-end runtime setup sequence is implemented yet.
+- Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
 - `docs/learning-notes/` is not present because no exploration lane is needed for the current repo state.
+
+
+
+
+## Plugin Conversion Addendum
+
+- `docs/PLUGIN_CONVERSION_PROOF.md` is the canonical proof and smoke-runbook surface for the plugin conversion sprint.
+- `.claude-plugin/plugin.json`, `hooks/hooks.json`, and `hooks/run-governance-hook.js` are now part of the shipped local plugin artifact.
+- Project `.claude/settings.json` remains the standalone compatibility path and deny-layer surface.
+- `package.json` is still absent, so package and marketplace install claims remain out of scope.

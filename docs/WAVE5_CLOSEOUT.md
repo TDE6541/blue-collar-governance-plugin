@@ -68,3 +68,11 @@ This artifact is the durable Wave 5 closeout evidence map for shipped Wave 5 run
 
 - Wave 5 closeout state: READY FOR ARCHITECT REVIEW.
 - Wave 5 signoff readiness: READY, pending Architect final signoff.
+
+## Post-Closeout Plugin Conversion Addendum
+
+- Wave 5 runtime proof remains unchanged; the plugin conversion sprint is additive over the signed-off runtime baseline.
+- Local plugin artifact structure now exists at `.claude-plugin/plugin.json`, `hooks/hooks.json`, `hooks/run-governance-hook.js`, and `skills/<name>/SKILL.md`.
+- Project-level deny rules remain an explicit host-project configuration step.
+- `docs/PLUGIN_CONVERSION_PROOF.md` records the plugin conversion proof and local smoke runbook.
+- Marketplace/package/install claims remain unmade.

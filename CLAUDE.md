@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; canonical onboarding/runtime-proof and Wave 5 closeout artifacts are shipped; later Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; install/package/compatibility claims remain unverified
+- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; later Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; marketplace/package/install claims remain unverified
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -78,38 +78,41 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Warranty remains derived-first in Wave 5 and is implemented as derived-only monitoring in Block B.
 - Wave 5A Block C baseline is implemented (`docs/specs/HOLD_ENGINE_SCARCITY_SIGNAL.md`, `src/HoldEngineScarcitySignal.js`, `tests/golden/HoldEngineScarcitySignal.golden.test.js`).
 - HoldEngine Scarcity Signal remains additive direction and is implemented as derived-only enrichment in Block C.
-- Wave 5B Block A baseline is implemented (`docs/specs/SESSION_LIFECYCLE_SKILLS.md`, `skills/toolbox-talk-SKILL.md`, `skills/receipt-SKILL.md`, `skills/as-built-SKILL.md`, `skills/walk-SKILL.md`, `src/SessionLifecycleSkills.js`, `tests/golden/SessionLifecycleSkills.golden.test.js`).
+- Wave 5B Block A baseline is implemented (`docs/specs/SESSION_LIFECYCLE_SKILLS.md`, `skills/toolbox-talk/SKILL.md`, `skills/receipt/SKILL.md`, `skills/as-built/SKILL.md`, `skills/walk/SKILL.md`, `src/SessionLifecycleSkills.js`, `tests/golden/SessionLifecycleSkills.golden.test.js`).
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
-- Wave 5B Block B baseline is implemented (`docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md`, `skills/phantoms-SKILL.md`, `skills/ufo-SKILL.md`, `skills/gaps-SKILL.md`, `src/CompressedIntelligenceSkills.js`, `tests/golden/CompressedIntelligenceSkills.golden.test.js`).
+- Wave 5B Block B baseline is implemented (`docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md`, `skills/phantoms/SKILL.md`, `skills/ufo/SKILL.md`, `skills/gaps/SKILL.md`, `src/CompressedIntelligenceSkills.js`, `tests/golden/CompressedIntelligenceSkills.golden.test.js`).
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
-- Wave 5B Block C baseline is implemented (`docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md`, `skills/chain-SKILL.md`, `skills/warranty-SKILL.md`, `skills/journeyman-SKILL.md`, `src/CompressedHistoryTrustSkills.js`, `tests/golden/CompressedHistoryTrustSkills.golden.test.js`).
-- Wave 5B Block D baseline is implemented (`docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md`, `skills/constraints-SKILL.md`, `skills/silence-map-SKILL.md`, `src/CompressedSafetyPostureSkills.js`, `tests/golden/CompressedSafetyPostureSkills.golden.test.js`).
+- Wave 5B Block C baseline is implemented (`docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md`, `skills/chain/SKILL.md`, `skills/warranty/SKILL.md`, `skills/journeyman/SKILL.md`, `src/CompressedHistoryTrustSkills.js`, `tests/golden/CompressedHistoryTrustSkills.golden.test.js`).
+- Wave 5B Block D baseline is implemented (`docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md`, `skills/constraints/SKILL.md`, `skills/silence-map/SKILL.md`, `src/CompressedSafetyPostureSkills.js`, `tests/golden/CompressedSafetyPostureSkills.golden.test.js`).
 - Compressed Safety posture skills are read/query/render-only surfaces over existing ConstraintsRegistry truth, SafetyInterlocks truth, and ControlRodMode posture/status views; no standalone `/control-rods` skill is shipped in Block D.
-- Wave 5B Block E1 baseline is implemented (`docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md`, `skills/prevention-record-SKILL.md`, `skills/rights-SKILL.md`, `src/CompressedGovernanceHealthSkills.js`, `tests/golden/CompressedGovernanceHealthSkills.golden.test.js`).
-- A Wave 5B read-only `/control-rods` posture slice is implemented (`docs/specs/CONTROL_ROD_POSTURE_SKILL.md`, `skills/control-rods-SKILL.md`, `src/ControlRodPostureSkill.js`, `tests/golden/ControlRodPostureSkill.golden.test.js`).
-- A Wave 5B read-only `/fire-break` audit slice is implemented (`docs/specs/FIRE_BREAK_SKILL.md`, `skills/fire-break-SKILL.md`, `src/FireBreakSkill.js`, `tests/golden/FireBreakSkill.golden.test.js`).
-- A Wave 5B read-only `/census` repo snapshot slice is implemented (`docs/specs/CENSUS_SKILL.md`, `skills/census-SKILL.md`, `src/CensusSkill.js`, `tests/golden/CensusSkill.golden.test.js`).
-- A Wave 5B read-only `/diagnose` evidence-view slice is implemented (`docs/specs/DIAGNOSE_SKILL.md`, `skills/diagnose-SKILL.md`, `src/DiagnoseSkill.js`, `tests/golden/DiagnoseSkill.golden.test.js`).
-- A Wave 5B read-only `/keystone` decision-support slice is implemented (`docs/specs/KEYSTONE_SKILL.md`, `skills/keystone-SKILL.md`, `src/KeystoneSkill.js`, `tests/golden/KeystoneSkill.golden.test.js`).
-- A Wave 5B read-only `/eliminate` hold-options slice is implemented (`docs/specs/ELIMINATE_SKILL.md`, `skills/eliminate-SKILL.md`, `src/EliminateSkill.js`, `tests/golden/EliminateSkill.golden.test.js`).
-- A Wave 5B read-only `/buddy-status` watcher-state slice is implemented (`docs/specs/BUDDY_STATUS_SKILL.md`, `skills/buddy-status-SKILL.md`, `src/BuddyStatusSkill.js`, `tests/golden/BuddyStatusSkill.golden.test.js`).
-- A Wave 5B read-only `/change-order` status slice is implemented (`docs/specs/CHANGE_ORDER_SKILL.md`, `skills/change-order-SKILL.md`, `src/ChangeOrderSkill.js`, `tests/golden/ChangeOrderSkill.golden.test.js`).
-- A Wave 5B read-only `/callout` callout-detail slice is implemented (`docs/specs/CALLOUT_SKILL.md`, `skills/callout-SKILL.md`, `src/CalloutSkill.js`, `tests/golden/CalloutSkill.golden.test.js`).
-- A Wave 5B `/red-tag` interlock decision surface is implemented (`docs/specs/RED_TAG_SKILL.md`, `skills/red-tag-SKILL.md`, `src/RedTagSkill.js`, `tests/golden/RedTagSkill.golden.test.js`).
-- A Wave 5B `/permit` gate decision surface is implemented (`docs/specs/PERMIT_SKILL.md`, `skills/permit-SKILL.md`, `src/PermitSkill.js`, `tests/golden/PermitSkill.golden.test.js`).
-- A Wave 5B `/lockout` LOTO validation surface is implemented (`docs/specs/LOCKOUT_SKILL.md`, `skills/lockout-SKILL.md`, `src/LockoutSkill.js`, `tests/golden/LockoutSkill.golden.test.js`).
+- Wave 5B Block E1 baseline is implemented (`docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md`, `skills/prevention-record/SKILL.md`, `skills/rights/SKILL.md`, `src/CompressedGovernanceHealthSkills.js`, `tests/golden/CompressedGovernanceHealthSkills.golden.test.js`).
+- A Wave 5B read-only `/control-rods` posture slice is implemented (`docs/specs/CONTROL_ROD_POSTURE_SKILL.md`, `skills/control-rods/SKILL.md`, `src/ControlRodPostureSkill.js`, `tests/golden/ControlRodPostureSkill.golden.test.js`).
+- A Wave 5B read-only `/fire-break` audit slice is implemented (`docs/specs/FIRE_BREAK_SKILL.md`, `skills/fire-break/SKILL.md`, `src/FireBreakSkill.js`, `tests/golden/FireBreakSkill.golden.test.js`).
+- A Wave 5B read-only `/census` repo snapshot slice is implemented (`docs/specs/CENSUS_SKILL.md`, `skills/census/SKILL.md`, `src/CensusSkill.js`, `tests/golden/CensusSkill.golden.test.js`).
+- A Wave 5B read-only `/diagnose` evidence-view slice is implemented (`docs/specs/DIAGNOSE_SKILL.md`, `skills/diagnose/SKILL.md`, `src/DiagnoseSkill.js`, `tests/golden/DiagnoseSkill.golden.test.js`).
+- A Wave 5B read-only `/keystone` decision-support slice is implemented (`docs/specs/KEYSTONE_SKILL.md`, `skills/keystone/SKILL.md`, `src/KeystoneSkill.js`, `tests/golden/KeystoneSkill.golden.test.js`).
+- A Wave 5B read-only `/eliminate` hold-options slice is implemented (`docs/specs/ELIMINATE_SKILL.md`, `skills/eliminate/SKILL.md`, `src/EliminateSkill.js`, `tests/golden/EliminateSkill.golden.test.js`).
+- A Wave 5B read-only `/buddy-status` watcher-state slice is implemented (`docs/specs/BUDDY_STATUS_SKILL.md`, `skills/buddy-status/SKILL.md`, `src/BuddyStatusSkill.js`, `tests/golden/BuddyStatusSkill.golden.test.js`).
+- A Wave 5B read-only `/change-order` status slice is implemented (`docs/specs/CHANGE_ORDER_SKILL.md`, `skills/change-order/SKILL.md`, `src/ChangeOrderSkill.js`, `tests/golden/ChangeOrderSkill.golden.test.js`).
+- A Wave 5B read-only `/callout` callout-detail slice is implemented (`docs/specs/CALLOUT_SKILL.md`, `skills/callout/SKILL.md`, `src/CalloutSkill.js`, `tests/golden/CalloutSkill.golden.test.js`).
+- A Wave 5B `/red-tag` interlock decision surface is implemented (`docs/specs/RED_TAG_SKILL.md`, `skills/red-tag/SKILL.md`, `src/RedTagSkill.js`, `tests/golden/RedTagSkill.golden.test.js`).
+- A Wave 5B `/permit` gate decision surface is implemented (`docs/specs/PERMIT_SKILL.md`, `skills/permit/SKILL.md`, `src/PermitSkill.js`, `tests/golden/PermitSkill.golden.test.js`).
+- A Wave 5B `/lockout` LOTO validation surface is implemented (`docs/specs/LOCKOUT_SKILL.md`, `skills/lockout/SKILL.md`, `src/LockoutSkill.js`, `tests/golden/LockoutSkill.golden.test.js`).
 - Wave 5 skins tranche 4 is implemented (`docs/specs/SKIN_FRAMEWORK.md`, `src/SkinFramework.js`, `tests/golden/SkinFramework.golden.test.js`).
 - Whiteboard and Punch List support `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report supports `/receipt`, `/as-built`, and `/walk`; Work Order supports `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board supports `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System supports `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log supports `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order supports `/receipt` and `/as-built`; Kitchen Ticket supports `/walk`, `/phantoms`, and `/change-order`; Farm Ledger supports `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log supports `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
 - Wave 5 hook/runtime Slice 2 enforcement spine is implemented at `.claude/settings.json`, `.claude/hooks/run-governance-hook.js`, `src/HookRuntime.js`, `src/HookRuntimeSlice2.js`, `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`, `tests/golden/HookRuntime.golden.test.js`, and `tests/live/wave5.hook-runtime.live.test.js`.
 - Slice 2 keeps fail-closed command hooks over `Bash`, `Write`, and `Edit`, and adds bounded `SessionStart` re-injection plus `PreCompact` preservation for compaction survival while retaining the session-local `Stop`/`ForemansWalk` gate.
+- Additive plugin conversion structure is implemented at `.claude-plugin/plugin.json`, `hooks/hooks.json`, `hooks/run-governance-hook.js`, and `skills/<name>/SKILL.md`.
+- Project `.claude/settings.json` remains the standalone compatibility path and the current `permissions.deny` delivery surface.
+- Standalone and plugin hook registration should be treated as alternate modes until simultaneous loading is explicitly proven.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Wave 5 skill topology is now 37 skills across 10 groups.
+- Wave 5 skill topology is now 26 skills across 10 groups.
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, and later proof/integration work, remains pending.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
-- `package.json` is absent; package metadata or publishing surfaces are not implemented.
+- `package.json` is absent; local plugin artifact structure is shipped, but package metadata, marketplace installation, and publishing surfaces are not implemented.
 - Canon specs for current scope:
   - `docs/specs/WAVE1_TRUST_KERNEL.md`
   - `docs/specs/HOLD_ENGINE.md`
@@ -152,6 +155,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/LOCKOUT_SKILL.md`
 - Wave 5 Block 0 substrate-gate memo: `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
 - Wave 5 onboarding/runtime-proof artifact: `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`
+- Plugin conversion proof artifact: `docs/PLUGIN_CONVERSION_PROOF.md`
 - Wave 5 closeout evidence map: `docs/WAVE5_CLOSEOUT.md`
 
 ## Canon And Reference Boundary

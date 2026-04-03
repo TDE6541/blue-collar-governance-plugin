@@ -141,3 +141,11 @@ Hook runtime behavior remains an adapter over existing truth.
 - Live proof exists at `tests/live/wave5.hook-runtime.live.test.js`.
 - Canonical onboarding/runtime-proof artifact exists at `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`.
 - Wave 5 closeout evidence map exists at `docs/WAVE5_CLOSEOUT.md`.
+
+## Plugin Conversion Addendum
+
+- Plugin hook registration now exists at `hooks/hooks.json`.
+- The plugin-root hook wrapper lives at `hooks/run-governance-hook.js` and reuses the existing shipped runtime rather than duplicating hook logic.
+- Project `.claude/settings.json` remains the current `permissions.deny` delivery surface and the standalone compatibility path.
+- Plugin conversion does not widen `ControlRodMode`, `ForemansWalk`, `SessionBrief`, `SessionReceipt`, or `ConstraintsRegistry`.
+- Plugin and standalone hook registration should currently be treated as alternate modes until simultaneous loading is explicitly proven.

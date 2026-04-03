@@ -64,7 +64,7 @@ Wave 5 starts with a governance-first gate:
 - `/rights` is a static manual declaration route and is not derived from trust-state engines.
 - SessionBrief no-widening is hard-locked for Wave 5 (`journeymanLevel` is not added).
 - Journeyman trust reads state at query/render time.
-- Skill topology now includes exactly 37 skills across 10 groups.
+- Skill topology now includes exactly 26 skills across 10 groups.
 - Skills are deterministic route adapters only; no hidden engine behavior is allowed inside skills.
 - Wave 5 skins tranche 4 implements `SkinFramework` as an optional rendering layer over existing canonical route views with no route-output contract widening.
 - Wave 5 hook/runtime Slice 1 ships fail-closed command-hook enforcement over existing `ControlRodMode` and `ForemansWalk` truth with no HTTP hooks and no LLM involvement in hook decisions.
@@ -105,96 +105,96 @@ Wave 5 starts with a governance-first gate:
   - `tests/golden/HoldEngineScarcitySignal.golden.test.js`
 - Wave 5B Block A Session Lifecycle skill tranche is now implemented at:
   - `docs/specs/SESSION_LIFECYCLE_SKILLS.md`
-  - `skills/toolbox-talk-SKILL.md`
-  - `skills/receipt-SKILL.md`
-  - `skills/as-built-SKILL.md`
-  - `skills/walk-SKILL.md`
+  - `skills/toolbox-talk/SKILL.md`
+  - `skills/receipt/SKILL.md`
+  - `skills/as-built/SKILL.md`
+  - `skills/walk/SKILL.md`
   - `src/SessionLifecycleSkills.js`
   - `tests/golden/SessionLifecycleSkills.golden.test.js`
 - Wave 5B Block B Compressed Intelligence skill micro-slice is now implemented at:
   - `docs/specs/COMPRESSED_INTELLIGENCE_SKILLS.md`
-  - `skills/phantoms-SKILL.md`
-  - `skills/ufo-SKILL.md`
-  - `skills/gaps-SKILL.md`
+  - `skills/phantoms/SKILL.md`
+  - `skills/ufo/SKILL.md`
+  - `skills/gaps/SKILL.md`
   - `src/CompressedIntelligenceSkills.js`
   - `tests/golden/CompressedIntelligenceSkills.golden.test.js`
 - Wave 5B Block C Compressed History & Trust skill micro-slice is now implemented at:
   - `docs/specs/COMPRESSED_HISTORY_TRUST_SKILLS.md`
-  - `skills/chain-SKILL.md`
-  - `skills/warranty-SKILL.md`
-  - `skills/journeyman-SKILL.md`
+  - `skills/chain/SKILL.md`
+  - `skills/warranty/SKILL.md`
+  - `skills/journeyman/SKILL.md`
   - `src/CompressedHistoryTrustSkills.js`
   - `tests/golden/CompressedHistoryTrustSkills.golden.test.js`
 - Wave 5B Block D Compressed Safety posture skill micro-slice is now implemented at:
   - `docs/specs/COMPRESSED_SAFETY_POSTURE_SKILLS.md`
-  - `skills/constraints-SKILL.md`
-  - `skills/silence-map-SKILL.md`
+  - `skills/constraints/SKILL.md`
+  - `skills/silence-map/SKILL.md`
   - `src/CompressedSafetyPostureSkills.js`
   - `tests/golden/CompressedSafetyPostureSkills.golden.test.js`
 - Wave 5B Block E1 Compressed Governance Health skill micro-slice is now implemented at:
   - `docs/specs/COMPRESSED_GOVERNANCE_HEALTH_SKILLS.md`
-  - `skills/prevention-record-SKILL.md`
-  - `skills/rights-SKILL.md`
+  - `skills/prevention-record/SKILL.md`
+  - `skills/rights/SKILL.md`
   - `src/CompressedGovernanceHealthSkills.js`
   - `tests/golden/CompressedGovernanceHealthSkills.golden.test.js`
 - A Wave 5B read-only `/control-rods` posture slice is now implemented at:
   - `docs/specs/CONTROL_ROD_POSTURE_SKILL.md`
-  - `skills/control-rods-SKILL.md`
+  - `skills/control-rods/SKILL.md`
   - `src/ControlRodPostureSkill.js`
   - `tests/golden/ControlRodPostureSkill.golden.test.js`
 - A Wave 5B read-only `/fire-break` audit slice is now implemented at:
   - `docs/specs/FIRE_BREAK_SKILL.md`
-  - `skills/fire-break-SKILL.md`
+  - `skills/fire-break/SKILL.md`
   - `src/FireBreakSkill.js`
   - `tests/golden/FireBreakSkill.golden.test.js`
 - A Wave 5B read-only `/census` repo snapshot slice is now implemented at:
   - `docs/specs/CENSUS_SKILL.md`
-  - `skills/census-SKILL.md`
+  - `skills/census/SKILL.md`
   - `src/CensusSkill.js`
   - `tests/golden/CensusSkill.golden.test.js`
 - A Wave 5B read-only `/diagnose` evidence-view slice is now implemented at:
   - `docs/specs/DIAGNOSE_SKILL.md`
-  - `skills/diagnose-SKILL.md`
+  - `skills/diagnose/SKILL.md`
   - `src/DiagnoseSkill.js`
   - `tests/golden/DiagnoseSkill.golden.test.js`
 - A Wave 5B read-only `/keystone` decision-support slice is now implemented at:
   - `docs/specs/KEYSTONE_SKILL.md`
-  - `skills/keystone-SKILL.md`
+  - `skills/keystone/SKILL.md`
   - `src/KeystoneSkill.js`
   - `tests/golden/KeystoneSkill.golden.test.js`
 - A Wave 5B read-only `/eliminate` hold-options slice is now implemented at:
   - `docs/specs/ELIMINATE_SKILL.md`
-  - `skills/eliminate-SKILL.md`
+  - `skills/eliminate/SKILL.md`
   - `src/EliminateSkill.js`
   - `tests/golden/EliminateSkill.golden.test.js`
 - A Wave 5B read-only `/buddy-status` watcher-state slice is now implemented at:
   - `docs/specs/BUDDY_STATUS_SKILL.md`
-  - `skills/buddy-status-SKILL.md`
+  - `skills/buddy-status/SKILL.md`
   - `src/BuddyStatusSkill.js`
   - `tests/golden/BuddyStatusSkill.golden.test.js`
 - A Wave 5B read-only `/change-order` status slice is now implemented at:
   - `docs/specs/CHANGE_ORDER_SKILL.md`
-  - `skills/change-order-SKILL.md`
+  - `skills/change-order/SKILL.md`
   - `src/ChangeOrderSkill.js`
   - `tests/golden/ChangeOrderSkill.golden.test.js`
 - A Wave 5B read-only `/callout` callout-detail slice is now implemented at:
   - `docs/specs/CALLOUT_SKILL.md`
-  - `skills/callout-SKILL.md`
+  - `skills/callout/SKILL.md`
   - `src/CalloutSkill.js`
   - `tests/golden/CalloutSkill.golden.test.js`
 - A Wave 5B `/red-tag` interlock decision surface is now implemented at:
   - `docs/specs/RED_TAG_SKILL.md`
-  - `skills/red-tag-SKILL.md`
+  - `skills/red-tag/SKILL.md`
   - `src/RedTagSkill.js`
   - `tests/golden/RedTagSkill.golden.test.js`
 - A Wave 5B `/permit` gate decision surface is now implemented at:
   - `docs/specs/PERMIT_SKILL.md`
-  - `skills/permit-SKILL.md`
+  - `skills/permit/SKILL.md`
   - `src/PermitSkill.js`
   - `tests/golden/PermitSkill.golden.test.js`
 - A Wave 5B `/lockout` LOTO validation surface is now implemented at:
   - `docs/specs/LOCKOUT_SKILL.md`
-  - `skills/lockout-SKILL.md`
+  - `skills/lockout/SKILL.md`
   - `src/LockoutSkill.js`
   - `tests/golden/LockoutSkill.golden.test.js`
 - Wave 5 skins tranche 4 rendering layer is now implemented at:
@@ -304,3 +304,13 @@ Wave 5 Block 0 truth and decision proof is anchored in:
 - `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
 - `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`
 - `docs/WAVE5_CLOSEOUT.md`
+
+
+## Plugin Conversion Addendum
+
+- Post-closeout structural plugin conversion now ships `.claude-plugin/plugin.json`, `hooks/hooks.json`, `hooks/run-governance-hook.js`, and plugin-discoverable `skills/<name>/SKILL.md`.
+- This conversion does not add new governance engines or widen existing runtime contracts.
+- Project `.claude/settings.json` remains the persistent deny-layer and standalone compatibility surface.
+- Plugin and standalone hook registration should currently be treated as alternate modes until simultaneous loading is explicitly proven.
+- `package.json` remains absent, so marketplace/package/install claims remain explicitly unverified.
+- `docs/PLUGIN_CONVERSION_PROOF.md` is the canonical proof and local smoke-runbook surface for this conversion.

@@ -9,6 +9,7 @@ Use this index to find the right canon surface before making a change.
 - Change `README.md` for repo identity, status, and public-facing truth.
 - Change `CLAUDE.md` for AI operating posture, sync blockers, and closeout expectations.
 - Change `REPO_INDEX.md` for top-level repo navigation.
+- Change `docs/PLUGIN_CONVERSION_PROOF.md` for plugin conversion validation notes, deny-rule install truth, and local smoke runbook.
 
 ## Governance And Session Rules
 
@@ -103,6 +104,9 @@ Use this index to find the right canon surface before making a change.
 
 - Change `.claude/settings.json` for project hook registration, matched tool coverage, persistent deny rules, and hook runtime profile settings.
 - Change `.claude/hooks/run-governance-hook.js` for fail-closed command-hook entrypoint behavior.
+- Change `.claude-plugin/plugin.json` for plugin identity, version, and shipped component metadata.
+- Change `hooks/hooks.json` for plugin hook registration truth.
+- Change `hooks/run-governance-hook.js` for the plugin-root hook wrapper.
 - Change `src/` for runtime implementation after a governed execution wave is approved.
 - Change `src/ContinuityLedger.js` for Wave 2 Block A continuity persistence behavior.
 - Change `src/StandingRiskEngine.js` for Wave 2 Block B1 derived standing-risk behavior.
@@ -137,32 +141,32 @@ Use this index to find the right canon surface before making a change.
 - Change `src/PermitSkill.js` for deterministic evaluate/render-only `/permit` gate decision behavior over existing ControlRodMode HARD_STOP permit-gate truth.
 - Change `src/LockoutSkill.js` for deterministic evaluate/render-only `/lockout` LOTO validation behavior over existing ControlRodMode authorization validation truth.
 - Change `src/SkinFramework.js` for shipped skin rendering behavior over existing canonical route views and raw fallback on unsupported combinations.
-- Change `skills/toolbox-talk-SKILL.md` for Wave 5B Block A `/toolbox-talk` operator-facing skill behavior.
-- Change `skills/receipt-SKILL.md` for Wave 5B Block A `/receipt` operator-facing skill behavior.
-- Change `skills/as-built-SKILL.md` for Wave 5B Block A `/as-built` operator-facing skill behavior.
-- Change `skills/walk-SKILL.md` for Wave 5B Block A `/walk` operator-facing skill behavior.
-- Change `skills/phantoms-SKILL.md` for Wave 5B Block B `/phantoms` operator-facing skill behavior.
-- Change `skills/ufo-SKILL.md` for Wave 5B Block B `/ufo` operator-facing skill behavior.
-- Change `skills/gaps-SKILL.md` for Wave 5B Block B `/gaps` operator-facing skill behavior.
-- Change `skills/chain-SKILL.md` for Wave 5B Block C `/chain` operator-facing skill behavior.
-- Change `skills/warranty-SKILL.md` for Wave 5B Block C `/warranty` operator-facing skill behavior.
-- Change `skills/journeyman-SKILL.md` for Wave 5B Block C `/journeyman` operator-facing skill behavior.
-- Change `skills/constraints-SKILL.md` for Wave 5B Block D `/constraints` operator-facing skill behavior.
-- Change `skills/silence-map-SKILL.md` for Wave 5B Block D `/silence-map` operator-facing skill behavior.
-- Change `skills/prevention-record-SKILL.md` for Wave 5B Block E1 `/prevention-record` operator-facing skill behavior.
-- Change `skills/rights-SKILL.md` for Wave 5B Block E1 `/rights` operator-facing skill behavior.
-- Change `skills/control-rods-SKILL.md` for the Wave 5B read-only `/control-rods` operator-facing skill behavior.
-- Change `skills/fire-break-SKILL.md` for the Wave 5B read-only `/fire-break` operator-facing skill behavior.
-- Change `skills/census-SKILL.md` for the Wave 5B read-only `/census` operator-facing skill behavior.
-- Change `skills/diagnose-SKILL.md` for the Wave 5B read-only `/diagnose` operator-facing skill behavior.
-- Change `skills/keystone-SKILL.md` for the Wave 5B read-only `/keystone` operator-facing skill behavior.
-- Change `skills/eliminate-SKILL.md` for the Wave 5B read-only `/eliminate` operator-facing skill behavior.
-- Change `skills/buddy-status-SKILL.md` for the Wave 5B read-only `/buddy-status` operator-facing skill behavior.
-- Change `skills/change-order-SKILL.md` for the Wave 5B read-only `/change-order` operator-facing skill behavior.
-- Change `skills/callout-SKILL.md` for the Wave 5B read-only `/callout` operator-facing skill behavior.
-- Change `skills/red-tag-SKILL.md` for the Wave 5B `/red-tag` operator-facing interlock decision surface behavior.
-- Change `skills/permit-SKILL.md` for the Wave 5B `/permit` operator-facing gate decision surface behavior.
-- Change `skills/lockout-SKILL.md` for the Wave 5B `/lockout` operator-facing LOTO validation surface behavior.
+- Change `skills/toolbox-talk/SKILL.md` for Wave 5B Block A `/toolbox-talk` operator-facing skill behavior.
+- Change `skills/receipt/SKILL.md` for Wave 5B Block A `/receipt` operator-facing skill behavior.
+- Change `skills/as-built/SKILL.md` for Wave 5B Block A `/as-built` operator-facing skill behavior.
+- Change `skills/walk/SKILL.md` for Wave 5B Block A `/walk` operator-facing skill behavior.
+- Change `skills/phantoms/SKILL.md` for Wave 5B Block B `/phantoms` operator-facing skill behavior.
+- Change `skills/ufo/SKILL.md` for Wave 5B Block B `/ufo` operator-facing skill behavior.
+- Change `skills/gaps/SKILL.md` for Wave 5B Block B `/gaps` operator-facing skill behavior.
+- Change `skills/chain/SKILL.md` for Wave 5B Block C `/chain` operator-facing skill behavior.
+- Change `skills/warranty/SKILL.md` for Wave 5B Block C `/warranty` operator-facing skill behavior.
+- Change `skills/journeyman/SKILL.md` for Wave 5B Block C `/journeyman` operator-facing skill behavior.
+- Change `skills/constraints/SKILL.md` for Wave 5B Block D `/constraints` operator-facing skill behavior.
+- Change `skills/silence-map/SKILL.md` for Wave 5B Block D `/silence-map` operator-facing skill behavior.
+- Change `skills/prevention-record/SKILL.md` for Wave 5B Block E1 `/prevention-record` operator-facing skill behavior.
+- Change `skills/rights/SKILL.md` for Wave 5B Block E1 `/rights` operator-facing skill behavior.
+- Change `skills/control-rods/SKILL.md` for the Wave 5B read-only `/control-rods` operator-facing skill behavior.
+- Change `skills/fire-break/SKILL.md` for the Wave 5B read-only `/fire-break` operator-facing skill behavior.
+- Change `skills/census/SKILL.md` for the Wave 5B read-only `/census` operator-facing skill behavior.
+- Change `skills/diagnose/SKILL.md` for the Wave 5B read-only `/diagnose` operator-facing skill behavior.
+- Change `skills/keystone/SKILL.md` for the Wave 5B read-only `/keystone` operator-facing skill behavior.
+- Change `skills/eliminate/SKILL.md` for the Wave 5B read-only `/eliminate` operator-facing skill behavior.
+- Change `skills/buddy-status/SKILL.md` for the Wave 5B read-only `/buddy-status` operator-facing skill behavior.
+- Change `skills/change-order/SKILL.md` for the Wave 5B read-only `/change-order` operator-facing skill behavior.
+- Change `skills/callout/SKILL.md` for the Wave 5B read-only `/callout` operator-facing skill behavior.
+- Change `skills/red-tag/SKILL.md` for the Wave 5B `/red-tag` operator-facing interlock decision surface behavior.
+- Change `skills/permit/SKILL.md` for the Wave 5B `/permit` operator-facing gate decision surface behavior.
+- Change `skills/lockout/SKILL.md` for the Wave 5B `/lockout` operator-facing LOTO validation surface behavior.
 - Add `tests/golden/ContinuityLedger.golden.test.js` for Continuity Ledger golden verification.
 - Add `tests/golden/ForensicChain.golden.test.js` for Forensic Chain golden verification.
 - Add `tests/golden/ControlRodMode.golden.test.js` for Control Rod Mode v2 golden verification.
@@ -207,3 +211,13 @@ Use this index to find the right canon surface before making a change.
 - Use `raw/governed-workflow/` for imported methodology references only.
 - Use `raw/starters/` for starter/template inputs only.
 - Do not edit reference inputs as a substitute for updating canon.
+
+
+
+
+## Plugin Conversion Surfaces
+
+- Change `.claude-plugin/plugin.json` for plugin identity, version, and shipped component metadata.
+- Change `hooks/hooks.json` for plugin hook registration truth.
+- Change `hooks/run-governance-hook.js` for the plugin-root hook wrapper.
+- Change `docs/PLUGIN_CONVERSION_PROOF.md` for plugin validation notes, deny-rule install truth, and local smoke runbook.
