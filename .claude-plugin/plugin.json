@@ -1,0 +1,9 @@
+{
+  "name": "blue-collar-governance-plugin",
+  "version": "0.1.0",
+  "description": "Governed Claude Code hooks and skills with deterministic local enforcement.",
+  "homepage": "https://github.com/TDE6541/blue-collar-governance-plugin",
+  "repository": "https://github.com/TDE6541/blue-collar-governance-plugin",
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
+}
