@@ -226,3 +226,55 @@ Block B does not widen:
 - `ForensicChain`
 
 Block B does not write to the forensic chain (that is Block C scope). Block B does not implement permit/lockout closure (that is Block D scope). Block B does not handle `InstructionsLoaded`, `PostToolUse`, `TaskCreated`, `TaskCompleted`, or any other events beyond the three listed above.
+
+## Block C: Live Chain Population v1 (Wave 6A)
+
+Block C extends the hook runtime from 8 handled events to 10 and populates the forensic chain from real runtime events.
+
+### New Events
+
+| Event | Behavior |
+|-------|----------|
+| `PostToolUse` | Classifies the completed tool action. If the action matches a governed domain, writes an `EVIDENCE` chain entry. Unclassified actions produce no chain write. |
+| `PostToolUseFailure` | Classifies the failed tool action. If the action matches a governed domain, writes an `EVIDENCE` chain entry with a bounded error summary. |
+
+### Chain Writes from Existing Events
+
+| Event | Chain entry type | Trigger |
+|-------|-----------------|---------|
+| PreToolUse (HARD_STOP blocked) | `OPERATOR_ACTION` | Every denied action |
+| ConfigChange | `OPERATOR_ACTION` | Every config mutation detection |
+| FileChanged | `OPERATOR_ACTION` | Every external governance-file change |
+
+### Chain Entry ID Strategy
+
+Entry IDs use the pattern `hook_{eventType}_{sessionId}_{counter}` where `counter` is a persisted monotonic integer (`nextChainCounter`) stored in session state. The counter increments atomically with each append, survives compaction via `PreCompact` persistence and `SessionStart` rehydration, and is never reset within a session lineage.
+
+### Duplicate-Entry Policy
+
+- Duplication across session state (observedActions/blockedAttempts) and chain is acceptable — they serve different purposes.
+- Duplication inside the chain is prevented: before appending, the helper checks if an entry with the generated `entryId` already exists in `chainEntries`. If so, the write is skipped. Since the counter is monotonic, this guard handles the edge case of an unexpected re-fire producing the same counter value.
+- Replayed or retried events that produce different counter values represent genuinely distinct invocations and write separate entries.
+
+### Events Consciously Deferred
+
+`TaskCreated` and `TaskCompleted` are not wired to chain writes in Block C. These are task-management lifecycle events with low governance-evidence value. Writing them would create chain noise without meaningful enforcement or accountability signal. This is a conscious noise-reduction decision.
+
+`InstructionsLoaded` is not handled. Instruction-integrity detection remains a separate HOLD.
+
+### Session State Additions
+
+- `chainEntries: []` — bounded array of chain entry objects (MAX_CHAIN_ENTRIES = 128)
+- `nextChainCounter: 1` — persisted monotonic counter for entry ID generation
+
+Both fields are persisted through compaction and rehydrated on recovery. Missing fields default to empty array and 1 respectively.
+
+### Walk Integration
+
+`buildWalkEvaluationFromState` continues to pass `forensicEntries: []` to the Foreman's Walk evaluation. Hook-generated chain entries are self-standing runtime evidence with no claim linkage, and feeding them into the Walk's truthfulness check would produce false GHOST findings (evidence without linked claims). Chain entries persist in session state and are visible through `/chain` independently from the Walk's evaluation.
+
+### Contract Boundaries
+
+Block C does not widen the ForensicChain contract. All entries use existing entry types (`EVIDENCE`, `OPERATOR_ACTION`). No new entry types are introduced. The ForensicChain class itself (`src/ForensicChain.js`) is not modified.
+
+Block C does not implement permit/lockout closure (Block D scope).

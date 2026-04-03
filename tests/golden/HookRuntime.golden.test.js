@@ -516,11 +516,11 @@ test("HookRuntime rejects unknown hook event names", () => {
   assert.throws(
     () => {
       runHookEvent(
-        "PostToolUse",
+        "SessionEnd",
         {
           session_id: "session-unknown-event",
           cwd: projectDir,
-          hook_event_name: "PostToolUse",
+          hook_event_name: "SessionEnd",
         },
         {
           projectDir,
@@ -535,11 +535,13 @@ test("HookRuntime rejects unknown hook event names", () => {
   );
 });
 
-test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the eight governed events", () => {
-  assert.equal(KNOWN_HOOK_EVENTS.size, 8);
+test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the ten governed events", () => {
+  assert.equal(KNOWN_HOOK_EVENTS.size, 10);
   assert.equal(KNOWN_HOOK_EVENTS.has("SessionStart"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PreCompact"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PreToolUse"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("PostToolUse"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("PostToolUseFailure"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PermissionRequest"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("Stop"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("ConfigChange"), true);
@@ -748,4 +750,380 @@ test("HookRuntime FileChanged fails closed with advisory on corrupted state", ()
 
   assert.equal(result.hookSpecificOutput.hookEventName, "FileChanged");
   assert.match(result.hookSpecificOutput.additionalContext, /FAIL_CLOSED/);
+});
+
+// --- Wave 6A Block C: Live Chain Population Tests ---
+
+test("HookRuntime blocked HARD_STOP action writes OPERATOR_ACTION chain entry", () => {
+  const projectDir = makeTempProject();
+
+  runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-chain-blocked",
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:00:00Z",
+    }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-chain-blocked");
+  assert.equal(state.chainEntries.length, 1);
+  assert.equal(state.chainEntries[0].entryType, "OPERATOR_ACTION");
+  assert.equal(state.chainEntries[0].sourceArtifact, "hook:PreToolUse");
+  assert.match(state.chainEntries[0].sourceLocation, /domain:pricing_quote_logic/);
+  assert.equal(state.chainEntries[0].payload.action, "blocked");
+  assert.equal(state.chainEntries[0].sessionId, "session-chain-blocked");
+  assert.equal(state.nextChainCounter, 2);
+});
+
+test("HookRuntime PostToolUse on classified domain writes EVIDENCE chain entry", () => {
+  const projectDir = makeTempProject();
+
+  runHookEvent(
+    "PostToolUse",
+    {
+      session_id: "session-chain-posttool",
+      cwd: projectDir,
+      hook_event_name: "PostToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+      tool_response: "Edit applied.",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:01:00Z",
+    }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-chain-posttool");
+  assert.equal(state.chainEntries.length, 1);
+  assert.equal(state.chainEntries[0].entryType, "EVIDENCE");
+  assert.equal(state.chainEntries[0].sourceArtifact, "hook:PostToolUse");
+  assert.equal(state.chainEntries[0].payload.action, "completed");
+  assert.equal(state.chainEntries[0].payload.toolName, "Edit");
+});
+
+test("HookRuntime PostToolUse on unclassified tool does NOT write chain entry", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "PostToolUse",
+    {
+      session_id: "session-chain-unclassified",
+      cwd: projectDir,
+      hook_event_name: "PostToolUse",
+      tool_name: "Read",
+      tool_input: {
+        file_path: path.join(projectDir, "docs", "note.md"),
+      },
+      tool_response: "file content",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:02:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-chain-unclassified");
+  assert.equal((state.chainEntries || []).length, 0);
+});
+
+test("HookRuntime PostToolUseFailure on classified domain writes EVIDENCE chain entry", () => {
+  const projectDir = makeTempProject();
+
+  runHookEvent(
+    "PostToolUseFailure",
+    {
+      session_id: "session-chain-failure",
+      cwd: projectDir,
+      hook_event_name: "PostToolUseFailure",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "not found",
+        new_string: "replacement",
+      },
+      error: "old_string not found in file",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:03:00Z",
+    }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-chain-failure");
+  assert.equal(state.chainEntries.length, 1);
+  assert.equal(state.chainEntries[0].entryType, "EVIDENCE");
+  assert.equal(state.chainEntries[0].sourceArtifact, "hook:PostToolUseFailure");
+  assert.equal(state.chainEntries[0].payload.action, "failed");
+  assert.equal(state.chainEntries[0].payload.errorSummary, "old_string not found in file");
+});
+
+test("HookRuntime ConfigChange writes OPERATOR_ACTION chain entry", () => {
+  const projectDir = makeTempProject();
+
+  runHookEvent(
+    "ConfigChange",
+    {
+      session_id: "session-chain-config",
+      cwd: projectDir,
+      hook_event_name: "ConfigChange",
+      source: "settings.json",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:04:00Z",
+    }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-chain-config");
+  const chainConfig = state.chainEntries.find(
+    (e) => e.sourceArtifact === "hook:ConfigChange"
+  );
+  assert.ok(chainConfig, "Should have a ConfigChange chain entry");
+  assert.equal(chainConfig.entryType, "OPERATOR_ACTION");
+  assert.equal(chainConfig.payload.action, "config_change_detected");
+});
+
+test("HookRuntime FileChanged writes OPERATOR_ACTION chain entry", () => {
+  const projectDir = makeTempProject();
+
+  runHookEvent(
+    "FileChanged",
+    {
+      session_id: "session-chain-file",
+      cwd: projectDir,
+      hook_event_name: "FileChanged",
+      source: ".claude/settings.json",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:05:00Z",
+    }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-chain-file");
+  const chainFile = state.chainEntries.find(
+    (e) => e.sourceArtifact === "hook:FileChanged"
+  );
+  assert.ok(chainFile, "Should have a FileChanged chain entry");
+  assert.equal(chainFile.entryType, "OPERATOR_ACTION");
+  assert.equal(chainFile.payload.action, "external_file_change_detected");
+});
+
+test("HookRuntime chain entries survive compaction and rehydration", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+
+  // Generate a chain entry via a blocked action
+  runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-chain-compact-src",
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:10:00Z",
+    }
+  );
+
+  const preState = loadSessionState(config, "session-chain-compact-src");
+  assert.equal(preState.chainEntries.length, 1);
+
+  // Compact
+  runHookEvent(
+    "PreCompact",
+    {
+      session_id: "session-chain-compact-src",
+      cwd: projectDir,
+      hook_event_name: "PreCompact",
+      trigger: "manual",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:11:00Z",
+    }
+  );
+
+  // Rehydrate in new session
+  runHookEvent(
+    "SessionStart",
+    {
+      session_id: "session-chain-compact-dst",
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "compact",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:12:00Z",
+    }
+  );
+
+  const rehydrated = loadSessionState(config, "session-chain-compact-dst");
+  assert.equal(rehydrated.chainEntries.length, 1);
+  assert.equal(rehydrated.chainEntries[0].entryType, "OPERATOR_ACTION");
+  assert.equal(rehydrated.chainEntries[0].payload.action, "blocked");
+  assert.ok(rehydrated.nextChainCounter >= 2, "Counter should survive compaction");
+});
+
+test("HookRuntime chain entries persist independently from Walk evaluation at Stop", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+
+  // Generate chain entries via blocked action and PostToolUse
+  runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-chain-walk",
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:20:00Z",
+    }
+  );
+
+  runHookEvent(
+    "PostToolUse",
+    {
+      session_id: "session-chain-walk",
+      cwd: projectDir,
+      hook_event_name: "PostToolUse",
+      tool_name: "Write",
+      tool_input: {
+        file_path: path.join(projectDir, "docs", "guide.md"),
+        content: "# guide\n",
+      },
+      tool_response: "File written.",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:20:30Z",
+    }
+  );
+
+  // Stop — Walk evaluates without chain entries in forensicEntries
+  // (chain entries are self-standing runtime evidence, not claim-linked)
+  runHookEvent(
+    "Stop",
+    {
+      session_id: "session-chain-walk",
+      cwd: projectDir,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+    },
+    {
+      projectDir,
+      now: "2026-04-03T11:21:00Z",
+    }
+  );
+
+  // Chain entries persist in state alongside Walk results
+  const state = loadSessionState(config, "session-chain-walk");
+  assert.ok(state.lastWalk, "lastWalk should be populated after Stop");
+  assert.ok(state.chainEntries.length >= 2, "chain entries persist independently from Walk");
+});
+
+test("HookRuntime chain entries pass ForensicChain validation", () => {
+  const { ForensicChain } = require("../../src/ForensicChain");
+  const projectDir = makeTempProject();
+
+  // Generate entries from multiple sources
+  runHookEvent("PreToolUse", {
+    session_id: "session-chain-validate",
+    cwd: projectDir,
+    hook_event_name: "PreToolUse",
+    tool_name: "Edit",
+    tool_input: {
+      file_path: path.join(projectDir, "src", "pricing-engine.js"),
+      old_string: "module.exports = {};",
+      new_string: "changed",
+    },
+  }, { projectDir, now: "2026-04-03T11:30:00Z" });
+
+  runHookEvent("ConfigChange", {
+    session_id: "session-chain-validate",
+    cwd: projectDir,
+    hook_event_name: "ConfigChange",
+    source: "settings.json",
+  }, { projectDir, now: "2026-04-03T11:31:00Z" });
+
+  const state = loadSessionState(
+    resolveRuntimeConfig(projectDir),
+    "session-chain-validate"
+  );
+
+  // All entries must load into a ForensicChain without validation errors
+  const chain = new ForensicChain("validation_test_chain", state.chainEntries);
+  assert.equal(chain.listEntries().length, state.chainEntries.length);
+});
+
+test("HookRuntime PostToolUse and PostToolUseFailure fail closed on corrupted state", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+
+  const statePath = getStateFilePath(config, "session-post-corrupt");
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, "{bad json", "utf8");
+
+  const postResult = runHookEvent("PostToolUse", {
+    session_id: "session-post-corrupt",
+    cwd: projectDir,
+    hook_event_name: "PostToolUse",
+    tool_name: "Edit",
+    tool_input: {
+      file_path: path.join(projectDir, "src", "pricing-engine.js"),
+      old_string: "x",
+      new_string: "y",
+    },
+    tool_response: "ok",
+  }, { projectDir, now: "2026-04-03T11:40:00Z" });
+
+  assert.match(postResult.hookSpecificOutput.additionalContext, /FAIL_CLOSED/);
+
+  const failResult = runHookEvent("PostToolUseFailure", {
+    session_id: "session-post-corrupt",
+    cwd: projectDir,
+    hook_event_name: "PostToolUseFailure",
+    tool_name: "Edit",
+    tool_input: {
+      file_path: path.join(projectDir, "src", "pricing-engine.js"),
+      old_string: "x",
+      new_string: "y",
+    },
+    error: "failed",
+  }, { projectDir, now: "2026-04-03T11:41:00Z" });
+
+  assert.match(failResult.hookSpecificOutput.additionalContext, /FAIL_CLOSED/);
 });

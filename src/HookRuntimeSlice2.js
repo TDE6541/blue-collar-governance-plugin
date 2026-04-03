@@ -7,6 +7,7 @@ const COMPACTION_STATE_VERSION = 1;
 const COMPACTION_STATE_FILE = "_compaction-preserved.json";
 const MAX_OBSERVED_ACTIONS = 128;
 const MAX_BLOCKED_ATTEMPTS = 128;
+const MAX_CHAIN_ENTRIES = 128;
 const SESSION_START_SOURCES = new Set(["startup", "resume", "clear", "compact"]);
 const RECOVERY_SOURCES = new Set(["compact", "resume"]);
 
@@ -72,6 +73,8 @@ function createFallbackEmptyState(sessionId, profile) {
     profileId,
     observedActions: [],
     blockedAttempts: [],
+    chainEntries: [],
+    nextChainCounter: 1,
     stopGate: {
       lastBlockedSignature: null,
       lastBlockedAt: null,
@@ -99,6 +102,11 @@ function ensureSessionStateShape(state, sessionId, profile, createEmptySessionSt
       : base.profileId;
   base.observedActions = capTail(sourceState.observedActions, MAX_OBSERVED_ACTIONS);
   base.blockedAttempts = capTail(sourceState.blockedAttempts, MAX_BLOCKED_ATTEMPTS);
+  base.chainEntries = capTail(sourceState.chainEntries, MAX_CHAIN_ENTRIES);
+  base.nextChainCounter =
+    typeof sourceState.nextChainCounter === "number" && sourceState.nextChainCounter >= 1
+      ? sourceState.nextChainCounter
+      : (base.chainEntries.length || 0) + 1;
   base.stopGate = normalizeStopGate(sourceState.stopGate);
   base.lastWalk =
     sourceState.lastWalk && typeof sourceState.lastWalk === "object" && !Array.isArray(sourceState.lastWalk)
@@ -369,6 +377,11 @@ function makeRecoveryHoldAction({ fingerprint, source, status, detail, now }) {
 function applyRecoveredState(state, recoveredState) {
   state.observedActions = capTail(recoveredState.observedActions, MAX_OBSERVED_ACTIONS);
   state.blockedAttempts = capTail(recoveredState.blockedAttempts, MAX_BLOCKED_ATTEMPTS);
+  state.chainEntries = capTail(recoveredState.chainEntries, MAX_CHAIN_ENTRIES);
+  state.nextChainCounter =
+    typeof recoveredState.nextChainCounter === "number" && recoveredState.nextChainCounter >= 1
+      ? recoveredState.nextChainCounter
+      : (Array.isArray(state.chainEntries) ? state.chainEntries.length : 0) + 1;
   state.stopGate = normalizeStopGate(recoveredState.stopGate);
   state.lastWalk =
     recoveredState.lastWalk &&
@@ -383,6 +396,7 @@ function hasMeaningfulSessionState(state) {
   return (
     (Array.isArray(state.observedActions) && state.observedActions.length > 0) ||
     (Array.isArray(state.blockedAttempts) && state.blockedAttempts.length > 0) ||
+    (Array.isArray(state.chainEntries) && state.chainEntries.length > 0) ||
     (state.lastWalk && typeof state.lastWalk === "object")
   );
 }
@@ -488,6 +502,11 @@ function handlePreCompactSlice({ input, config, options, loadSessionState, resol
     rehydration: {
       observedActions: capTail(state.observedActions, MAX_OBSERVED_ACTIONS),
       blockedAttempts: capTail(state.blockedAttempts, MAX_BLOCKED_ATTEMPTS),
+      chainEntries: capTail(state.chainEntries, MAX_CHAIN_ENTRIES),
+      nextChainCounter:
+        typeof state.nextChainCounter === "number" && state.nextChainCounter >= 1
+          ? state.nextChainCounter
+          : (Array.isArray(state.chainEntries) ? state.chainEntries.length : 0) + 1,
       stopGate: normalizeStopGate(state.stopGate),
       lastWalk:
         state.lastWalk && typeof state.lastWalk === "object" && !Array.isArray(state.lastWalk)

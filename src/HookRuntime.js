@@ -40,12 +40,16 @@ const KNOWN_HOOK_EVENTS = new Set([
   "SessionStart",
   "PreCompact",
   "PreToolUse",
+  "PostToolUse",
+  "PostToolUseFailure",
   "PermissionRequest",
   "Stop",
   "ConfigChange",
   "CwdChanged",
   "FileChanged",
 ]);
+
+const MAX_CHAIN_ENTRIES = 128;
 
 const AUTONOMY_PRIORITY = Object.freeze({
   HARD_STOP: 3,
@@ -297,6 +301,8 @@ function createEmptySessionState(sessionId, profile) {
     profileId: profile.profileId,
     observedActions: [],
     blockedAttempts: [],
+    chainEntries: [],
+    nextChainCounter: 1,
     stopGate: {
       lastBlockedSignature: null,
       lastBlockedAt: null,
@@ -553,6 +559,47 @@ function recordBlockedAttempt(state, fingerprint, classification, blockedAt) {
   });
 }
 
+function appendChainEntry(state, { eventType, entryType, sourceArtifact, sourceLocation, payload, sessionId, recordedAt }) {
+  if (!Array.isArray(state.chainEntries)) {
+    state.chainEntries = [];
+  }
+
+  if (typeof state.nextChainCounter !== "number") {
+    state.nextChainCounter = 1;
+  }
+
+  const counter = state.nextChainCounter;
+  state.nextChainCounter = counter + 1;
+
+  const entryId = `hook_${eventType}_${sessionId}_${String(counter).padStart(4, "0")}`;
+
+  if (state.chainEntries.some((entry) => entry.entryId === entryId)) {
+    return null;
+  }
+
+  const entry = {
+    chainId: `hook_chain_${sessionId}`,
+    entryId,
+    entryType,
+    recordedAt,
+    sessionId,
+    sourceArtifact,
+    sourceLocation,
+    payload: payload && typeof payload === "object" ? { ...payload } : {},
+    linkedEntryRefs: [],
+  };
+
+  state.chainEntries.push(entry);
+
+  if (state.chainEntries.length > MAX_CHAIN_ENTRIES) {
+    state.chainEntries = state.chainEntries.slice(
+      state.chainEntries.length - MAX_CHAIN_ENTRIES
+    );
+  }
+
+  return entry;
+}
+
 function resolveNow(options) {
   return (options && options.now) || new Date().toISOString();
 }
@@ -570,6 +617,21 @@ function handlePreToolUse(input, config, options) {
 
     if (classification.autonomyLevel === "HARD_STOP") {
       recordBlockedAttempt(state, fingerprint, classification, now);
+      appendChainEntry(state, {
+        eventType: "blocked",
+        entryType: "OPERATOR_ACTION",
+        sourceArtifact: "hook:PreToolUse",
+        sourceLocation: `domain:${classification.domainId}`,
+        payload: {
+          action: "blocked",
+          toolName: classification.toolName,
+          workItem: classification.workItem,
+          autonomyLevel: classification.autonomyLevel,
+          reason: describeAction(classification, config.profile),
+        },
+        sessionId: input.session_id,
+        recordedAt: now,
+      });
       saveSessionState(config, input.session_id, state);
 
       return {
@@ -776,6 +838,92 @@ function handleStop(input, config, options) {
   }
 }
 
+function handlePostToolUse(input, config, options) {
+  try {
+    const classification = classifyToolAction(input.tool_name, input.tool_input, config);
+    if (!classification) {
+      return {};
+    }
+
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+
+    appendChainEntry(state, {
+      eventType: "completed",
+      entryType: "EVIDENCE",
+      sourceArtifact: "hook:PostToolUse",
+      sourceLocation: `domain:${classification.domainId}`,
+      payload: {
+        action: "completed",
+        toolName: classification.toolName,
+        workItem: classification.workItem,
+        autonomyLevel: classification.autonomyLevel,
+        operationType: classification.operationType,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+    return {};
+  } catch (error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "PostToolUse",
+        additionalContext: `FAIL_CLOSED: PostToolUse internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
+      },
+    };
+  }
+}
+
+function handlePostToolUseFailure(input, config, options) {
+  try {
+    const classification = classifyToolAction(input.tool_name, input.tool_input, config);
+    if (!classification) {
+      return {};
+    }
+
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+
+    const errorSummary =
+      typeof input.error === "string" && input.error.trim() !== ""
+        ? input.error.slice(0, 200)
+        : "unknown";
+
+    appendChainEntry(state, {
+      eventType: "failed",
+      entryType: "EVIDENCE",
+      sourceArtifact: "hook:PostToolUseFailure",
+      sourceLocation: `domain:${classification.domainId}`,
+      payload: {
+        action: "failed",
+        toolName: classification.toolName,
+        workItem: classification.workItem,
+        autonomyLevel: classification.autonomyLevel,
+        operationType: classification.operationType,
+        errorSummary,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+    return {};
+  } catch (error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "PostToolUseFailure",
+        additionalContext: `FAIL_CLOSED: PostToolUseFailure internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
+      },
+    };
+  }
+}
+
 function handleConfigChange(input, config, options) {
   try {
     const state = loadSessionState(config, input.session_id);
@@ -804,6 +952,16 @@ function handleConfigChange(input, config, options) {
       approvalState: "config_change_detected",
       firstObservedAt: now,
       lastObservedAt: now,
+    });
+
+    appendChainEntry(state, {
+      eventType: "config_change",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:ConfigChange",
+      sourceLocation: `source:${source}`,
+      payload: { action: "config_change_detected", source },
+      sessionId: input.session_id,
+      recordedAt: now,
     });
 
     saveSessionState(config, input.session_id, state);
@@ -905,6 +1063,16 @@ function handleFileChanged(input, config, options) {
       lastObservedAt: now,
     });
 
+    appendChainEntry(state, {
+      eventType: "file_change",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:FileChanged",
+      sourceLocation: `source:${source}`,
+      payload: { action: "external_file_change_detected", source },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
     saveSessionState(config, input.session_id, state);
 
     return {
@@ -966,6 +1134,10 @@ function runHookEvent(eventName, input, options = {}) {
       });
     case "PreToolUse":
       return handlePreToolUse(input, config, options);
+    case "PostToolUse":
+      return handlePostToolUse(input, config, options);
+    case "PostToolUseFailure":
+      return handlePostToolUseFailure(input, config, options);
     case "PermissionRequest":
       return handlePermissionRequest(input, config, options);
     case "Stop":
