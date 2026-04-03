@@ -10,13 +10,13 @@ The Architect is the human authority. AI is the execution partner.
 
 ## Mission
 
-Build a private runtime trust layer for non-technical AI operators while preserving truth, explicit boundaries, dangerous-action control, and durable session records.
+Build a runtime trust layer for non-technical AI operators while preserving truth, explicit boundaries, dangerous-action control, and durable session records.
 
 ## Product Position
 
 This repository is:
 
-- a private runtime/control layer
+- a runtime governance layer
 - a trust kernel built on top of the Governed Workflow methodology spine
 - intended for operators who cannot rely on code review for safety
 

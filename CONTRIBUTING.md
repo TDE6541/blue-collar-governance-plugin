@@ -15,10 +15,10 @@ Read these files first:
 
 ## Working Rules
 
-- Treat this repo as a private runtime/control layer, not the public methodology repo.
+- Treat this repo as a runtime governance layer, not the methodology repo.
 - Follow the governed flow: plan, approve, execute, verify, close out.
 - Keep diffs minimal and scoped to the approved wave.
-- Do not widen beyond the Wave 1 trust-kernel scope without explicit approval.
+- Do not widen beyond the current approved scope without explicit approval.
 - Do not leave stale front-door or navigation docs behind after behavior or spec changes.
 
 ## Contract Discipline

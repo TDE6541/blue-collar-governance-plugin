@@ -1,122 +1,147 @@
 # Blue Collar Governance Plugin
 
-Blue Collar Governance Plugin is a real Claude Code plugin artifact built from the signed-off Wave 5 repo without changing the underlying governance engines.
+A Claude Code plugin that enforces governance rules through deterministic local hooks — not just prompt instructions.
 
-**Status:** Plugin structure is shipped locally: `.claude-plugin/plugin.json`, `hooks/hooks.json`, plugin-discoverable `skills/<name>/SKILL.md`, and a plugin-root hook entrypoint now exist. The existing standalone repo path under `.claude/` is still preserved. Wave 6A fail-closed hook hardening is in progress. `package.json`, npm/package publish flow, marketplace install flow, and end-to-end compatibility claims are still not shipped.
+## What This Does
 
-## What This Is
+This plugin adds a runtime governance layer to Claude Code sessions:
 
-This repository now ships two honest things at once:
+- **Fail-closed command hooks** over `Bash`, `Write`, and `Edit` — dangerous actions are blocked before execution, not after
+- **Control rod profiles** that classify every tool action against configurable domain rules (pricing, customer data, auth, destructive ops, and more)
+- **Session closeout gating** — the session cannot close cleanly if unresolved blocking findings exist
+- **Governance state preservation** — enforcement state survives context compaction and session restarts
+- **26 operator-facing skills** for inspecting governance posture, forensic history, safety interlocks, and session health during a live session
 
-- a governed runtime/control layer with deterministic local hook enforcement
-- a Claude Code plugin artifact that exposes the shipped hook and skill surfaces in plugin format
+## Why This Exists
 
-It is still the same governed repo. This sprint converted the structure so the repo can be loaded as a plugin without inventing new engine behavior.
+Prompt-based instructions alone do not reliably prevent dangerous actions at the moment a tool runs. They can be compacted away, ignored under pressure, or simply not loaded.
 
-## Why Prompt-Only Governance Is Not Enough
+This plugin exists to make the load-bearing governance seams deterministic and local:
 
-Prompt text alone does not reliably enforce dangerous-action posture at the moment a tool runs, survive compaction, or gate closeout against unresolved blocking findings.
+- A hook that runs real code before every `Bash`, `Write`, or `Edit` call
+- Classification logic that maps tool actions to protected domains
+- Deny decisions that fire before the tool executes, not after
+- State that persists through compaction so enforcement doesn't silently disappear mid-session
 
-This repo exists to ship those load-bearing seams as deterministic local behavior:
+## How It Works
 
-- fail-closed command hooks over `Bash`, `Write`, and `Edit`
-- bounded `SessionStart` re-injection and `PreCompact` preservation
-- `Stop` closeout gating through existing `ForemansWalk` truth
-- namespaced skills over existing runtime truth instead of hidden behavior inside prompts
+The plugin registers hooks for five Claude Code lifecycle events:
+
+| Event | What happens |
+|-------|-------------|
+| **SessionStart** | Injects governance context; rehydrates state after compaction |
+| **PreCompact** | Preserves governance state before context compaction |
+| **PreToolUse** | Classifies the tool action; denies HARD_STOP domains; asks on SUPERVISED |
+| **PermissionRequest** | Resolves permission dialogs against the active control rod profile |
+| **Stop** | Evaluates a Foreman's Walk; blocks closeout if blocking findings exist |
+
+Every hook path fails closed on internal error — a crash produces a deny/block decision, never a silent pass-through.
+
+### Control Rod Profiles
+
+The plugin ships three starter profiles that define autonomy levels per domain:
+
+| Profile | HARD_STOP domains | SUPERVISED domains | FULL_AUTO domains |
+|---------|-------------------|--------------------|-------------------|
+| **conservative** | 5 (pricing, customer data, schema, auth, destructive ops) | 4 (existing files, new files, UI/styling, tests) | 1 (documentation) |
+| **balanced** | 4 | 2 | 4 |
+| **velocity** | 2 | 3 | 5 |
+
+Custom profiles are supported through the same domain-rule structure.
+
+## How to Use It
+
+### Plugin Mode
+
+Load the repo as a local Claude Code plugin:
+
+```bash
+claude --plugin-dir /path/to/blue-collar-governance-plugin
+```
+
+This registers the hooks and makes the 26 skills available as `/blue-collar-governance-plugin:<skill-name>`.
+
+### Standalone Repo Mode
+
+The plugin also works as a standalone project-local governance layer through:
+
+- `.claude/settings.json` — hook registration and deny rules
+- `.claude/hooks/run-governance-hook.js` — hook entrypoint
+
+### Mode Boundary
+
+Plugin mode and standalone mode are alternate loading paths. Do not run both simultaneously in the same session unless you have explicitly verified that combination — duplicate hook execution is possible.
+
+### Configuration
+
+The active profile and matched tools are configured in `.claude/settings.json`:
+
+```json
+{
+  "blueCollarGovernance": {
+    "hookRuntime": {
+      "profileId": "conservative",
+      "matchedTools": ["Bash", "Write", "Edit"],
+      "stateDirectory": ".claude/runtime",
+      "blockingSeverities": ["CRITICAL", "HIGH"]
+    }
+  }
+}
+```
 
 ## What Ships Today
 
 - Claude plugin manifest at `.claude-plugin/plugin.json`
 - Plugin hook registry at `hooks/hooks.json`
-- Plugin hook wrapper at `hooks/run-governance-hook.js`
-- 26 skills in plugin format under `skills/<name>/SKILL.md`
-- Existing standalone compatibility path at `.claude/settings.json` and `.claude/hooks/run-governance-hook.js`
-- Existing runtime modules under `src/`
-- Existing hook/runtime proof at `tests/golden/HookRuntime.golden.test.js` and `tests/live/wave5.hook-runtime.live.test.js`
+- Fail-closed hook runtime at `src/HookRuntime.js` and `src/HookRuntimeSlice2.js`
+- 26 operator-facing skills under `skills/<name>/SKILL.md`
+- Standalone compatibility path at `.claude/settings.json`
+- Runtime governance engines under `src/`
+- 290 passing golden tests under `tests/golden/`
 
-## Use It Today
+## What This Does Not Do
 
-### Plugin Mode
+- **No npm package or marketplace install.** There is no `package.json`. Load the repo directly with `--plugin-dir`.
+- **No Agent tool governance.** Hooks cover `Bash`, `Write`, and `Edit` only. `Agent` spawn semantics are not classified.
+- **No HTTP hooks or LLM-based decisions.** All hook logic is deterministic local code. No network calls, no model queries.
+- **No universal project compatibility claim.** The plugin has been proven on its own repo and on one foreign production repo. Broader compatibility is not yet validated.
+- **No multi-agent governance.** This is single-session, single-operator enforcement.
 
-Load the repo directly as a local plugin artifact:
+## Proof
 
-```powershell
-claude --plugin-dir "C:\dev\Blue Collar Governance Plugin"
-```
+- **Golden tests:** 290 tests, 0 failures (`node --test tests/golden/*.golden.test.js`)
+- **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
+- **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
+- **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
 
-Then run:
+Detailed proof documentation:
 
-1. `/reload-plugins`
-2. `/blue-collar-governance-plugin:toolbox-talk`
-3. `/hooks`
-
-That path proves plugin discovery, namespaced skill loading, and hook registration visibility.
-
-### Standalone Repo Mode
-
-The existing standalone path still works through:
-
-- `.claude/settings.json`
-- `.claude/hooks/run-governance-hook.js`
-
-This remains the repo’s original project-local runtime path.
-
-### Important Mode Boundary
-
-Do not treat plugin mode and standalone mode as one merged setup in the same host-project session unless that combination is explicitly proven.
-
-Today’s honest posture is:
-
-- standalone mode is preserved
-- plugin mode is added
-- if both hook registration paths are active together, duplicate hook execution risk exists
-
-## Deny-Rule Truth
-
-The plugin ships hooks and skills.
-
-The repo’s current deny-first posture does **not** fully move into plugin-shipped defaults. Project-level `permissions.deny` remains a host-project configuration step when you want the same hard-stop deny layer the standalone repo currently uses.
-
-That means the honest install story today is:
-
-- plugin artifact: shipped
-- hook and skill structure: shipped
-- deny-rule layer: still an explicit project-settings step
-
-## What Is Not Claimed
-
-- No `package.json`
-- No npm install or package publish flow
-- No marketplace-ready claim
-- No `claude plugin install <name>` claim for this repo
-- No HTTP hooks, LLM hook decisions, or Agent hook governance beyond the current shipped Slice 2 scope
-
-## Proof And Runbook
-
-- `docs/PLUGIN_CONVERSION_PROOF.md` - plugin conversion proof, validation notes, and local smoke runbook
-- `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md` - current runtime startup and proof posture
-- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - authoritative hook/runtime contract baseline
-- `docs/WAVE5_CLOSEOUT.md` - Wave 5 runtime closeout evidence map
+- `docs/PLUGIN_CONVERSION_PROOF.md` — plugin validation and local smoke runbook
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` — hook runtime contract baseline
 
 ## Repository Layout
 
 ```text
 .
-├── .claude-plugin/                # Claude plugin manifest
-├── hooks/                         # Plugin hook registry + plugin-root hook wrapper
-├── .claude/                       # Standalone compatibility path, project settings, deny rules, runtime state
-├── skills/                        # Plugin-discoverable skills/<name>/SKILL.md
-├── src/                           # Runtime implementation
-├── tests/                         # Golden + live verification
-├── docs/                          # Canon specs, proof, and maintenance indexes
-└── raw/                           # Reference-only inputs, not canon
+├── .claude-plugin/        # Claude plugin manifest
+├── hooks/                 # Plugin hook registry and wrapper
+├── .claude/               # Standalone path, project settings, deny rules
+├── skills/                # 26 operator-facing skills
+├── src/                   # Runtime governance engines and hook runtime
+├── tests/                 # Golden (290) and live verification
+├── docs/                  # Specs, proof artifacts, and indexes
+│   └── specs/             # Canonical contract baselines
+└── raw/                   # Reference-only methodology inputs (not canon)
 ```
+
+## License
+
+[MIT](LICENSE)
 
 ## Start Here
 
-1. `CLAUDE.md`
-2. `TEAM_CHARTER.md`
-3. `AI_EXECUTION_DOCTRINE.md`
-4. `docs/PLUGIN_CONVERSION_PROOF.md`
-5. `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`
-6. `REPO_INDEX.md`
+1. `CLAUDE.md` — AI operating posture and repo truth
+2. `TEAM_CHARTER.md` — governance doctrine
+3. `CONTRIBUTING.md` — contribution rules
+4. `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` — hook runtime contract
+5. `REPO_INDEX.md` — full repo navigation map
