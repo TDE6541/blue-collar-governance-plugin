@@ -1365,6 +1365,7 @@ module.exports = {
   getCompactionStateFilePath,
   getStateFilePath,
   loadSessionState,
+  appendChainEntry,
   resolveRuntimeConfig,
   runHookEvent,
   saveSessionState,

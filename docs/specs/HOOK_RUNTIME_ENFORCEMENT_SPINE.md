@@ -106,7 +106,7 @@ Current enforcement posture still resolves from `.claude/settings.json` and uses
 
 - auto-allow `FULL_AUTO` actions when dialog would otherwise appear
 - preserve normal user approval on `SUPERVISED` actions
-- deny `HARD_STOP` as safety backstop if request reaches this hook unexpectedly
+- consult active permits for `HARD_STOP` domains (Block D); allow if valid permit exists, deny otherwise
 
 ## Persistent Deny Layer
 
