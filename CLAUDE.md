@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; later Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; marketplace/package/install claims remain unverified
+- Status: private runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; Wave 5 closeout and MIGRATIONS.md entries are awaiting Architect final signoff; Wave 6A Block 0 truth-sync and Block A fail-closed hook hardening are in progress; later Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; marketplace/package/install claims remain unverified
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -107,7 +107,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Standalone and plugin hook registration should be treated as alternate modes until simultaneous loading is explicitly proven.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Wave 5 skill topology is now 26 skills across 10 groups.
+- Wave 5 skill topology is now 26 skills.
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, and later proof/integration work, remains pending.
@@ -157,6 +157,9 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Wave 5 onboarding/runtime-proof artifact: `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`
 - Plugin conversion proof artifact: `docs/PLUGIN_CONVERSION_PROOF.md`
 - Wave 5 closeout evidence map: `docs/WAVE5_CLOSEOUT.md`
+- Wave 6A Block A fail-closed hook hardening is governed by the additive Slice 3 section in `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`.
+- Wave 6A does not introduce new skills, skins, engines, or contract widening.
+- Conservative control-rod profile posture is 5 HARD_STOP / 4 SUPERVISED / 1 FULL_AUTO (10 baseline domains).
 
 ## Canon And Reference Boundary
 

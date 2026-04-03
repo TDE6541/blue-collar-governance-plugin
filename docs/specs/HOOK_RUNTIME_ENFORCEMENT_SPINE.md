@@ -149,3 +149,43 @@ Hook runtime behavior remains an adapter over existing truth.
 - Project `.claude/settings.json` remains the current `permissions.deny` delivery surface and the standalone compatibility path.
 - Plugin conversion does not widen `ControlRodMode`, `ForemansWalk`, `SessionBrief`, `SessionReceipt`, or `ConstraintsRegistry`.
 - Plugin and standalone hook registration should currently be treated as alternate modes until simultaneous loading is explicitly proven.
+
+## Slice 3: Fail-Closed Hook Hardening (Wave 6A Block A)
+
+Slice 3 hardens the existing Slice 2 hook runtime so that blocking enforcement paths fail closed on internal error rather than propagating exceptions to the hook wrapper.
+
+### Scope
+
+Slice 3 adds exactly:
+
+- `PreToolUse` internal try-catch: on unexpected error during classification, state load, or state save, returns a deny decision with `FAIL_CLOSED` reason instead of propagating the exception
+- `PermissionRequest` internal try-catch: on unexpected error, returns a deny decision with `FAIL_CLOSED` reason instead of propagating the exception
+- `Stop` internal try-catch: on unexpected error during Walk evaluation, state load, or state save, returns a block decision with `FAIL_CLOSED` reason instead of crashing the process
+- Unknown hook event guard: `runHookEvent` now throws on unrecognized event names instead of returning `{}`, ensuring new Claude Code lifecycle events do not silently pass through
+
+### Why
+
+Prior to Slice 3, blocking hook paths relied on the outermost hook wrapper catching exceptions and exiting with code 2. This is fail-closed at the process level, but exit code 2 means the hook crashed — which may trigger Claude Code retry behavior or surface an error to the user. Slice 3 makes each handler produce a correct governance decision even on internal error, keeping the session governable.
+
+The unknown-event guard prevents silent fail-open if Claude Code introduces new lifecycle events that the governance runtime does not yet handle. The thrown error propagates to the hook wrapper, which exits with code 2.
+
+### Behavior Table
+
+| Handler | Internal Error Before Slice 3 | Internal Error After Slice 3 |
+|---------|-------------------------------|------------------------------|
+| `PreToolUse` | Exception → wrapper exit 2 | Deny decision with FAIL_CLOSED reason |
+| `PermissionRequest` | Exception → wrapper exit 2 | Deny decision with FAIL_CLOSED reason |
+| `Stop` | Exception → wrapper exit 2 | Block decision with FAIL_CLOSED reason |
+| Unknown event | Return `{}` (silent pass) | Exception → wrapper exit 2 |
+
+### Contract Boundaries
+
+Slice 3 does not widen:
+
+- `ControlRodMode`
+- `ForemansWalk`
+- `SessionBrief`
+- `SessionReceipt`
+- `ConstraintsRegistry`
+
+Slice 3 does not add new hook event handlers, does not change classification logic, and does not change the normal-path behavior of any existing handler. Only error paths are affected.

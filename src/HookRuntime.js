@@ -36,6 +36,14 @@ const PROJECT_HARD_STOP_DENY_RULES = Object.freeze([
   "Edit(/**/*security*.*)",
 ]);
 
+const KNOWN_HOOK_EVENTS = new Set([
+  "SessionStart",
+  "PreCompact",
+  "PreToolUse",
+  "PermissionRequest",
+  "Stop",
+]);
+
 const AUTONOMY_PRIORITY = Object.freeze({
   HARD_STOP: 3,
   SUPERVISED: 2,
@@ -547,95 +555,122 @@ function resolveNow(options) {
 }
 
 function handlePreToolUse(input, config, options) {
-  const fingerprint = createToolFingerprint(input.tool_name, input.tool_input);
-  const classification = classifyToolAction(input.tool_name, input.tool_input, config);
-  if (!classification) {
-    return {};
-  }
+  try {
+    const fingerprint = createToolFingerprint(input.tool_name, input.tool_input);
+    const classification = classifyToolAction(input.tool_name, input.tool_input, config);
+    if (!classification) {
+      return {};
+    }
 
-  const state = loadSessionState(config, input.session_id);
-  const now = resolveNow(options);
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
 
-  if (classification.autonomyLevel === "HARD_STOP") {
-    recordBlockedAttempt(state, fingerprint, classification, now);
+    if (classification.autonomyLevel === "HARD_STOP") {
+      recordBlockedAttempt(state, fingerprint, classification, now);
+      saveSessionState(config, input.session_id, state);
+
+      return {
+        hookSpecificOutput: {
+          hookEventName: "PreToolUse",
+          permissionDecision: "deny",
+          permissionDecisionReason: `Control Rod HARD_STOP: ${describeAction(
+            classification,
+            config.profile
+          )}`,
+        },
+      };
+    }
+
+    if (classification.autonomyLevel === "SUPERVISED") {
+      recordObservedAction(state, fingerprint, classification, "pretool_supervised", now);
+      saveSessionState(config, input.session_id, state);
+
+      return {
+        hookSpecificOutput: {
+          hookEventName: "PreToolUse",
+          permissionDecision: "ask",
+          permissionDecisionReason: `Control Rod SUPERVISED: ${describeAction(
+            classification,
+            config.profile
+          )}`,
+        },
+      };
+    }
+
+    recordObservedAction(state, fingerprint, classification, "pretool_full_auto", now);
     saveSessionState(config, input.session_id, state);
-
+    return {};
+  } catch (error) {
     return {
       hookSpecificOutput: {
         hookEventName: "PreToolUse",
         permissionDecision: "deny",
-        permissionDecisionReason: `Control Rod HARD_STOP: ${describeAction(
-          classification,
-          config.profile
-        )}`,
+        permissionDecisionReason: `FAIL_CLOSED: PreToolUse internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
       },
     };
   }
-
-  if (classification.autonomyLevel === "SUPERVISED") {
-    recordObservedAction(state, fingerprint, classification, "pretool_supervised", now);
-    saveSessionState(config, input.session_id, state);
-
-    return {
-      hookSpecificOutput: {
-        hookEventName: "PreToolUse",
-        permissionDecision: "ask",
-        permissionDecisionReason: `Control Rod SUPERVISED: ${describeAction(
-          classification,
-          config.profile
-        )}`,
-      },
-    };
-  }
-
-  recordObservedAction(state, fingerprint, classification, "pretool_full_auto", now);
-  saveSessionState(config, input.session_id, state);
-  return {};
 }
 
 function handlePermissionRequest(input, config, options) {
-  const fingerprint = createToolFingerprint(input.tool_name, input.tool_input);
-  const classification = classifyToolAction(input.tool_name, input.tool_input, config);
-  if (!classification) {
-    return {};
-  }
+  try {
+    const fingerprint = createToolFingerprint(input.tool_name, input.tool_input);
+    const classification = classifyToolAction(input.tool_name, input.tool_input, config);
+    if (!classification) {
+      return {};
+    }
 
-  const state = loadSessionState(config, input.session_id);
-  const now = resolveNow(options);
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
 
-  if (classification.autonomyLevel === "HARD_STOP") {
-    recordBlockedAttempt(state, fingerprint, classification, now);
+    if (classification.autonomyLevel === "HARD_STOP") {
+      recordBlockedAttempt(state, fingerprint, classification, now);
+      saveSessionState(config, input.session_id, state);
+
+      return {
+        hookSpecificOutput: {
+          hookEventName: "PermissionRequest",
+          decision: {
+            behavior: "deny",
+            message: `Control Rod HARD_STOP: ${describeAction(classification, config.profile)}`,
+            interrupt: false,
+          },
+        },
+      };
+    }
+
+    if (classification.autonomyLevel === "FULL_AUTO") {
+      recordObservedAction(state, fingerprint, classification, "permission_full_auto_allow", now);
+      saveSessionState(config, input.session_id, state);
+
+      return {
+        hookSpecificOutput: {
+          hookEventName: "PermissionRequest",
+          decision: {
+            behavior: "allow",
+          },
+        },
+      };
+    }
+
+    recordObservedAction(state, fingerprint, classification, "permission_user_review", now);
     saveSessionState(config, input.session_id, state);
-
+    return {};
+  } catch (error) {
     return {
       hookSpecificOutput: {
         hookEventName: "PermissionRequest",
         decision: {
           behavior: "deny",
-          message: `Control Rod HARD_STOP: ${describeAction(classification, config.profile)}`,
+          message: `FAIL_CLOSED: PermissionRequest internal error: ${
+            error && typeof error.message === "string" ? error.message : "unknown"
+          }`,
           interrupt: false,
         },
       },
     };
   }
-
-  if (classification.autonomyLevel === "FULL_AUTO") {
-    recordObservedAction(state, fingerprint, classification, "permission_full_auto_allow", now);
-    saveSessionState(config, input.session_id, state);
-
-    return {
-      hookSpecificOutput: {
-        hookEventName: "PermissionRequest",
-        decision: {
-          behavior: "allow",
-        },
-      },
-    };
-  }
-
-  recordObservedAction(state, fingerprint, classification, "permission_user_review", now);
-  saveSessionState(config, input.session_id, state);
-  return {};
 }
 
 function buildWalkEvaluationFromState(state, config) {
@@ -693,40 +728,49 @@ function buildStopReason(blockingFindings) {
 }
 
 function handleStop(input, config, options) {
-  const state = loadSessionState(config, input.session_id);
-  const walkEvaluation = buildWalkEvaluationFromState(state, config);
-  const blockingFindings = walkEvaluation.findings.filter((finding) =>
-    config.blockingSeverities.has(finding.severity)
-  );
-  const signature =
-    blockingFindings.length > 0 ? buildBlockingFindingSignature(blockingFindings) : null;
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const walkEvaluation = buildWalkEvaluationFromState(state, config);
+    const blockingFindings = walkEvaluation.findings.filter((finding) =>
+      config.blockingSeverities.has(finding.severity)
+    );
+    const signature =
+      blockingFindings.length > 0 ? buildBlockingFindingSignature(blockingFindings) : null;
 
-  state.lastWalk = {
-    evaluatedAt: resolveNow(options),
-    findingSummary: walkEvaluation.findingSummary,
-    findings: walkEvaluation.findings,
-  };
+    state.lastWalk = {
+      evaluatedAt: resolveNow(options),
+      findingSummary: walkEvaluation.findingSummary,
+      findings: walkEvaluation.findings,
+    };
 
-  if (blockingFindings.length === 0) {
-    state.stopGate.lastBlockedSignature = null;
-    state.stopGate.lastBlockedAt = null;
+    if (blockingFindings.length === 0) {
+      state.stopGate.lastBlockedSignature = null;
+      state.stopGate.lastBlockedAt = null;
+      saveSessionState(config, input.session_id, state);
+      return {};
+    }
+
+    if (input.stop_hook_active === true && signature === state.stopGate.lastBlockedSignature) {
+      saveSessionState(config, input.session_id, state);
+      return {};
+    }
+
+    state.stopGate.lastBlockedSignature = signature;
+    state.stopGate.lastBlockedAt = resolveNow(options);
     saveSessionState(config, input.session_id, state);
-    return {};
+
+    return {
+      decision: "block",
+      reason: buildStopReason(blockingFindings),
+    };
+  } catch (error) {
+    return {
+      decision: "block",
+      reason: `FAIL_CLOSED: Stop internal error: ${
+        error && typeof error.message === "string" ? error.message : "unknown"
+      }`,
+    };
   }
-
-  if (input.stop_hook_active === true && signature === state.stopGate.lastBlockedSignature) {
-    saveSessionState(config, input.session_id, state);
-    return {};
-  }
-
-  state.stopGate.lastBlockedSignature = signature;
-  state.stopGate.lastBlockedAt = resolveNow(options);
-  saveSessionState(config, input.session_id, state);
-
-  return {
-    decision: "block",
-    reason: buildStopReason(blockingFindings),
-  };
 }
 
 function runHookEvent(eventName, input, options = {}) {
@@ -741,6 +785,12 @@ function runHookEvent(eventName, input, options = {}) {
   }
 
   const config = resolveRuntimeConfig(resolveProjectDir(input, options));
+
+  if (!KNOWN_HOOK_EVENTS.has(eventName)) {
+    throw new Error(
+      `FAIL_CLOSED: Unknown hook event '${eventName}'. Governance runtime does not handle this event.`
+    );
+  }
 
   switch (eventName) {
     case "SessionStart":
@@ -768,8 +818,6 @@ function runHookEvent(eventName, input, options = {}) {
       return handlePermissionRequest(input, config, options);
     case "Stop":
       return handleStop(input, config, options);
-    default:
-      return {};
   }
 }
 
@@ -779,6 +827,7 @@ module.exports = {
   DEFAULT_STATE_DIRECTORY,
   DEFAULT_MATCHED_TOOLS,
   DEFAULT_BLOCKING_SEVERITIES,
+  KNOWN_HOOK_EVENTS,
   PROJECT_HARD_STOP_DENY_RULES,
   buildWalkEvaluationFromState,
   classifyToolAction,

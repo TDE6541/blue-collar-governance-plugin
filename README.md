@@ -2,7 +2,7 @@
 
 Blue Collar Governance Plugin is a real Claude Code plugin artifact built from the signed-off Wave 5 repo without changing the underlying governance engines.
 
-**Status:** Plugin structure is shipped locally: `.claude-plugin/plugin.json`, `hooks/hooks.json`, plugin-discoverable `skills/<name>/SKILL.md`, and a plugin-root hook entrypoint now exist. The existing standalone repo path under `.claude/` is still preserved. `package.json`, npm/package publish flow, marketplace install flow, and end-to-end compatibility claims are still not shipped.
+**Status:** Plugin structure is shipped locally: `.claude-plugin/plugin.json`, `hooks/hooks.json`, plugin-discoverable `skills/<name>/SKILL.md`, and a plugin-root hook entrypoint now exist. The existing standalone repo path under `.claude/` is still preserved. Wave 6A fail-closed hook hardening is in progress. `package.json`, npm/package publish flow, marketplace install flow, and end-to-end compatibility claims are still not shipped.
 
 ## What This Is
 

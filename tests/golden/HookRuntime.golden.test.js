@@ -8,6 +8,7 @@ const path = require("node:path");
 
 const {
   DEFAULT_PROFILE_ID,
+  KNOWN_HOOK_EVENTS,
   PROJECT_HARD_STOP_DENY_RULES,
   createEmptySessionState,
   getCompactionStateFilePath,
@@ -418,4 +419,127 @@ test("HookRuntime persists session state under the configured runtime directory"
   saveSessionState(config, "session-state-path", state);
 
   assert.equal(fs.existsSync(getStateFilePath(config, "session-state-path")), true);
+});
+
+// --- Wave 6A Slice 3: Fail-Closed Hardening Tests ---
+
+test("HookRuntime PreToolUse fails closed with deny on corrupted state file", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  const statePath = getStateFilePath(config, "session-pretool-corrupt");
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, "{bad json", "utf8");
+
+  const result = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-pretool-corrupt",
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-02T13:00:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "PreToolUse");
+  assert.equal(result.hookSpecificOutput.permissionDecision, "deny");
+  assert.match(result.hookSpecificOutput.permissionDecisionReason, /FAIL_CLOSED/);
+});
+
+test("HookRuntime PermissionRequest fails closed with deny on corrupted state file", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  const statePath = getStateFilePath(config, "session-perm-corrupt");
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, "{bad json", "utf8");
+
+  const result = runHookEvent(
+    "PermissionRequest",
+    {
+      session_id: "session-perm-corrupt",
+      cwd: projectDir,
+      hook_event_name: "PermissionRequest",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-02T13:01:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "PermissionRequest");
+  assert.equal(result.hookSpecificOutput.decision.behavior, "deny");
+  assert.match(result.hookSpecificOutput.decision.message, /FAIL_CLOSED/);
+});
+
+test("HookRuntime Stop fails closed with block on corrupted state file", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  const statePath = getStateFilePath(config, "session-stop-corrupt");
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, "{bad json", "utf8");
+
+  const result = runHookEvent(
+    "Stop",
+    {
+      session_id: "session-stop-corrupt",
+      cwd: projectDir,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+    },
+    {
+      projectDir,
+      now: "2026-04-02T13:02:00Z",
+    }
+  );
+
+  assert.equal(result.decision, "block");
+  assert.match(result.reason, /FAIL_CLOSED/);
+});
+
+test("HookRuntime rejects unknown hook event names", () => {
+  const projectDir = makeTempProject();
+
+  assert.throws(
+    () => {
+      runHookEvent(
+        "PostToolUse",
+        {
+          session_id: "session-unknown-event",
+          cwd: projectDir,
+          hook_event_name: "PostToolUse",
+        },
+        {
+          projectDir,
+        }
+      );
+    },
+    (error) => {
+      assert.match(error.message, /FAIL_CLOSED/);
+      assert.match(error.message, /Unknown hook event/);
+      return true;
+    }
+  );
+});
+
+test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the five governed events", () => {
+  assert.equal(KNOWN_HOOK_EVENTS.size, 5);
+  assert.equal(KNOWN_HOOK_EVENTS.has("SessionStart"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("PreCompact"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("PreToolUse"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("PermissionRequest"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("Stop"), true);
 });
