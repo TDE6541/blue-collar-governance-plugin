@@ -11,9 +11,9 @@ Wave 1 established the first proposed contract baselines for the six trust-kerne
 
 | Date | Change | Migration Path | Sign-off |
 |------|--------|----------------|----------|
-| 2026-03-30 | SessionBrief additive field toolboxTalk (second approved widening of a Wave 1 shared contract) | Adds one optional summary object for startup carry-forward context (`summary`, `counts`, `refs`, `currentHazards`, `activeDeferredChangeOrderSummary`, `permitLockoutSummary`, `continuityStandingRiskSummary`); existing briefs remain compatible when field is absent; no additional flat Brief fields were introduced | Architect sign-off pending |
-| 2026-03-30 | ControlRodMode v1 -> v2 behavioral upgrade (LOTO + Permit semantics on HARD_STOP domains; autonomy enum unchanged) | Existing `controlRodProfile` snapshots remain compatible because domain ids and autonomy enum are unchanged; v2 adds deterministic authorization/permit contract validation and gate decisions without data rewrite | Architect sign-off pending |
-| 2026-03-30 | SessionBrief additive field controlRodProfile (first approved widening of a Wave 1 shared contract) | Spec baseline widened in Wave 3 Block 0; runtime adoption deferred to Block B1; no data rewrite yet; no other Block 0 contract widening approved | Architect sign-off pending |
+| 2026-03-30 | SessionBrief additive field toolboxTalk (second approved widening of a Wave 1 shared contract) | Adds one optional summary object for startup carry-forward context (`summary`, `counts`, `refs`, `currentHazards`, `activeDeferredChangeOrderSummary`, `permitLockoutSummary`, `continuityStandingRiskSummary`); existing briefs remain compatible when field is absent; no additional flat Brief fields were introduced | Architect signed off 2026-04-03 |
+| 2026-03-30 | ControlRodMode v1 -> v2 behavioral upgrade (LOTO + Permit semantics on HARD_STOP domains; autonomy enum unchanged) | Existing `controlRodProfile` snapshots remain compatible because domain ids and autonomy enum are unchanged; v2 adds deterministic authorization/permit contract validation and gate decisions without data rewrite | Architect signed off 2026-04-03 |
+| 2026-03-30 | SessionBrief additive field controlRodProfile (first approved widening of a Wave 1 shared contract) | Spec baseline widened in Wave 3 Block 0; runtime adoption deferred to Block B1; no data rewrite yet; no other Block 0 contract widening approved | Architect signed off 2026-04-03 |
 
 ## Entry Rules
 

@@ -61,7 +61,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 ## Current State
 
 - `docs/specs/` contains the Wave 1 umbrella spec, promoted contract specs for all six Wave 1 systems, the Wave 2 Block A/B/C/D baseline specs, and the Wave 3 Block A1 Forensic Chain + Block B1 Control Rod Mode + Block C1 Foreman's Walk baseline specs.
-- Wave 2 Block D closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
+- Wave 2 Block D closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect signed off 2026-04-03.
 - Wave 4 Block A1 Control Rod Mode is shipped in current docs/runtime truth with deterministic HARD_STOP LOTO + Permit semantics while preserving the same three-level autonomy enum.
 - Wave 4 Block B1 Change Order Engine is shipped in current docs/runtime truth with deterministic `APPROVED`, `REJECTED`, and `DEFERRED` outcomes for live drift governance.
 - Wave 4 Block C1 Buddy System is shipped in current docs/runtime truth as watcher-only live oversight that writes callouts to existing Forensic Chain.
@@ -98,3 +98,10 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `.claude-plugin/plugin.json`, `hooks/hooks.json`, and `hooks/run-governance-hook.js` are now part of the shipped local plugin artifact.
 - Project `.claude/settings.json` remains the standalone compatibility path and deny-layer surface.
 - `package.json` is still absent, so package and marketplace install claims remain out of scope.
+
+## Wave 6A Addendum
+
+- Wave 6A shipped Blocks 0 through D: fail-closed hook hardening, enforcement matrix (10 events), live chain population, and permit/lockout runtime closure.
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` contains additive sections for Slice 3, Block B, Block C, and Block D.
+- `docs/WAVE6A_CLOSEOUT.md` is the durable Wave 6A closeout evidence map.
+- Waves 2/3/4/5 closeouts and MIGRATIONS.md entries are signed off as of 2026-04-03.

@@ -87,11 +87,12 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/PERMIT_SKILL.md` for the Wave 5B `/permit` gate decision surface contract boundaries and invariants.
 - Change `docs/specs/LOCKOUT_SKILL.md` for the Wave 5B `/lockout` LOTO validation surface contract boundaries and invariants.
 
-## Wave 6A Hook Hardening Truth
+## Wave 6A Runtime Truth
 
-- Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for Wave 6A Slice 3 fail-closed hook hardening scope, error-handling requirements, and unknown-event guard contract.
-- Change `src/HookRuntime.js` for Wave 6A fail-closed error handling in blocking hook paths and unknown-event guard.
-- Change `src/HookRuntimeSlice2.js` for Wave 6A fail-closed error handling in SessionStart/PreCompact paths if needed.
+- Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for Wave 6A Slice 3 fail-closed hook hardening, Block B enforcement matrix (ConfigChange/CwdChanged/FileChanged), Block C live chain population (PostToolUse/PostToolUseFailure/chain writes), and Block D permit/lockout runtime closure.
+- Change `src/HookRuntime.js` for Wave 6A hook event handlers, fail-closed error handling, chain-write logic, permit-gate consultation in HARD_STOP paths, and known-event set.
+- Change `src/HookRuntimeSlice2.js` for Wave 6A compaction persistence of chainEntries, nextChainCounter, activePermits, and activeAuthorizations.
+- Change `docs/WAVE6A_CLOSEOUT.md` for Wave 6A closeout evidence.
 
 ## Wave 4 Closeout Truth
 
