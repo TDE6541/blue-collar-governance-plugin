@@ -16,9 +16,10 @@ Render a manual governance health snapshot from existing Open Items Board output
 
 ## Render Path
 
-1. Gather current Open Items Board snapshot.
-2. Pass input to `FireBreakSkill.renderFireBreak`.
-3. Return deterministic route output.
+1. Invoke `node scripts/render-skill.js fire-break` via Bash.
+2. The wrapper checks for persisted Open Items Board projection data. If these are not available, the wrapper returns a deterministic HOLD.
+3. Render the wrapper's JSON result faithfully.
+4. If `status` is `hold`, surface the HOLD directly and stop.
 
 ## Output Contract
 

@@ -19,9 +19,10 @@ Render Foreman's Walk evaluation results as a deterministic post-session verific
 
 ## Render Path
 
-1. Run or read an existing Foreman's Walk evaluation.
-2. Pass evaluation output to `SessionLifecycleSkills.renderWalk`.
-3. Render findings and As-Built status counts.
+1. Invoke `node scripts/render-skill.js walk` via Bash.
+2. The wrapper checks for persisted sessionBrief and sessionReceipt data required by the Walk engine. If these are not available, the wrapper returns a deterministic HOLD.
+3. Render the wrapper's JSON result faithfully.
+4. If `status` is `hold`, surface the HOLD directly and stop.
 
 ## Output Contract
 

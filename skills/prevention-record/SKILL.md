@@ -17,9 +17,10 @@ Render a conservative cumulative governance-history view from explicit captured 
 
 ## Render Path
 
-1. Gather explicit captured signals from approved surfaces.
-2. Pass signals to `CompressedGovernanceHealthSkills.renderPreventionRecord`.
-3. Return deterministic route output.
+1. Invoke `node scripts/render-skill.js prevention-record` via Bash.
+2. The wrapper reads the most recent session state, extracts available forensic entries, and calls `CompressedGovernanceHealthSkills.renderPreventionRecord`.
+3. Render the wrapper's JSON result faithfully.
+4. If `status` is `hold`, surface the HOLD directly and stop.
 
 ## Output Contract
 
