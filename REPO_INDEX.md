@@ -115,6 +115,9 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `skills/issue-permit/SKILL.md` - Wave 6B `/issue-permit` operator-facing permit issuance skill artifact
 - `docs/WAVE6A_CLOSEOUT.md` - durable Wave 6A closeout evidence map
 - `docs/WAVE6B_CLOSEOUT.md` - durable Wave 6B closeout evidence map
+- `docs/WAVE6_CLOSEOUT.md` - durable Wave 6 full closeout evidence map
+- `docs/WAVE6_PROOF_PACK.md` - Wave 6 evaluator-facing proof pack
+- `scripts/render-skill.js` - CC-native render wrapper for proof surface dispatch
 - `CLAUDE.md` - current session posture and closeout expectations
 - `README.md` - repo identity and current implementation truth
 
@@ -199,7 +202,12 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4 and later proof/integration work, remains pending. Hook/runtime slices through Wave 6A (Slice 3 + Blocks B/C/D) and Wave 6B (Block A InstructionsLoaded) are now shipped.
+- Block F shipped deny-pattern refinement (narrowed `*auth*` glob to 10 targeted patterns) and CC-native render wrapper (`scripts/render-skill.js` with 8 golden tests).
+- Block G shipped governed-workflow portability proof (plugin governs foreign repo, non-empty chain and prevention-record from governed-workflow session).
+- Block H shipped FieldPoint external enforcement proof v2 (HARD_STOP + SUPERVISED + non-empty chain, stronger than the first AAR).
+- Wave 6 proof pack: `docs/WAVE6_PROOF_PACK.md`. Wave 6 closeout: `docs/WAVE6_CLOSEOUT.md`.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, remains pending. Hook/runtime slices through Wave 6A/6B and Blocks F/G/H are now shipped.
+- Structural HOLDs: /walk render requires sessionBrief/sessionReceipt not persisted by hook runtime; /fire-break render requires cross-session board inputs not in hook state.
 - Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.
 - No multi-agent control room behavior is implemented.
 - `origin` remote is configured.

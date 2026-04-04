@@ -103,25 +103,27 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - 28 operator-facing skills under `skills/<name>/SKILL.md`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance engines under `src/`
-- 337 passing golden tests under `tests/golden/`
+- 345 passing golden tests under `tests/golden/`
+- CC-native render wrapper at `scripts/render-skill.js`
 
 ## What This Does Not Do
 
 - **No npm package or marketplace install.** There is no `package.json`. Load the repo directly with `--plugin-dir`.
 - **No Agent tool governance.** Hooks cover `Bash`, `Write`, and `Edit` only. `Agent` spawn semantics are not classified.
 - **No HTTP hooks or LLM-based decisions.** All hook logic is deterministic local code. No network calls, no model queries.
-- **No universal project compatibility claim.** The plugin has been proven on its own repo and on one foreign production repo. Broader compatibility is not yet validated.
+- **No universal project compatibility claim.** The plugin has been proven on its own repo, on governed-workflow, and on one foreign production repo (FieldPoint). Broader compatibility is not yet validated.
 - **No multi-agent governance.** This is single-session, single-operator enforcement.
 
 ## Proof
 
-- **Golden tests:** 337 tests, 0 failures (`node --test tests/golden/*.golden.test.js`)
+- **Golden tests:** 345 tests, 0 failures (`node --test tests/golden/*.golden.test.js`)
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
 
 Detailed proof documentation:
 
+- `docs/WAVE6_PROOF_PACK.md` — Wave 6 proof pack (fail-closed, enforcement breadth, cross-repo governance)
 - `docs/PLUGIN_CONVERSION_PROOF.md` — plugin validation and local smoke runbook
 - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` — hook runtime contract baseline
 
@@ -134,7 +136,8 @@ Detailed proof documentation:
 ├── .claude/               # Standalone path, project settings, deny rules
 ├── skills/                # 28 operator-facing skills
 ├── src/                   # Runtime governance engines and hook runtime
-├── tests/                 # Golden (337) and live verification
+├── scripts/               # Render wrapper and utility scripts
+├── tests/                 # Golden (345) and live verification
 ├── docs/                  # Specs, proof artifacts, and indexes
 │   └── specs/             # Canonical contract baselines
 └── raw/                   # Reference-only methodology inputs (not canon)

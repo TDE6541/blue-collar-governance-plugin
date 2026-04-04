@@ -61,6 +61,8 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/PERMIT_ISSUANCE_SKILL.md` - authoritative Wave 6B Block B `/issue-permit` permit issuance authoring surface contract baseline
 - `docs/WAVE6A_CLOSEOUT.md` - durable Wave 6A closeout evidence map
 - `docs/WAVE6B_CLOSEOUT.md` - durable Wave 6B closeout evidence map
+- `docs/WAVE6_CLOSEOUT.md` - durable Wave 6 full closeout evidence map
+- `docs/WAVE6_PROOF_PACK.md` - Wave 6 evaluator-facing proof pack
 
 ## Current State
 
@@ -87,7 +89,11 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Plugin conversion proof artifact is implemented at `docs/PLUGIN_CONVERSION_PROOF.md`.
 - Wave 5 closeout evidence map is implemented at `docs/WAVE5_CLOSEOUT.md`.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4 and later proof/integration work, remains pending. Hook/runtime slices through Wave 6A (Slice 3 + Blocks B/C/D) and Wave 6B (Block A InstructionsLoaded) are now shipped.
+- Block F shipped deny-pattern refinement and CC-native render wrapper (`scripts/render-skill.js`).
+- Block G shipped governed-workflow portability proof (plugin governs foreign repo with non-empty evidence).
+- Block H shipped FieldPoint external enforcement proof v2 (HARD_STOP + SUPERVISED + non-empty chain).
+- Wave 6 proof pack: `docs/WAVE6_PROOF_PACK.md`. Wave 6 closeout: `docs/WAVE6_CLOSEOUT.md`.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, remains pending. Wave 6 runtime, enforcement, and evidence work is shipped.
 - Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.

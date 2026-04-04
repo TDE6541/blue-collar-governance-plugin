@@ -105,6 +105,19 @@ Use this index to find the right canon surface before making a change.
 - Change `skills/issue-permit/SKILL.md` for `/issue-permit` operator-facing skill behavior.
 - Change `docs/WAVE6B_CLOSEOUT.md` for Wave 6B closeout evidence.
 
+## Block F / Render Wrapper Truth
+
+- Change `scripts/render-skill.js` for CC-native render wrapper dispatch behavior over session state.
+- Change `.claude/settings.json` for deny-pattern refinement (narrowed patterns for the protected-domain glob).
+- Change `src/HookRuntime.js` for `PROJECT_HARD_STOP_DENY_RULES` constant sync with deny-pattern changes.
+- Change `src/ControlRodMode.js` for domain classifier `filePatterns` sync with deny-pattern changes.
+- Change `tests/golden/RenderSkillWrapper.golden.test.js` for render wrapper golden verification.
+
+## Wave 6 Closeout and Proof Truth
+
+- Change `docs/WAVE6_CLOSEOUT.md` for the durable Wave 6 full closeout evidence map.
+- Change `docs/WAVE6_PROOF_PACK.md` for the Wave 6 evaluator-facing proof pack.
+
 ## Wave 4 Closeout Truth
 
 - Change `docs/WAVE4_CLOSEOUT.md` for Wave 4 Block D evidence map, no-leakage confirmation, and final signoff state.
