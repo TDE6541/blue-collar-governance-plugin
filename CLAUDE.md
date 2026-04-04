@@ -26,7 +26,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 
 ## Current Repo Truth
 
-- Status: runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; Wave 5 closeout and MIGRATIONS.md entries are signed off (2026-04-03); Wave 6A Blocks 0, A, B, C, and D are shipped; Wave 6B Blocks 0, A, and B are shipped; the hook runtime handles 11 lifecycle events, populates the forensic chain, and consults operator-authored permits for scoped HARD_STOP passage; marketplace/package/install claims remain unverified
+- Status: runtime trust layer; Waves 1-4 are shipped; Wave 5 is shipped through the current `/lockout` surface chain plus tranche 4 skins rendering for supported routes; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; additive plugin artifact structure is now shipped locally; canonical onboarding/runtime-proof, plugin conversion proof, and Wave 5 closeout artifacts are shipped; Wave 5 closeout and MIGRATIONS.md entries are signed off (2026-04-03); Wave 6A Blocks 0, A, B, C, and D are shipped; Wave 6B Blocks 0, A, B, and C are shipped; the hook runtime handles 11 lifecycle events, populates the forensic chain, and consults operator-authored permits for scoped HARD_STOP passage; marketplace/package/install claims remain unverified
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -110,8 +110,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Skill topology is now 28 skills (26 from Wave 5 + `/loto-clearance` and `/issue-permit` from Wave 6B).
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, and later proof/integration work, remains pending.
-- Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4 and later proof/integration work, remains pending. Hook/runtime slices through Wave 6A (Slice 3 + Blocks B/C/D) and Wave 6B (Block A InstructionsLoaded) are now shipped.
+- Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect signed off 2026-04-03.
 - `package.json` is absent; local plugin artifact structure is shipped, but package metadata, marketplace installation, and publishing surfaces are not implemented.
 - Canon specs for current scope:
   - `docs/specs/WAVE1_TRUST_KERNEL.md`
@@ -153,6 +153,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/RED_TAG_SKILL.md`
   - `docs/specs/PERMIT_SKILL.md`
   - `docs/specs/LOCKOUT_SKILL.md`
+  - `docs/specs/LOTO_CLEARANCE_SKILL.md`
+  - `docs/specs/PERMIT_ISSUANCE_SKILL.md`
 - Wave 5 Block 0 substrate-gate memo: `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md`
 - Wave 5 onboarding/runtime-proof artifact: `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`
 - Plugin conversion proof artifact: `docs/PLUGIN_CONVERSION_PROOF.md`

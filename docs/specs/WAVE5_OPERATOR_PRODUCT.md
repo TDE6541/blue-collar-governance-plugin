@@ -1,5 +1,5 @@
 # WAVE5_OPERATOR_PRODUCT.md
-**Status:** Wave 5A Block 0 shipped; Wave 5A Blocks A-C and Wave 5B Blocks A-D-E1 plus `/control-rods` through `/lockout` are implemented; tranche 4 skins rendering over the approved route matrix is implemented; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; canonical onboarding/runtime-proof and Wave 5 closeout artifacts are shipped; additional Wave 5 work outside the current shipped set, including later hook/runtime slices after Slice 2, remains pending; package/install/compatibility claims remain unverified
+**Status:** Wave 5A Block 0 shipped; Wave 5A Blocks A-C and Wave 5B Blocks A-D-E1 plus `/control-rods` through `/lockout` are implemented; tranche 4 skins rendering over the approved route matrix is implemented; hook/runtime Slice 2 compaction-survival + startup-reinjection spine is shipped; canonical onboarding/runtime-proof and Wave 5 closeout artifacts are shipped; hook/runtime slices beyond Slice 2 shipped in Wave 6A/6B; additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4 and later proof/integration work, remains pending; package/install/compatibility claims remain unverified
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose

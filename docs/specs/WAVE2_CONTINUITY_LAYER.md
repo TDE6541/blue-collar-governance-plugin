@@ -1,5 +1,5 @@
 # WAVE2_CONTINUITY_LAYER.md
-**Status:** Block A, Block B1, Block C1, and Block D1 baselines implemented; Architect signoff pending
+**Status:** Block A, Block B1, Block C1, and Block D1 baselines implemented; Architect signed off 2026-04-03
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose

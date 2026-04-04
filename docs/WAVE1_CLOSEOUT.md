@@ -39,4 +39,4 @@ This artifact is the durable Wave 1 closeout evidence map for the six-system tru
 ## Remaining HOLDs
 - None.
 
-Wave 1 Final Signoff: Architect signoff pending.
+Wave 1 Final Signoff: Architect signed off 2026-04-03.

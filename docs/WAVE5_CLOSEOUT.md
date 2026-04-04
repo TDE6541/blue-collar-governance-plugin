@@ -62,12 +62,10 @@ This artifact is the durable Wave 5 closeout evidence map for shipped Wave 5 run
 
 - Additional Wave 5 runtime/hook slices beyond current Slice 2 remain out of scope and not shipped.
 - Installable/package/marketplace surfaces remain not shipped; this closeout explicitly keeps those claims unmade.
-- Architect signoff remains required.
-
 ## Final Signoff Status
 
-- Wave 5 closeout state: READY FOR ARCHITECT REVIEW.
-- Wave 5 signoff readiness: READY, pending Architect final signoff.
+- Wave 5 closeout state: COMPLETE.
+- Wave 5 signoff: Architect signed off 2026-04-03.
 
 ## Post-Closeout Plugin Conversion Addendum
 

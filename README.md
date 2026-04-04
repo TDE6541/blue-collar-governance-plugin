@@ -115,7 +115,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 
 ## Proof
 
-- **Golden tests:** 290 tests, 0 failures (`node --test tests/golden/*.golden.test.js`)
+- **Golden tests:** 337 tests, 0 failures (`node --test tests/golden/*.golden.test.js`)
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
@@ -134,7 +134,7 @@ Detailed proof documentation:
 ├── .claude/               # Standalone path, project settings, deny rules
 ├── skills/                # 28 operator-facing skills
 ├── src/                   # Runtime governance engines and hook runtime
-├── tests/                 # Golden (290) and live verification
+├── tests/                 # Golden (337) and live verification
 ├── docs/                  # Specs, proof artifacts, and indexes
 │   └── specs/             # Canonical contract baselines
 └── raw/                   # Reference-only methodology inputs (not canon)

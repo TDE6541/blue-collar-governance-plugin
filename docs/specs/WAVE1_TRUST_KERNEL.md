@@ -1,5 +1,5 @@
 # WAVE1_TRUST_KERNEL.md
-**Status:** Wave 1 runtime implemented and verified; final Architect signoff pending
+**Status:** Wave 1 runtime implemented and verified; Architect signed off 2026-04-03
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -20,7 +20,7 @@ Wave 1 is successful only if a non-technical operator can:
 
 ## Claims Boundary
 
-- This repository is a private runtime/control layer.
+- This repository is a runtime/control layer.
 - Governed Workflow is the methodology spine behind the work.
 - This document defines locked Wave 1 scope and contract direction and reflects current implemented runtime truth for the six systems.
 - Runtime implementation is currently claimed for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.

@@ -49,7 +49,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/FORENSIC_CHAIN.md` - Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` - Control Rod Mode v2 deterministic HARD_STOP LOTO + Permit contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` - Foreman's Walk Engine v1 post-session verification contract baseline
-- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - Wave 5 hook/runtime Slice 2 compaction-survival + startup-reinjection enforcement spine contract baseline
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - Hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections through 11 lifecycle events)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - Buddy System v1 watcher-only live oversight contract baseline
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 closeout evidence map
@@ -120,7 +120,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 
 ## Current State
 
-- The repo is on `main` with `origin` configured and current shipped truth running through the Wave 5 `/lockout` surface plus tranche 4 skins rendering for supported routes.
+- The repo is on `main` with `origin` configured and current shipped truth running through Wave 5 (`/lockout` surface chain plus tranche 4 skins rendering), Wave 6A (fail-closed hook hardening, 11-event enforcement matrix, live chain population, permit/lockout runtime closure), and Wave 6B (InstructionsLoaded observability, `/loto-clearance` and `/issue-permit` authoring surfaces).
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.
@@ -135,7 +135,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Block D1 is projection-only over existing A/B/C truth, uses explicit current-session resolved-outcomes input, and enforces precedence+dedupe.
 - Block D1 has no persisted board store and no continuity-promotion runtime behavior.
 - No score/confidence/rank/priority/anomaly/prediction logic is implemented in Block D1.
-- Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect final signoff is pending.
+- Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect signed off 2026-04-03.
 - Wave 3 Block A1 Forensic Chain baseline is implemented at `src/ForensicChain.js` with golden proof at `tests/golden/ForensicChain.golden.test.js` and canon spec at `docs/specs/FORENSIC_CHAIN.md`.
 - Forensic Chain is evidence-substrate only and does not create a second continuity or standing-risk operational substrate.
 - Wave 4 Block A1 Control Rod Mode baseline is implemented at `src/ControlRodMode.js` with golden proof at `tests/golden/ControlRodMode.golden.test.js` and canon spec at `docs/specs/CONTROL_ROD_MODE.md`.
@@ -199,7 +199,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, and later proof/integration work, remains pending.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4 and later proof/integration work, remains pending. Hook/runtime slices through Wave 6A (Slice 3 + Blocks B/C/D) and Wave 6B (Block A InstructionsLoaded) are now shipped.
 - Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.
 - No multi-agent control room behavior is implemented.
 - `origin` remote is configured.

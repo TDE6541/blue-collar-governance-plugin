@@ -1,5 +1,5 @@
 # HOOK_RUNTIME_ENFORCEMENT_SPINE.md
-**Status:** Wave 5 hook/runtime Slice 2 contract baseline (compaction survival + startup re-injection)
+**Status:** Hook runtime enforcement spine contract baseline (Slice 2 core + Wave 6A Slice 3/Blocks B-D + Wave 6B Block A; 11 lifecycle events)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose

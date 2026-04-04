@@ -60,7 +60,7 @@ Use this index to find the right canon surface before making a change.
 ## Wave 5 Operator Product Truth
 
 - Change `docs/specs/WAVE5_OPERATOR_PRODUCT.md` for Wave 5 umbrella truth, locked decisions, 5A/5B split, anti-goals, and no-leakage fence.
-- Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for Wave 5 hook/runtime Slice 2 fail-closed command-hook scope plus compaction survival/startup re-injection, Control Rod alignment, Stop/Walk closeout gate, and persistent deny-layer truth.
+- Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for hook runtime enforcement spine truth (Slice 2 core, Wave 6A Slice 3/Blocks B-D, Wave 6B Block A), including fail-closed command-hook scope, compaction survival/startup re-injection, Control Rod alignment, Stop/Walk closeout gate, persistent deny-layer truth, enforcement matrix (11 events), live chain population, permit gate, and InstructionsLoaded observability.
 - Change `docs/specs/SKIN_FRAMEWORK.md` for shipped skin ids, supported route matrix, fallback behavior, Whiteboard default rule, and structural distinction rules.
 - Change `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` for Block 0 substrate merit rubric and decisions (Operator Trust Ledger, Warranty, Scarcity Signal, SessionBrief no-widening).
 - Change `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md` for canonical startup path, runtime proof commands/results, and package/install posture truth.
@@ -136,7 +136,7 @@ Use this index to find the right canon surface before making a change.
 - Change `src/ChangeOrderEngine.js` for Wave 4 Block B1 formal drift-governance decision behavior.
 - Change `src/BuddySystem.js` for Wave 4 Block C1 live watcher callout behavior and chain-authored event wiring.
 - Change `src/ForemansWalk.js` for Wave 3 Block C1 post-session verification findings and As-Built accountability behavior.
-- Change `src/HookRuntime.js` for Wave 5 hook/runtime Slice 2 deterministic SessionStart/PreCompact preservation + re-injection behavior and Slice 1 PreToolUse/PermissionRequest/Stop enforcement behavior.
+- Change `src/HookRuntime.js` for hook runtime enforcement behavior across all 11 lifecycle events, including Wave 5 Slice 1/2 core paths, Wave 6A event handlers/chain writes/permit gate, and Wave 6B InstructionsLoaded observability.
 - Change `src/OperatorTrustLedger.js` for Wave 5A Block A operator trust lifecycle persistence behavior.
 - Change `src/JourneymanTrustEngine.js` for Wave 5A Block A deterministic trust decision and trust-ledger write behavior.
 - Change `src/WarrantyMonitor.js` for Wave 5A Block B derived-only warranty monitoring behavior.
@@ -192,7 +192,7 @@ Use this index to find the right canon surface before making a change.
 - Add `tests/golden/ChangeOrderEngine.golden.test.js` for Change Order Engine v1 golden verification.
 - Add `tests/golden/BuddySystem.golden.test.js` for Buddy System v1 golden verification.
 - Add `tests/golden/ForemansWalk.golden.test.js` for Foreman's Walk golden verification.
-- Add `tests/golden/HookRuntime.golden.test.js` for Wave 5 hook/runtime Slice 2 golden verification (including Slice 1 no-regression coverage).
+- Add `tests/golden/HookRuntime.golden.test.js` for hook runtime golden verification across all shipped slices and lifecycle events.
 - Add `tests/golden/StandingRiskEngine.golden.test.js` for Standing Risk Engine golden verification.
 - Add `tests/golden/OmissionCoverageEngine.golden.test.js` for Omission & Coverage Engine golden verification.
 - Add `tests/golden/OpenItemsBoard.golden.test.js` for Open Items Board golden verification.
@@ -221,7 +221,7 @@ Use this index to find the right canon surface before making a change.
 - Add golden references under `tests/golden/`.
 - Add `tests/live/wave3.active-governance.live.test.js` for Wave 3 Block D integration proof.
 - Add `tests/live/wave4.live-oversight.live.test.js` for Wave 4 Block D integration proof.
-- Add `tests/live/wave5.hook-runtime.live.test.js` for Wave 5 hook/runtime Slice 2 live integration proof (including Slice 1 no-regression coverage).
+- Add `tests/live/wave5.hook-runtime.live.test.js` for hook runtime live integration proof across shipped enforcement behavior.
 - Add live or integration verification under `tests/live/`.
 
 ## Reference Inputs

@@ -21,7 +21,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/FORENSIC_CHAIN.md` - authoritative Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` - authoritative Control Rod Mode v2 deterministic HARD_STOP LOTO + Permit contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` - authoritative Foreman's Walk Engine v1 post-session verification contract baseline
-- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - authoritative Wave 5 hook/runtime Slice 2 compaction-survival + startup-reinjection enforcement spine contract baseline
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - authoritative hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections through 11 lifecycle events)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - authoritative Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - authoritative Buddy System v1 watcher-only live oversight contract baseline
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
@@ -57,6 +57,10 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/RED_TAG_SKILL.md` - authoritative Wave 5B `/red-tag` interlock decision surface contract baseline
 - `docs/specs/PERMIT_SKILL.md` - authoritative Wave 5B `/permit` gate decision surface contract baseline
 - `docs/specs/LOCKOUT_SKILL.md` - authoritative Wave 5B `/lockout` LOTO validation surface contract baseline
+- `docs/specs/LOTO_CLEARANCE_SKILL.md` - authoritative Wave 6B Block B `/loto-clearance` LOTO clearance authoring surface contract baseline
+- `docs/specs/PERMIT_ISSUANCE_SKILL.md` - authoritative Wave 6B Block B `/issue-permit` permit issuance authoring surface contract baseline
+- `docs/WAVE6A_CLOSEOUT.md` - durable Wave 6A closeout evidence map
+- `docs/WAVE6B_CLOSEOUT.md` - durable Wave 6B closeout evidence map
 
 ## Current State
 
@@ -83,7 +87,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Plugin conversion proof artifact is implemented at `docs/PLUGIN_CONVERSION_PROOF.md`.
 - Wave 5 closeout evidence map is implemented at `docs/WAVE5_CLOSEOUT.md`.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, later hook/runtime slices beyond Slice 2, and later proof/integration work, remains pending.
+- Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4 and later proof/integration work, remains pending. Hook/runtime slices through Wave 6A (Slice 3 + Blocks B/C/D) and Wave 6B (Block A InstructionsLoaded) are now shipped.
 - Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.
