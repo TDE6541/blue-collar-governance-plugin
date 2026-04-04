@@ -32,7 +32,16 @@ const PROJECT_HARD_STOP_DENY_RULES = Object.freeze([
   "Edit(/**/*pii*.*)",
   "Edit(/**/*schema*.*)",
   "Edit(/migrations/**)",
-  "Edit(/**/*auth*.*)",
+  "Edit(/**/auth.*)",
+  "Edit(/**/auth-*.*)",
+  "Edit(/**/auth_*.*)",
+  "Edit(/**/*-auth.*)",
+  "Edit(/**/*_auth.*)",
+  "Edit(/**/*.auth.*)",
+  "Edit(/**/*oauth*.*)",
+  "Edit(/**/*authent*.*)",
+  "Edit(/**/*authoriz*.*)",
+  "Edit(/**/*authz*.*)",
   "Edit(/**/*security*.*)",
 ]);
 

@@ -31,7 +31,7 @@ const STARTER_DOMAIN_RULE_TEMPLATES = Object.freeze([
   Object.freeze({
     domainId: "auth_security_surfaces",
     label: "Auth / security surfaces",
-    filePatterns: Object.freeze(["**/*auth*.*", "**/*security*.*"]),
+    filePatterns: Object.freeze(["**/auth.*", "**/auth-*.*", "**/auth_*.*", "**/*-auth.*", "**/*_auth.*", "**/*.auth.*", "**/*oauth*.*", "**/*authent*.*", "**/*authoriz*.*", "**/*authz*.*", "**/*security*.*"]),
     operationTypes: Object.freeze(["auth_change", "security_change"]),
   }),
   Object.freeze({

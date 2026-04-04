@@ -124,7 +124,16 @@ test("HookRuntime resolves conservative runtime config by default", () => {
     "Edit(/**/*pii*.*)",
     "Edit(/**/*schema*.*)",
     "Edit(/migrations/**)",
-    "Edit(/**/*auth*.*)",
+    "Edit(/**/auth.*)",
+    "Edit(/**/auth-*.*)",
+    "Edit(/**/auth_*.*)",
+    "Edit(/**/*-auth.*)",
+    "Edit(/**/*_auth.*)",
+    "Edit(/**/*.auth.*)",
+    "Edit(/**/*oauth*.*)",
+    "Edit(/**/*authent*.*)",
+    "Edit(/**/*authoriz*.*)",
+    "Edit(/**/*authz*.*)",
     "Edit(/**/*security*.*)",
   ]);
 });
