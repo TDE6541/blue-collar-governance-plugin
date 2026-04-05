@@ -24,7 +24,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - authoritative hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections through 11 lifecycle events)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - authoritative Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - authoritative Buddy System v1 watcher-only live oversight contract baseline
-- `docs/specs/WAVE7_TRUTH_LOCK.md` - authoritative Wave 7 Block 0 truth lock for C1/C2/C3, Work Order-only intake pilot, and parked scope
+- `docs/specs/WAVE7_TRUTH_LOCK.md` - authoritative Wave 7 umbrella truth lock and post-Blocks A/B seam-status sync for C1/C2/C3, Work Order-only intake pilot, and parked scope
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/WAVE1_CLOSEOUT.md` - durable Wave 1 integration/proof closeout evidence map
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 integration/proof closeout evidence map
@@ -95,9 +95,9 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Block H shipped FieldPoint external enforcement proof v2 (HARD_STOP + SUPERVISED + non-empty chain).
 - Wave 6 proof pack: `docs/WAVE6_PROOF_PACK.md`. Wave 6 closeout: `docs/WAVE6_CLOSEOUT.md`.
 - Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, remains pending. Wave 6 runtime, enforcement, and evidence work is shipped.
-- Wave 7 Block 0 truth lock is implemented at `docs/specs/WAVE7_TRUTH_LOCK.md`.
-- Wave 7 names C1 `/walk` persistence seam, C2 `/fire-break` persistence seam, and C3 plugin-native foreign-repo deny delivery. Work Order is the only intake pilot for Wave 7, and current shipped truth is that Work Order exists today as a skin/render surface only, not as a shipped intake runtime.
-- Parked/out of scope in Wave 7 Block 0: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
+- Wave 7 umbrella truth is implemented at `docs/specs/WAVE7_TRUTH_LOCK.md`.
+- C1 `/walk` persistence seam is closed. C2 `/fire-break` persistence seam is closed through a persisted hook-derived governance-health snapshot that is route-compatible for `/fire-break`; canonical Open Items Board engine inputs remain outside current hook-runtime scope. C3 plugin-native foreign-repo deny delivery remains open. Work Order is the only intake pilot for Wave 7, and current shipped truth is that Work Order exists today as a skin/render surface only, not as a shipped intake runtime.
+- Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 - Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.

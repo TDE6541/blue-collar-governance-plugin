@@ -116,11 +116,10 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 
 ## Wave 7 Truth Lock
 
-- Wave 7 Block 0 is a docs-only truth lock at `docs/specs/WAVE7_TRUTH_LOCK.md`.
-- Wave 7 names C1 `/walk` persistence seam, C2 `/fire-break` persistence seam, and C3 plugin-native foreign-repo deny delivery.
+- Wave 7 umbrella truth lives at `docs/specs/WAVE7_TRUTH_LOCK.md`.
+- C1 `/walk` persistence seam is closed. C2 `/fire-break` persistence seam is closed through a persisted hook-derived governance-health snapshot that is route-compatible for `/fire-break`; canonical Open Items Board engine inputs remain outside current hook-runtime scope. C3 plugin-native foreign-repo deny delivery remains open.
 - Work Order is the only intake pilot for Wave 7, and current shipped truth is narrower: Work Order exists today as a skin/render surface only, not as a shipped intake runtime.
-- Parked/out of scope in Wave 7 Block 0: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
-
+- Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 ## Proof
 
 - **Golden tests:** 345 tests, 0 failures (`node --test tests/golden/*.golden.test.js`)
