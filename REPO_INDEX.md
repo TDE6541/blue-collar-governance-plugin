@@ -52,9 +52,11 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - Hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections through 11 lifecycle events)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - Buddy System v1 watcher-only live oversight contract baseline
-- `docs/specs/WAVE7_TRUTH_LOCK.md` - Wave 7 umbrella truth lock and post-Blocks A/B/C seam-status sync plus post-Blocks D/E front-door sync for C1/C2/C3, the Work Order-only intake pilot chain, and parked scope
+- `docs/specs/WAVE7_TRUTH_LOCK.md` - Wave 7 umbrella truth lock and final seam-status/front-door sync for C1/C2/C3, the Work Order-only intake/scaffold/posture pilot chain, and parked scope
 - `docs/specs/WORK_ORDER_INTAKE.md` - Work Order intake pilot contract baseline
 - `docs/specs/WORK_ORDER_SCAFFOLD.md` - governed scaffold generation contract baseline for the Work Order intake pilot
+- `docs/specs/WORK_ORDER_POSTURE.md` - visible Work Order posture map contract baseline for the Work Order intake pilot
+- `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 closeout evidence map
 - `docs/WAVE3_CLOSEOUT.md` - durable Wave 3 closeout evidence map
 - `docs/specs/WAVE4_LIVE_OVERSIGHT.md` - Wave 4 umbrella contract and load-bearing decisions
@@ -116,10 +118,14 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/PERMIT_ISSUANCE_SKILL.md` - Wave 6B Block B `/issue-permit` permit issuance authoring surface contract baseline
 - `skills/loto-clearance/SKILL.md` - Wave 6B `/loto-clearance` operator-facing LOTO clearance authoring skill artifact
 - `skills/issue-permit/SKILL.md` - Wave 6B `/issue-permit` operator-facing permit issuance skill artifact
+- `skills/work-order-intake/SKILL.md` - Wave 7B `/work-order-intake` operator-facing intake pilot skill artifact
+- `skills/work-order-scaffold/SKILL.md` - Wave 7B `/work-order-scaffold` operator-facing scaffold pilot skill artifact
+- `skills/work-order-posture/SKILL.md` - Wave 7B `/work-order-posture` operator-facing posture pilot skill artifact
 - `docs/WAVE6A_CLOSEOUT.md` - durable Wave 6A closeout evidence map
 - `docs/WAVE6B_CLOSEOUT.md` - durable Wave 6B closeout evidence map
 - `docs/WAVE6_CLOSEOUT.md` - durable Wave 6 full closeout evidence map
 - `docs/WAVE6_PROOF_PACK.md` - Wave 6 evaluator-facing proof pack
+- `docs/WAVE7_CLOSEOUT.md` - durable Wave 7 closeout evidence map
 - `scripts/render-skill.js` - CC-native render wrapper for proof surface dispatch
 - `CLAUDE.md` - current session posture and closeout expectations
 - `README.md` - repo identity and current implementation truth
@@ -201,20 +207,21 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Wave 5 skill topology shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, and Wave 7B Blocks D/E added `/work-order-intake` and `/work-order-scaffold`, bringing the total to 30 skills.
+- Wave 5 skill topology shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, and Wave 7B Blocks D/E/F added `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`, bringing the total to 31 skills.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
-- Block F shipped deny-pattern refinement (narrowed `*auth*` glob to 10 targeted patterns) and CC-native render wrapper (`scripts/render-skill.js` with 8 golden tests).
+- Block F shipped deny-pattern refinement (narrowed `*auth*` glob to 10 targeted patterns) and CC-native render wrapper (`scripts/render-skill.js` with golden proof).
 - Block G shipped governed-workflow portability proof (plugin governs foreign repo, non-empty chain and prevention-record from governed-workflow session).
 - Block H shipped FieldPoint external enforcement proof v2 (HARD_STOP + SUPERVISED + non-empty chain, stronger than the first AAR).
 - Wave 6 proof pack: `docs/WAVE6_PROOF_PACK.md`. Wave 6 closeout: `docs/WAVE6_CLOSEOUT.md`.
 - Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, remains pending. Hook/runtime slices through Wave 6A/6B and Blocks F/G/H are now shipped.
 - Wave 7 umbrella truth is implemented at `docs/specs/WAVE7_TRUTH_LOCK.md`.
 - C1 `/walk` persistence seam is closed through persisted hook-runtime inputs and render cache. C2 `/fire-break` persistence seam is closed through persisted `lastFireBreak`, a hook-derived governance-health snapshot that is route-compatible for `/fire-break`; canonical Open Items Board engine inputs remain outside current hook-runtime scope. C3 plugin-native foreign-repo deny delivery is closed: foreign repos can now receive plugin-governed deny posture through a plugin-owned, operator-invoked apply path that is deterministic and reviewable, not runtime auto-injection, and not a universal compatibility claim. Work Order is the only intake pilot for Wave 7.
-- Current shipped truth: the existing Work Order skin/render surface still exists unchanged, the new Work Order intake pilot surface is shipped at `docs/specs/WORK_ORDER_INTAKE.md`, `src/WorkOrderIntakeEngine.js`, `skills/work-order-intake/SKILL.md`, and `tests/golden/WorkOrderIntakeEngine.golden.test.js`, and the Work Order scaffold generation surface is shipped at `docs/specs/WORK_ORDER_SCAFFOLD.md`, `src/WorkOrderScaffoldEngine.js`, `skills/work-order-scaffold/SKILL.md`, and `tests/golden/WorkOrderScaffoldEngine.golden.test.js`.
-- Blocks D and E are shipped. Block E stops at the scaffold object only. No protection-default bridge, SessionBrief bridge, or execution path from intake/scaffold is shipped yet. Blocks F and G remain open.
+- Current shipped truth: the existing Work Order skin/render surface still exists unchanged, the Work Order intake pilot surface is shipped at `docs/specs/WORK_ORDER_INTAKE.md`, `src/WorkOrderIntakeEngine.js`, `skills/work-order-intake/SKILL.md`, and `tests/golden/WorkOrderIntakeEngine.golden.test.js`, the Work Order scaffold generation surface is shipped at `docs/specs/WORK_ORDER_SCAFFOLD.md`, `src/WorkOrderScaffoldEngine.js`, `skills/work-order-scaffold/SKILL.md`, and `tests/golden/WorkOrderScaffoldEngine.golden.test.js`, and the Work Order posture surface is shipped at `docs/specs/WORK_ORDER_POSTURE.md`, `src/WorkOrderPostureEngine.js`, `skills/work-order-posture/SKILL.md`, and `tests/golden/WorkOrderPostureEngine.golden.test.js`.
+- Blocks D, E, F, and G are shipped. The chain stops at reviewed artifacts only: intake object, scaffold object, and posture map. No protection-default bridge, SessionBrief bridge, hook-runtime integration, or execution path from intake/scaffold/posture is shipped.
 - Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
+- Wave 7 closeout evidence map is implemented at `docs/WAVE7_CLOSEOUT.md`, and the bounded thesis rider is implemented at `docs/BLUE_COLLAR_CODING_THESIS.md`.
 - Boundary hold: Block C closes foreign-repo deny delivery through operator-invoked apply; runtime auto-injection and universal compatibility remain out of scope.
 - Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.
 - No multi-agent control room behavior is implemented.

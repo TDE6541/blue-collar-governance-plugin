@@ -10,7 +10,7 @@ This plugin adds a runtime governance layer to Claude Code sessions:
 - **Control rod profiles** that classify every tool action against configurable domain rules (pricing, customer data, auth, destructive ops, and more)
 - **Session closeout gating** — the session cannot close cleanly if unresolved blocking findings exist
 - **Governance state preservation** — enforcement state survives context compaction and session restarts
-- **30 operator-facing skills** for inspecting governance posture, forensic history, safety interlocks, session health, and the Work Order intake pilot chain during a live session
+- **Operator-facing skills** for inspecting governance posture, forensic history, safety interlocks, session health, and the Work Order intake pilot chain during a live session
 
 ## Why This Exists
 
@@ -65,7 +65,7 @@ Load the repo as a local Claude Code plugin:
 claude --plugin-dir /path/to/blue-collar-governance-plugin
 ```
 
-This registers the hooks and makes the 30 skills available as `/blue-collar-governance-plugin:<skill-name>`.
+This registers the hooks and makes the shipped skills available as `/blue-collar-governance-plugin:<skill-name>`.
 
 ### Standalone Repo Mode
 
@@ -100,36 +100,43 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Claude plugin manifest at `.claude-plugin/plugin.json`
 - Plugin hook registry at `hooks/hooks.json`
 - Fail-closed hook runtime at `src/HookRuntime.js` and `src/HookRuntimeSlice2.js`
-- 30 operator-facing skills under `skills/<name>/SKILL.md`
+- Operator-facing skills under `skills/<name>/SKILL.md`
+- Work Order pilot chain surfaces at `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance engines under `src/`
-- 345 passing golden tests under `tests/golden/`
+- Golden and live verification under `tests/`
 - CC-native render wrapper at `scripts/render-skill.js`
+
+## Work Order Pilot Chain
+
+- Governance remains the engine underneath the pilot chain. Wave 7 closes C1 `/walk`, C2 `/fire-break`, and C3 foreign-repo deny delivery without changing the repo's governance-first identity.
+- Work Order is the only intake pilot shipped in this repo. The existing Work Order skin/render surface still exists unchanged.
+- `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture` are shipped.
+- The chain stops at reviewed artifacts only: intake object, scaffold object, and posture map.
+- No SessionBrief bridge, hook-runtime integration, or execution path from intake/scaffold/posture is shipped.
 
 ## What This Does Not Do
 
 - **No npm package or marketplace install.** There is no `package.json`. Load the repo directly with `--plugin-dir`.
+- **No intake-chain execution bridge.** The Work Order pilot does not create SessionBrief, mutate Control Rod settings, or start execution on its own.
+- **No second intake skin.** Work Order is the only intake pilot currently shipped.
 - **No Agent tool governance.** Hooks cover `Bash`, `Write`, and `Edit` only. `Agent` spawn semantics are not classified.
 - **No HTTP hooks or LLM-based decisions.** All hook logic is deterministic local code. No network calls, no model queries.
 - **No universal project compatibility claim.** The plugin has been proven on its own repo, on governed-workflow, and on one foreign production repo (FieldPoint). Broader compatibility is not yet validated.
 - **No multi-agent governance.** This is single-session, single-operator enforcement.
+- **No trust-transfer or certificate claims.** That work remains parked.
 
-## Wave 7 Truth Lock
-
-- Wave 7 umbrella truth lives at `docs/specs/WAVE7_TRUTH_LOCK.md`.
-- C1 `/walk` persistence seam is closed. C2 `/fire-break` persistence seam is closed through a persisted hook-derived governance-health snapshot that is route-compatible for `/fire-break`; canonical Open Items Board engine inputs remain outside current hook-runtime scope. C3 plugin-native foreign-repo deny delivery is closed: foreign repos can now receive plugin-governed deny posture through a plugin-owned, operator-invoked apply path that is deterministic and reviewable, not runtime auto-injection, and not a universal compatibility claim.
-- Work Order is the only intake pilot for Wave 7. The existing Work Order skin/render surface still exists unchanged, the Work Order intake pilot surface is shipped, and the Work Order scaffold generation surface is shipped.
-- Blocks D and E are shipped. Block E stops at the scaffold object only. No protection-default bridge, no SessionBrief bridge, and no execution path from intake/scaffold are shipped yet. Blocks F and G remain open.
-- Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 ## Proof
 
-- **Golden tests:** 345 tests, 0 failures (`node --test tests/golden/*.golden.test.js`)
+- **Golden verification:** shipped under `tests/golden/`.
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
 
 Detailed proof documentation:
 
+- `docs/WAVE7_CLOSEOUT.md` — Wave 7 closeout evidence map
+- `docs/BLUE_COLLAR_CODING_THESIS.md` — bounded thesis rider for the first front door
 - `docs/WAVE6_PROOF_PACK.md` — Wave 6 proof pack (fail-closed, enforcement breadth, cross-repo governance)
 - `docs/PLUGIN_CONVERSION_PROOF.md` — plugin validation and local smoke runbook
 - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` — hook runtime contract baseline
@@ -141,10 +148,10 @@ Detailed proof documentation:
 ├── .claude-plugin/        # Claude plugin manifest
 ├── hooks/                 # Plugin hook registry and wrapper
 ├── .claude/               # Standalone path, project settings, deny rules
-├── skills/                # 30 operator-facing skills
+├── skills/                # Operator-facing skills
 ├── src/                   # Runtime governance engines and hook runtime
 ├── scripts/               # Render wrapper and utility scripts
-├── tests/                 # Golden (345) and live verification
+├── tests/                 # Golden and live verification
 ├── docs/                  # Specs, proof artifacts, and indexes
 │   └── specs/             # Canonical contract baselines
 └── raw/                   # Reference-only methodology inputs (not canon)
@@ -157,7 +164,7 @@ Detailed proof documentation:
 ## Start Here
 
 1. `CLAUDE.md` — AI operating posture and repo truth
-2. `TEAM_CHARTER.md` — governance doctrine
-3. `CONTRIBUTING.md` — contribution rules
+2. `docs/WAVE7_CLOSEOUT.md` — Wave 7 shipped scope and remaining HOLDs
+3. `docs/BLUE_COLLAR_CODING_THESIS.md` — bounded thesis rider for the front-door shift
 4. `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` — hook runtime contract
 5. `REPO_INDEX.md` — full repo navigation map
