@@ -348,3 +348,46 @@ On internal error, returns advisory context with `FAIL_CLOSED` prefix. Non-block
 ### Contract Boundaries
 
 Block A does not widen any shared contracts. `InstructionsLoaded` is observation-only. No new skills or engines.
+
+## Block A: Persisted Walk Inputs And Render Cache (Wave 7A)
+
+Block A closes the `/walk` seam by persisting the exact session-level artifacts the existing Walk evaluation requires.
+
+### Persisted Session State Additions
+
+- `persistedBrief` - hook-derived SessionBrief subset with `briefId`, `inScope`, `outOfScope`, `controlRodProfile`, `source`, and `createdAt`
+- `persistedReceipt` - hook-derived SessionReceipt subset with `receiptId`, `completedWork`, `holdsRaised`, `source`, and `createdAt`
+- `lastWalk` - full Walk evaluation cache including `findings`, `findingSummary`, and `asBuilt`
+
+`persistedBrief` initializes at `SessionStart` with empty `inScope` / `outOfScope`, resolved control-rod profile, and `source: "hook_runtime"`. `persistedReceipt` is updated at `Stop` from runtime-observed work only. No conversation reconstruction is used.
+
+### Stop Evaluation Path
+
+At `Stop`, the hook runtime now:
+
+1. ensures `persistedBrief` exists
+2. updates `persistedReceipt.completedWork` from observed matched-tool actions
+3. updates `persistedReceipt.holdsRaised` from blocked attempts
+4. runs `ForemansWalk.evaluate()` against `persistedBrief` + `persistedReceipt`
+5. continues to pass `forensicEntries: []` so hook chain entries do not create false GHOST findings
+6. persists full Walk output, including `asBuilt`, to `lastWalk`
+
+`performedActions` remain derived at `Stop` from observed actions; no separate performed-action substrate is persisted.
+
+### Compaction Survival
+
+`persistedBrief`, `persistedReceipt`, and full `lastWalk` survive `PreCompact` preservation and `SessionStart` rehydration alongside the existing runtime state.
+
+### `/walk` Render Path
+
+`scripts/render-skill.js` now renders `/walk` from persisted runtime state alone by reading `state.lastWalk`. When `lastWalk` is absent, the wrapper returns a truthful HOLD instead of reconstructing Walk input from conversation state.
+
+### Contract Boundaries
+
+Block A does not widen:
+
+- `SessionBrief`
+- `SessionReceipt`
+- `ForemansWalk`
+
+This is a hook-runtime session-state widening only. `MIGRATIONS.md` remains unchanged.

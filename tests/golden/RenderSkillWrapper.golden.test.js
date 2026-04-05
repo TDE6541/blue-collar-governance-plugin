@@ -68,6 +68,52 @@ function buildPopulatedState() {
   };
 }
 
+function buildWalkReadyState() {
+  return {
+    ...buildPopulatedState(),
+    persistedBrief: {
+      briefId: `hook_brief_${SESSION_ID}`,
+      inScope: [],
+      outOfScope: [],
+      controlRodProfile: {
+        profileId: "conservative",
+        domainRules: [],
+      },
+      source: "hook_runtime",
+      createdAt: T0,
+    },
+    persistedReceipt: {
+      receiptId: `hook_receipt_${SESSION_ID}`,
+      completedWork: ["Write docs/walk-note.md"],
+      holdsRaised: [],
+      source: "hook_runtime",
+      createdAt: T1,
+    },
+    lastWalk: {
+      findings: [],
+      findingSummary: {
+        VIOLATION: 0,
+        DRIFT: 0,
+        INCOMPLETE: 0,
+        PHANTOM: 0,
+        GHOST: 0,
+        PARTIAL_VERIFICATION: 0,
+        EVIDENCE_GAP: 0,
+      },
+      asBuilt: {
+        sessionOfRecordRef: `hook_receipt_${SESSION_ID}`,
+        statusCounts: {
+          MATCHED: 0,
+          MODIFIED: 0,
+          ADDED: 1,
+          DEFERRED: 0,
+          HELD: 0,
+        },
+      },
+    },
+  };
+}
+
 test("render-skill chain returns deterministic non-empty render from populated state", () => {
   const { base, runtimeDir } = makeTempRuntimeDir();
   writeSessionState(runtimeDir, `${SESSION_ID}.json`, buildPopulatedState());
@@ -107,7 +153,24 @@ test("render-skill chain returns hold when session state has no chain entries", 
   fs.rmSync(base, { recursive: true, force: true });
 });
 
-test("render-skill walk returns deterministic hold for missing session brief and receipt", () => {
+test("render-skill walk returns deterministic render from persisted Walk state", () => {
+  const { base, runtimeDir } = makeTempRuntimeDir();
+  writeSessionState(runtimeDir, `${SESSION_ID}.json`, buildWalkReadyState());
+
+  const result = runWrapper("walk", base);
+
+  assert.equal(result.route, "walk");
+  assert.equal(result.status, "ok");
+  assert.ok(result.rendered);
+  assert.equal(result.rendered.route, "/walk");
+  assert.equal(result.rendered.findingCount, 0);
+  assert.equal(result.rendered.sessionOfRecordRef, `hook_receipt_${SESSION_ID}`);
+  assert.equal(result.rendered.asBuiltStatusCounts.ADDED, 1);
+
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test("render-skill walk returns deterministic hold when persisted Walk cache is absent", () => {
   const { base, runtimeDir } = makeTempRuntimeDir();
   writeSessionState(runtimeDir, `${SESSION_ID}.json`, buildPopulatedState());
 
@@ -116,7 +179,7 @@ test("render-skill walk returns deterministic hold for missing session brief and
   assert.equal(result.route, "walk");
   assert.equal(result.status, "hold");
   assert.ok(result.hold);
-  assert.ok(result.hold.missingInputs.length > 0);
+  assert.deepEqual(result.hold.missingInputs, ["lastWalk"]);
 
   fs.rmSync(base, { recursive: true, force: true });
 });

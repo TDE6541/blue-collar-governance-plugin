@@ -17,6 +17,12 @@ const DEFAULT_PROFILE_ID = "conservative";
 const DEFAULT_STATE_DIRECTORY = ".claude/runtime";
 const DEFAULT_MATCHED_TOOLS = Object.freeze(["Bash", "Write", "Edit"]);
 const DEFAULT_BLOCKING_SEVERITIES = Object.freeze(["CRITICAL", "HIGH"]);
+const WALK_COMPLETED_APPROVAL_STATES = Object.freeze([
+  "pretool_full_auto",
+  "permission_full_auto_allow",
+  "permission_user_review",
+  "permitted_hard_stop",
+]);
 
 const PROJECT_HARD_STOP_DENY_RULES = Object.freeze([
   "Bash(rm *)",
@@ -321,6 +327,8 @@ function createEmptySessionState(sessionId, profile) {
       lastBlockedSignature: null,
       lastBlockedAt: null,
     },
+    persistedBrief: null,
+    persistedReceipt: null,
     lastWalk: null,
   };
 }
@@ -872,36 +880,139 @@ function handlePermissionRequest(input, config, options) {
   }
 }
 
-function buildWalkEvaluationFromState(state, config) {
-  const allowedActions = state.observedActions.filter((action) =>
-    ["pretool_full_auto", "permission_full_auto_allow", "permission_user_review"].includes(
-      action.approvalState
+function createHookDerivedBriefSnapshot(sessionId, controlRodProfile, createdAt) {
+  return {
+    briefId: `hook_brief_${sessionId}`,
+    inScope: [],
+    outOfScope: [],
+    controlRodProfile: JSON.parse(JSON.stringify(controlRodProfile)),
+    source: "hook_runtime",
+    createdAt,
+  };
+}
+
+function ensurePersistedBrief(state, config, createdAt) {
+  if (state.persistedBrief && typeof state.persistedBrief === "object" && !Array.isArray(state.persistedBrief)) {
+    return state.persistedBrief;
+  }
+
+  state.persistedBrief = createHookDerivedBriefSnapshot(
+    state.sessionId,
+    config.profile,
+    createdAt
+  );
+  return state.persistedBrief;
+}
+
+function isWalkCompletedObservedAction(action) {
+  return (
+    action &&
+    typeof action === "object" &&
+    DEFAULT_MATCHED_TOOLS.includes(action.toolName) &&
+    WALK_COMPLETED_APPROVAL_STATES.includes(action.approvalState)
+  );
+}
+
+function isRecoveryHoldObservedAction(action) {
+  return (
+    action &&
+    typeof action === "object" &&
+    action.toolName === "SessionStart" &&
+    action.domainId === "protected_destructive_ops" &&
+    action.approvalState === "permission_user_review" &&
+    typeof action.recoveryDetail === "string"
+  );
+}
+
+function dedupeWorkItems(items) {
+  const uniqueItems = [];
+  const seen = new Set();
+
+  for (const item of items) {
+    if (typeof item !== "string" || item.trim() === "" || seen.has(item)) {
+      continue;
+    }
+
+    seen.add(item);
+    uniqueItems.push(item);
+  }
+
+  return uniqueItems;
+}
+
+function getWalkCompletedObservedActions(state) {
+  if (!Array.isArray(state.observedActions)) {
+    return [];
+  }
+
+  return state.observedActions.filter((action) => isWalkCompletedObservedAction(action));
+}
+
+function getWalkPerformedObservedActions(state) {
+  if (!Array.isArray(state.observedActions)) {
+    return [];
+  }
+
+  return state.observedActions.filter(
+    (action) => isWalkCompletedObservedAction(action) || isRecoveryHoldObservedAction(action)
+  );
+}
+
+function buildPersistedReceiptFromState(state, createdAt) {
+  const existingReceipt =
+    state.persistedReceipt &&
+    typeof state.persistedReceipt === "object" &&
+    !Array.isArray(state.persistedReceipt)
+      ? state.persistedReceipt
+      : null;
+
+  const completedWork = dedupeWorkItems(
+    getWalkCompletedObservedActions(state).map((action) => action.workItem)
+  );
+  const holdsRaised = dedupeWorkItems(
+    (Array.isArray(state.blockedAttempts) ? state.blockedAttempts : []).map(
+      (attempt) => attempt && attempt.workItem
     )
   );
 
-  const completedWork = allowedActions.map((action) => action.workItem);
-  const performedActions = allowedActions.map((action, index) => ({
+  return {
+    receiptId:
+      existingReceipt &&
+      typeof existingReceipt.receiptId === "string" &&
+      existingReceipt.receiptId.trim() !== ""
+        ? existingReceipt.receiptId
+        : `hook_receipt_${state.sessionId}`,
+    completedWork,
+    holdsRaised,
+    source: "hook_runtime",
+    createdAt:
+      existingReceipt &&
+      typeof existingReceipt.createdAt === "string" &&
+      existingReceipt.createdAt.trim() !== ""
+        ? existingReceipt.createdAt
+        : createdAt,
+  };
+}
+
+function buildPerformedActionsFromState(state) {
+  return getWalkPerformedObservedActions(state).map((action, index) => ({
     actionId: `hook_action_${index + 1}`,
     workItem: action.workItem,
     domainId: action.domainId,
     operationType: action.operationType,
-    hardStopAuthorized: action.autonomyLevel === "HARD_STOP" ? false : undefined,
+    hardStopAuthorized: action.approvalState === "permitted_hard_stop" ? true : undefined,
   }));
+}
+
+function buildWalkEvaluationFromState(state) {
+  ensurePlainObject(state.persistedBrief, "Persisted Walk input 'persistedBrief'");
+  ensurePlainObject(state.persistedReceipt, "Persisted Walk input 'persistedReceipt'");
 
   const walk = new ForemansWalk();
   return walk.evaluate({
-    sessionBrief: {
-      briefId: `hook_brief_${state.sessionId}`,
-      inScope: [],
-      outOfScope: [],
-      controlRodProfile: config.profile,
-    },
-    sessionReceipt: {
-      receiptId: `hook_receipt_${state.sessionId}`,
-      completedWork,
-      holdsRaised: [],
-    },
-    performedActions,
+    sessionBrief: state.persistedBrief,
+    sessionReceipt: state.persistedReceipt,
+    performedActions: buildPerformedActionsFromState(state),
     forensicEntries: [],
   });
 }
@@ -929,7 +1040,11 @@ function buildStopReason(blockingFindings) {
 function handleStop(input, config, options) {
   try {
     const state = loadSessionState(config, input.session_id);
-    const walkEvaluation = buildWalkEvaluationFromState(state, config);
+    const now = resolveNow(options);
+    ensurePersistedBrief(state, config, now);
+    state.persistedReceipt = buildPersistedReceiptFromState(state, now);
+
+    const walkEvaluation = buildWalkEvaluationFromState(state);
     const blockingFindings = walkEvaluation.findings.filter((finding) =>
       config.blockingSeverities.has(finding.severity)
     );
@@ -937,9 +1052,8 @@ function handleStop(input, config, options) {
       blockingFindings.length > 0 ? buildBlockingFindingSignature(blockingFindings) : null;
 
     state.lastWalk = {
-      evaluatedAt: resolveNow(options),
-      findingSummary: walkEvaluation.findingSummary,
-      findings: walkEvaluation.findings,
+      evaluatedAt: now,
+      ...walkEvaluation,
     };
 
     if (blockingFindings.length === 0) {
@@ -955,7 +1069,7 @@ function handleStop(input, config, options) {
     }
 
     state.stopGate.lastBlockedSignature = signature;
-    state.stopGate.lastBlockedAt = resolveNow(options);
+    state.stopGate.lastBlockedAt = now;
     saveSessionState(config, input.session_id, state);
 
     return {

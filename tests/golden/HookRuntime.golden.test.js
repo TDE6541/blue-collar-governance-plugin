@@ -162,6 +162,12 @@ test("HookRuntime SessionStart startup injects bounded governance context", () =
   const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-startup");
   assert.equal(state.sessionStart.source, "startup");
   assert.equal(state.recovery.status, "not_required");
+  assert.deepEqual(state.persistedBrief.inScope, []);
+  assert.deepEqual(state.persistedBrief.outOfScope, []);
+  assert.equal(state.persistedBrief.source, "hook_runtime");
+  assert.equal(state.persistedBrief.createdAt, "2026-04-02T11:59:00Z");
+  assert.equal(state.persistedBrief.controlRodProfile.profileId, "conservative");
+  assert.equal(state.persistedReceipt, null);
 });
 
 test("HookRuntime PreToolUse denies HARD_STOP pricing edits and records blocked attempt", () => {
@@ -316,6 +322,8 @@ test("HookRuntime PreCompact preserves state and SessionStart compact rehydrates
   assert.equal(rehydratedState.recovery.status, "ok");
   assert.equal(rehydratedState.observedActions.length, 1);
   assert.equal(rehydratedState.observedActions[0].domainId, "pricing_quote_logic");
+  assert.ok(rehydratedState.persistedBrief, "persistedBrief should exist after compact recovery");
+  assert.equal(rehydratedState.persistedBrief.source, "hook_runtime");
 
   const stopResult = runHookEvent(
     "Stop",
@@ -332,6 +340,11 @@ test("HookRuntime PreCompact preserves state and SessionStart compact rehydrates
   );
 
   assert.equal(stopResult.decision, "block");
+
+  const stoppedState = loadSessionState(config, "session-after-compact");
+  assert.ok(stoppedState.persistedReceipt, "persistedReceipt should be populated at Stop");
+  assert.ok(stoppedState.lastWalk, "lastWalk should be populated at Stop");
+  assert.ok(stoppedState.lastWalk.asBuilt, "lastWalk should include asBuilt");
 });
 
 test("HookRuntime SessionStart compact without preserved state enters recovery HOLD and Stop blocks", () => {
@@ -415,6 +428,96 @@ test("HookRuntime SessionStart compact with malformed preserved state enters rec
   );
 
   assert.equal(stopResult.decision, "block");
+
+  const stoppedState = loadSessionState(config, "session-compact-malformed");
+  assert.ok(stoppedState.persistedReceipt, "persistedReceipt should be populated at Stop");
+  assert.ok(stoppedState.lastWalk, "lastWalk should be populated at Stop");
+  assert.ok(stoppedState.lastWalk.asBuilt, "lastWalk should include asBuilt");
+});
+
+
+test("HookRuntime Stop persists hook-derived receipt and full Walk cache for render", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-walk-persist";
+
+  runHookEvent(
+    "SessionStart",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "startup",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:26:00Z",
+    }
+  );
+
+  runHookEvent(
+    "PreToolUse",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Write",
+      tool_input: {
+        file_path: path.join(projectDir, "docs", "walk-note.md"),
+        content: "# walk\n",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:27:00Z",
+    }
+  );
+
+  runHookEvent(
+    "PostToolUse",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PostToolUse",
+      tool_name: "Write",
+      tool_input: {
+        file_path: path.join(projectDir, "docs", "walk-note.md"),
+        content: "# walk\n",
+      },
+      tool_response: "File written.",
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:27:30Z",
+    }
+  );
+
+  const stopResult = runHookEvent(
+    "Stop",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+    },
+    {
+      projectDir,
+      now: "2026-04-02T12:28:00Z",
+    }
+  );
+
+  assert.deepEqual(stopResult, {});
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.persistedBrief.source, "hook_runtime");
+  assert.deepEqual(state.persistedBrief.inScope, []);
+  assert.deepEqual(state.persistedBrief.outOfScope, []);
+  assert.equal(state.persistedReceipt.source, "hook_runtime");
+  assert.deepEqual(state.persistedReceipt.completedWork, ["Write docs/walk-note.md"]);
+  assert.deepEqual(state.persistedReceipt.holdsRaised, []);
+  assert.ok(state.lastWalk, "lastWalk should be populated after Stop");
+  assert.ok(state.lastWalk.asBuilt, "lastWalk should include asBuilt");
+  assert.equal(state.lastWalk.asBuilt.sessionOfRecordRef, state.persistedReceipt.receiptId);
+  assert.equal(state.lastWalk.asBuilt.statusCounts.ADDED, 1);
 });
 
 test("HookRuntime Stop blocks once on blocking Walk findings and then respects stop loop guard", () => {

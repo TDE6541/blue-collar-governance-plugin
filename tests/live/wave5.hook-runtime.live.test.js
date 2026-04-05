@@ -2,6 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const { execFileSync } = require("node:child_process");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
@@ -16,6 +17,7 @@ const {
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
 const SETTINGS_SOURCE = path.join(REPO_ROOT, ".claude", "settings.json");
+const WRAPPER_PATH = path.join(REPO_ROOT, "scripts", "render-skill.js");
 
 function makeTempProject() {
   const projectDir = fs.mkdtempSync(path.join(os.tmpdir(), "bcgp-hook-live-"));
@@ -205,6 +207,127 @@ test("Wave5 hook runtime live proof: PreCompact snapshot rehydrates compact Sess
   assert.equal(stopResult.decision, "block");
 });
 
+function runRenderWrapper(route, projectDir) {
+  return JSON.parse(
+    execFileSync("node", [WRAPPER_PATH, route], {
+      cwd: projectDir,
+      encoding: "utf8",
+      timeout: 10000,
+    })
+  );
+}
+
+test("Wave7A walk render live proof: persisted runtime state survives compaction and renders /walk", () => {
+  const projectDir = makeTempProject();
+  const sourceSessionId = "wave7_walk_render_source";
+  const targetSessionId = "wave7_walk_render_target";
+
+  runHookEvent(
+    "SessionStart",
+    {
+      session_id: sourceSessionId,
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "startup",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T10:00:00Z",
+    }
+  );
+
+  runHookEvent(
+    "PreToolUse",
+    {
+      session_id: sourceSessionId,
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Write",
+      tool_input: {
+        file_path: path.join(projectDir, "docs", "walk-proof.md"),
+        content: "# proof\n",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-04T10:01:00Z",
+    }
+  );
+
+  runHookEvent(
+    "PostToolUse",
+    {
+      session_id: sourceSessionId,
+      cwd: projectDir,
+      hook_event_name: "PostToolUse",
+      tool_name: "Write",
+      tool_input: {
+        file_path: path.join(projectDir, "docs", "walk-proof.md"),
+        content: "# proof\n",
+      },
+      tool_response: "File written.",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T10:01:30Z",
+    }
+  );
+
+  const stopResult = runHookEvent(
+    "Stop",
+    {
+      session_id: sourceSessionId,
+      cwd: projectDir,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+    },
+    {
+      projectDir,
+      now: "2026-04-04T10:02:00Z",
+    }
+  );
+
+  assert.deepEqual(stopResult, {});
+
+  runHookEvent(
+    "PreCompact",
+    {
+      session_id: sourceSessionId,
+      cwd: projectDir,
+      hook_event_name: "PreCompact",
+      trigger: "manual",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T10:03:00Z",
+    }
+  );
+
+  runHookEvent(
+    "SessionStart",
+    {
+      session_id: targetSessionId,
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "compact",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T10:04:00Z",
+    }
+  );
+
+  const walkRender = runRenderWrapper("walk", projectDir);
+  assert.equal(walkRender.route, "walk");
+  assert.equal(walkRender.status, "ok");
+  assert.equal(walkRender.rendered.route, "/walk");
+  assert.equal(walkRender.rendered.asBuiltStatusCounts.ADDED, 1);
+  assert.equal(walkRender.rendered.sessionOfRecordRef, `hook_receipt_${sourceSessionId}`);
+  assert.ok(
+    typeof walkRender.sessionSource === "string" &&
+      walkRender.sessionSource.endsWith(`${targetSessionId}.json`)
+  );
+});
 test("Wave5 hook runtime live proof: malformed hook posture throws before any allow path can proceed", () => {
   const projectDir = makeTempProject();
   const brokenSettingsPath = path.join(projectDir, ".claude", "settings.json");

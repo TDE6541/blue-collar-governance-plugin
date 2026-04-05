@@ -62,6 +62,23 @@ function normalizeStopGate(stopGate) {
   };
 }
 
+function cloneObjectOrNull(value) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? cloneJsonValue(value)
+    : null;
+}
+
+function createPersistedBriefSnapshot(sessionId, profile, createdAt) {
+  return {
+    briefId: `hook_brief_${sessionId}`,
+    inScope: [],
+    outOfScope: [],
+    controlRodProfile: cloneJsonValue(profile),
+    source: "hook_runtime",
+    createdAt,
+  };
+}
+
 function createFallbackEmptyState(sessionId, profile) {
   const profileId =
     profile && typeof profile.profileId === "string" && profile.profileId.trim() !== ""
@@ -83,6 +100,8 @@ function createFallbackEmptyState(sessionId, profile) {
       lastBlockedSignature: null,
       lastBlockedAt: null,
     },
+    persistedBrief: null,
+    persistedReceipt: null,
     lastWalk: null,
   };
 }
@@ -121,6 +140,8 @@ function ensureSessionStateShape(state, sessionId, profile, createEmptySessionSt
     ? cloneJsonValue(sourceState.loadedInstructions).slice(-MAX_LOADED_INSTRUCTIONS)
     : [];
   base.stopGate = normalizeStopGate(sourceState.stopGate);
+  base.persistedBrief = cloneObjectOrNull(sourceState.persistedBrief);
+  base.persistedReceipt = cloneObjectOrNull(sourceState.persistedReceipt);
   base.lastWalk =
     sourceState.lastWalk && typeof sourceState.lastWalk === "object" && !Array.isArray(sourceState.lastWalk)
       ? cloneJsonValue(sourceState.lastWalk)
@@ -405,6 +426,8 @@ function applyRecoveredState(state, recoveredState) {
     ? cloneJsonValue(recoveredState.loadedInstructions).slice(-MAX_LOADED_INSTRUCTIONS)
     : [];
   state.stopGate = normalizeStopGate(recoveredState.stopGate);
+  state.persistedBrief = cloneObjectOrNull(recoveredState.persistedBrief);
+  state.persistedReceipt = cloneObjectOrNull(recoveredState.persistedReceipt);
   state.lastWalk =
     recoveredState.lastWalk &&
     typeof recoveredState.lastWalk === "object" &&
@@ -419,6 +442,8 @@ function hasMeaningfulSessionState(state) {
     (Array.isArray(state.observedActions) && state.observedActions.length > 0) ||
     (Array.isArray(state.blockedAttempts) && state.blockedAttempts.length > 0) ||
     (Array.isArray(state.chainEntries) && state.chainEntries.length > 0) ||
+    (state.persistedBrief && typeof state.persistedBrief === "object") ||
+    (state.persistedReceipt && typeof state.persistedReceipt === "object") ||
     (state.lastWalk && typeof state.lastWalk === "object")
   );
 }
@@ -499,6 +524,10 @@ function handleSessionStartSlice({
     checkedAt: now,
   };
 
+  if (!state.persistedBrief) {
+    state.persistedBrief = createPersistedBriefSnapshot(state.sessionId, config.profile, now);
+  }
+
   saveSessionState(config, input.session_id, state);
 
   return {
@@ -539,6 +568,8 @@ function handlePreCompactSlice({ input, config, options, loadSessionState, resol
         ? cloneJsonValue(state.loadedInstructions).slice(-MAX_LOADED_INSTRUCTIONS)
         : [],
       stopGate: normalizeStopGate(state.stopGate),
+      persistedBrief: cloneObjectOrNull(state.persistedBrief),
+      persistedReceipt: cloneObjectOrNull(state.persistedReceipt),
       lastWalk:
         state.lastWalk && typeof state.lastWalk === "object" && !Array.isArray(state.lastWalk)
           ? cloneJsonValue(state.lastWalk)

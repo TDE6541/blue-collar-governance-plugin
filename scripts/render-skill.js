@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const SUPPORTED_ROUTES = ["chain", "walk", "fire-break", "prevention-record"];
+const COMPACTION_STATE_FILE = "_compaction-preserved.json";
 const RUNTIME_DIR = path.join(process.cwd(), ".claude", "runtime");
 
 function findMostRecentSessionFile() {
@@ -11,7 +12,9 @@ function findMostRecentSessionFile() {
     return null;
   }
 
-  const files = fs.readdirSync(RUNTIME_DIR).filter((f) => f.endsWith(".json"));
+  const files = fs
+    .readdirSync(RUNTIME_DIR)
+    .filter((f) => f.endsWith(".json") && f !== COMPACTION_STATE_FILE);
   if (files.length === 0) {
     return null;
   }
@@ -78,15 +81,56 @@ function renderChain(state, sessionSource) {
   };
 }
 
-function renderWalk(_state, sessionSource) {
-  return holdResult(
-    "walk",
-    sessionSource,
-    "sessionBrief and sessionReceipt are not persisted by the hook runtime; " +
-      "valid Walk input cannot be constructed without inventing conversation-scope data",
-    ["chainEntries", "observedActions", "blockedActions"],
-    ["sessionBrief.inScope", "sessionBrief.outOfScope", "sessionReceipt.completedWork", "sessionReceipt.holdsRaised"]
+function isPlainObject(value) {
+  return value && typeof value === "object" && !Array.isArray(value);
+}
+
+function renderWalk(state, sessionSource) {
+  const hasPersistedBrief = isPlainObject(state.persistedBrief);
+  const hasPersistedReceipt = isPlainObject(state.persistedReceipt);
+  const hasLastWalk = isPlainObject(state.lastWalk);
+
+  if (!hasLastWalk) {
+    return holdResult(
+      "walk",
+      sessionSource,
+      "no persisted Walk evaluation in session state",
+      [
+        ...(hasPersistedBrief ? ["persistedBrief"] : []),
+        ...(hasPersistedReceipt ? ["persistedReceipt"] : []),
+        ...(Array.isArray(state.observedActions) ? ["observedActions"] : []),
+        ...(Array.isArray(state.blockedAttempts) ? ["blockedAttempts"] : []),
+      ],
+      ["lastWalk"]
+    );
+  }
+
+  if (!hasPersistedBrief || !hasPersistedReceipt) {
+    return holdResult(
+      "walk",
+      sessionSource,
+      "persisted Walk inputs are incomplete; lastWalk cache cannot be trusted alone",
+      ["lastWalk"],
+      [
+        ...(hasPersistedBrief ? [] : ["persistedBrief"]),
+        ...(hasPersistedReceipt ? [] : ["persistedReceipt"]),
+      ]
+    );
+  }
+
+  const { SessionLifecycleSkills } = require(
+    path.join(__dirname, "..", "src", "SessionLifecycleSkills.js")
   );
+
+  const skills = new SessionLifecycleSkills();
+  const rendered = skills.renderWalk(state.lastWalk);
+
+  return {
+    route: "walk",
+    sessionSource,
+    status: "ok",
+    rendered,
+  };
 }
 
 function renderFireBreak(_state, sessionSource) {
