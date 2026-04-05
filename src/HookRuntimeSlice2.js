@@ -103,6 +103,7 @@ function createFallbackEmptyState(sessionId, profile) {
     persistedBrief: null,
     persistedReceipt: null,
     lastWalk: null,
+    lastFireBreak: null,
   };
 }
 
@@ -145,6 +146,10 @@ function ensureSessionStateShape(state, sessionId, profile, createEmptySessionSt
   base.lastWalk =
     sourceState.lastWalk && typeof sourceState.lastWalk === "object" && !Array.isArray(sourceState.lastWalk)
       ? cloneJsonValue(sourceState.lastWalk)
+      : null;
+  base.lastFireBreak =
+    sourceState.lastFireBreak && typeof sourceState.lastFireBreak === "object" && !Array.isArray(sourceState.lastFireBreak)
+      ? cloneJsonValue(sourceState.lastFireBreak)
       : null;
 
   if (
@@ -434,6 +439,12 @@ function applyRecoveredState(state, recoveredState) {
     !Array.isArray(recoveredState.lastWalk)
       ? cloneJsonValue(recoveredState.lastWalk)
       : null;
+  state.lastFireBreak =
+    recoveredState.lastFireBreak &&
+    typeof recoveredState.lastFireBreak === "object" &&
+    !Array.isArray(recoveredState.lastFireBreak)
+      ? cloneJsonValue(recoveredState.lastFireBreak)
+      : null;
   state.profileId = recoveredState.profileId || state.profileId;
 }
 
@@ -444,7 +455,8 @@ function hasMeaningfulSessionState(state) {
     (Array.isArray(state.chainEntries) && state.chainEntries.length > 0) ||
     (state.persistedBrief && typeof state.persistedBrief === "object") ||
     (state.persistedReceipt && typeof state.persistedReceipt === "object") ||
-    (state.lastWalk && typeof state.lastWalk === "object")
+    (state.lastWalk && typeof state.lastWalk === "object") ||
+    (state.lastFireBreak && typeof state.lastFireBreak === "object")
   );
 }
 
@@ -573,6 +585,10 @@ function handlePreCompactSlice({ input, config, options, loadSessionState, resol
       lastWalk:
         state.lastWalk && typeof state.lastWalk === "object" && !Array.isArray(state.lastWalk)
           ? cloneJsonValue(state.lastWalk)
+          : null,
+      lastFireBreak:
+        state.lastFireBreak && typeof state.lastFireBreak === "object" && !Array.isArray(state.lastFireBreak)
+          ? cloneJsonValue(state.lastFireBreak)
           : null,
     },
   };

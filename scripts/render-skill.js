@@ -133,15 +133,34 @@ function renderWalk(state, sessionSource) {
   };
 }
 
-function renderFireBreak(_state, sessionSource) {
-  return holdResult(
-    "fire-break",
+function renderFireBreak(state, sessionSource) {
+  const hasLastFireBreak = isPlainObject(state.lastFireBreak);
+
+  if (!hasLastFireBreak) {
+    return holdResult(
+      "fire-break",
+      sessionSource,
+      "no persisted hook-derived fire-break snapshot in session state",
+      [
+        ...(Array.isArray(state.blockedAttempts) ? ["blockedAttempts"] : []),
+        ...(Array.isArray(state.observedActions) ? ["observedActions"] : []),
+        ...(Array.isArray(state.chainEntries) ? ["chainEntries"] : []),
+      ],
+      ["lastFireBreak"]
+    );
+  }
+
+  const { FireBreakSkill } = require(path.join(__dirname, "..", "src", "FireBreakSkill.js"));
+
+  const skill = new FireBreakSkill();
+  const rendered = skill.renderFireBreak({ openItemsBoardView: state.lastFireBreak });
+
+  return {
+    route: "fire-break",
     sessionSource,
-    "OpenItemsBoard projection requires continuity, standing-risk, and omission inputs " +
-      "not persisted by the hook runtime",
-    ["chainEntries", "observedActions"],
-    ["continuityEntries", "standingRiskItems", "omissionFindings", "boardProjection"]
-  );
+    status: "ok",
+    rendered,
+  };
 }
 
 function renderPreventionRecord(state, sessionSource) {

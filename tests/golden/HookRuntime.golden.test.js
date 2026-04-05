@@ -168,6 +168,7 @@ test("HookRuntime SessionStart startup injects bounded governance context", () =
   assert.equal(state.persistedBrief.createdAt, "2026-04-02T11:59:00Z");
   assert.equal(state.persistedBrief.controlRodProfile.profileId, "conservative");
   assert.equal(state.persistedReceipt, null);
+  assert.equal(state.lastFireBreak, null);
 });
 
 test("HookRuntime PreToolUse denies HARD_STOP pricing edits and records blocked attempt", () => {
@@ -518,6 +519,232 @@ test("HookRuntime Stop persists hook-derived receipt and full Walk cache for ren
   assert.ok(state.lastWalk.asBuilt, "lastWalk should include asBuilt");
   assert.equal(state.lastWalk.asBuilt.sessionOfRecordRef, state.persistedReceipt.receiptId);
   assert.equal(state.lastWalk.asBuilt.statusCounts.ADDED, 1);
+});
+
+
+test("HookRuntime Stop persists hook-derived fire-break snapshot with resolved precedence over blocked fingerprint", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-firebreak-dedupe";
+  const editInput = {
+    file_path: path.join(projectDir, "src", "pricing-engine.js"),
+    old_string: "module.exports = {};",
+    new_string: "module.exports = { changed: true };",
+  };
+
+  runHookEvent(
+    "SessionStart",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "startup",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T11:00:00Z",
+    }
+  );
+
+  const blocked = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: editInput,
+    },
+    {
+      projectDir,
+      now: "2026-04-04T11:01:00Z",
+    }
+  );
+
+  assert.equal(blocked.hookSpecificOutput.permissionDecision, "deny");
+
+  seedPermitState(projectDir, sessionId, "pricing_quote_logic", "GRANTED");
+
+  const permitted = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: editInput,
+    },
+    {
+      projectDir,
+      now: "2026-04-04T11:02:00Z",
+    }
+  );
+
+  assert.deepEqual(permitted, {});
+
+  runHookEvent(
+    "PostToolUse",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PostToolUse",
+      tool_name: "Edit",
+      tool_input: editInput,
+      tool_response: "File written.",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T11:02:30Z",
+    }
+  );
+
+  runHookEvent(
+    "Stop",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+    },
+    {
+      projectDir,
+      now: "2026-04-04T11:03:00Z",
+    }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.ok(state.lastFireBreak, "lastFireBreak should be populated after Stop");
+  assert.equal(state.lastFireBreak.source, "hook_runtime");
+  assert.equal(state.lastFireBreak.projectionType, "hook_runtime_governance_health_snapshot");
+  assert.deepEqual(state.lastFireBreak.precedence, [
+    "Resolved this session",
+    "Aging into risk",
+    "Still unresolved",
+    "Missing now",
+  ]);
+  assert.equal(state.lastFireBreak.groups["Resolved this session"].length, 1);
+  assert.equal(state.lastFireBreak.groups["Missing now"].length, 0);
+  assert.equal(state.lastFireBreak.groups["Still unresolved"].length, 0);
+  assert.equal(state.lastFireBreak.groups["Aging into risk"].length, 0);
+  assert.equal(
+    state.lastFireBreak.groups["Resolved this session"][0].stateLabel,
+    "Hook-runtime governance passage"
+  );
+  assert.match(
+    state.lastFireBreak.groups["Resolved this session"][0].summary,
+    /permit-cleared HARD_STOP governance passage/
+  );
+});
+
+test("HookRuntime lastFireBreak survives compaction and compact SessionStart rehydrates it", () => {
+  const projectDir = makeTempProject();
+  const sourceSessionId = "session-firebreak-compact-src";
+  const targetSessionId = "session-firebreak-compact-dst";
+  const editInput = {
+    file_path: path.join(projectDir, "src", "pricing-engine.js"),
+    old_string: "module.exports = {};",
+    new_string: "module.exports = { changed: true };",
+  };
+
+  runHookEvent(
+    "SessionStart",
+    {
+      session_id: sourceSessionId,
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "startup",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T11:10:00Z",
+    }
+  );
+
+  seedPermitState(projectDir, sourceSessionId, "pricing_quote_logic", "GRANTED");
+
+  assert.deepEqual(
+    runHookEvent(
+      "PreToolUse",
+      {
+        session_id: sourceSessionId,
+        cwd: projectDir,
+        hook_event_name: "PreToolUse",
+        tool_name: "Edit",
+        tool_input: editInput,
+      },
+      {
+        projectDir,
+        now: "2026-04-04T11:11:00Z",
+      }
+    ),
+    {}
+  );
+
+  runHookEvent(
+    "PostToolUse",
+    {
+      session_id: sourceSessionId,
+      cwd: projectDir,
+      hook_event_name: "PostToolUse",
+      tool_name: "Edit",
+      tool_input: editInput,
+      tool_response: "File written.",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T11:11:30Z",
+    }
+  );
+
+  assert.deepEqual(
+    runHookEvent(
+      "Stop",
+      {
+        session_id: sourceSessionId,
+        cwd: projectDir,
+        hook_event_name: "Stop",
+        stop_hook_active: false,
+      },
+      {
+        projectDir,
+        now: "2026-04-04T11:12:00Z",
+      }
+    ),
+    {}
+  );
+
+  runHookEvent(
+    "PreCompact",
+    {
+      session_id: sourceSessionId,
+      cwd: projectDir,
+      hook_event_name: "PreCompact",
+      trigger: "manual",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T11:13:00Z",
+    }
+  );
+
+  runHookEvent(
+    "SessionStart",
+    {
+      session_id: targetSessionId,
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "compact",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T11:14:00Z",
+    }
+  );
+
+  const rehydrated = loadSessionState(resolveRuntimeConfig(projectDir), targetSessionId);
+  assert.ok(rehydrated.lastFireBreak, "lastFireBreak should survive compaction");
+  assert.equal(rehydrated.lastFireBreak.sessionId, sourceSessionId);
+  assert.equal(rehydrated.lastFireBreak.groups["Resolved this session"].length, 1);
+  assert.equal(rehydrated.lastFireBreak.groups["Missing now"].length, 0);
 });
 
 test("HookRuntime Stop blocks once on blocking Walk findings and then respects stop loop guard", () => {

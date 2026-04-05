@@ -114,6 +114,39 @@ function buildWalkReadyState() {
   };
 }
 
+function buildFireBreakReadyState() {
+  return {
+    ...buildPopulatedState(),
+    lastFireBreak: {
+      boardLabel: "Open Items Board",
+      sessionId: SESSION_ID,
+      precedence: [
+        "Resolved this session",
+        "Aging into risk",
+        "Still unresolved",
+        "Missing now",
+      ],
+      groups: {
+        "Missing now": [],
+        "Still unresolved": [],
+        "Aging into risk": [],
+        "Resolved this session": [
+          {
+            itemId: `hook_firebreak_resolved_${SESSION_ID}`,
+            summary: "Edit src/pricing-engine.js completed after permit-cleared HARD_STOP governance passage in this session.",
+            stateLabel: "Hook-runtime governance passage",
+            sourceRefs: [`hook_runtime:observedAction:${SESSION_ID}`],
+            evidenceRefs: [`hook_completed_${SESSION_ID}_0002`],
+          },
+        ],
+      },
+      source: "hook_runtime",
+      projectionType: "hook_runtime_governance_health_snapshot",
+      derivedAt: T1,
+    },
+  };
+}
+
 test("render-skill chain returns deterministic non-empty render from populated state", () => {
   const { base, runtimeDir } = makeTempRuntimeDir();
   writeSessionState(runtimeDir, `${SESSION_ID}.json`, buildPopulatedState());
@@ -184,7 +217,25 @@ test("render-skill walk returns deterministic hold when persisted Walk cache is 
   fs.rmSync(base, { recursive: true, force: true });
 });
 
-test("render-skill fire-break returns deterministic hold for missing board inputs", () => {
+test("render-skill fire-break returns deterministic render from persisted hook snapshot", () => {
+  const { base, runtimeDir } = makeTempRuntimeDir();
+  writeSessionState(runtimeDir, `${SESSION_ID}.json`, buildFireBreakReadyState());
+
+  const result = runWrapper("fire-break", base);
+
+  assert.equal(result.route, "fire-break");
+  assert.equal(result.status, "ok");
+  assert.ok(result.rendered);
+  assert.equal(result.rendered.route, "/fire-break");
+  assert.equal(result.rendered.snapshot.resolvedThisSessionCount, 1);
+  assert.equal(result.rendered.snapshot.missingNowCount, 0);
+  assert.equal(result.rendered.snapshot.totalItems, 1);
+  assert.equal(result.rendered.groups["Resolved this session"][0].stateLabel, "Hook-runtime governance passage");
+
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test("render-skill fire-break returns deterministic hold when persisted snapshot is absent", () => {
   const { base, runtimeDir } = makeTempRuntimeDir();
   writeSessionState(runtimeDir, `${SESSION_ID}.json`, buildPopulatedState());
 
@@ -193,7 +244,7 @@ test("render-skill fire-break returns deterministic hold for missing board input
   assert.equal(result.route, "fire-break");
   assert.equal(result.status, "hold");
   assert.ok(result.hold);
-  assert.ok(result.hold.missingInputs.length > 0);
+  assert.deepEqual(result.hold.missingInputs, ["lastFireBreak"]);
 
   fs.rmSync(base, { recursive: true, force: true });
 });

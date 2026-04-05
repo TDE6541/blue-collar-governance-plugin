@@ -23,6 +23,23 @@ const WALK_COMPLETED_APPROVAL_STATES = Object.freeze([
   "permission_user_review",
   "permitted_hard_stop",
 ]);
+const FIRE_BREAK_BOARD_LABEL = "Open Items Board";
+const FIRE_BREAK_GROUP_LABELS = Object.freeze({
+  MISSING_NOW: "Missing now",
+  STILL_UNRESOLVED: "Still unresolved",
+  AGING_INTO_RISK: "Aging into risk",
+  RESOLVED_THIS_SESSION: "Resolved this session",
+});
+const FIRE_BREAK_PRECEDENCE = Object.freeze([
+  FIRE_BREAK_GROUP_LABELS.RESOLVED_THIS_SESSION,
+  FIRE_BREAK_GROUP_LABELS.AGING_INTO_RISK,
+  FIRE_BREAK_GROUP_LABELS.STILL_UNRESOLVED,
+  FIRE_BREAK_GROUP_LABELS.MISSING_NOW,
+]);
+const FIRE_BREAK_STATE_LABELS = Object.freeze({
+  MISSING_NOW: "Blocked HARD_STOP",
+  RESOLVED_THIS_SESSION: "Hook-runtime governance passage",
+});
 
 const PROJECT_HARD_STOP_DENY_RULES = Object.freeze([
   "Bash(rm *)",
@@ -330,6 +347,7 @@ function createEmptySessionState(sessionId, profile) {
     persistedBrief: null,
     persistedReceipt: null,
     lastWalk: null,
+    lastFireBreak: null,
   };
 }
 
@@ -1017,6 +1035,185 @@ function buildWalkEvaluationFromState(state) {
   });
 }
 
+function isPermittedHardStopObservedAction(action) {
+  return (
+    action &&
+    typeof action === "object" &&
+    action.approvalState === "permitted_hard_stop" &&
+    typeof action.fingerprint === "string" &&
+    action.fingerprint.trim() !== "" &&
+    typeof action.workItem === "string" &&
+    action.workItem.trim() !== "" &&
+    typeof action.toolName === "string" &&
+    action.toolName.trim() !== "" &&
+    typeof action.domainId === "string" &&
+    action.domainId.trim() !== ""
+  );
+}
+
+function getFireBreakMatchingChainEntries(state, actionName, reference) {
+  if (!Array.isArray(state.chainEntries)) {
+    return [];
+  }
+
+  return state.chainEntries.filter((entry) => {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      return false;
+    }
+
+    if (!entry.payload || typeof entry.payload !== "object" || Array.isArray(entry.payload)) {
+      return false;
+    }
+
+    return (
+      entry.payload.action === actionName &&
+      entry.payload.toolName === reference.toolName &&
+      entry.payload.workItem === reference.workItem &&
+      entry.sourceLocation === `domain:${reference.domainId}`
+    );
+  });
+}
+
+function hasCompletedPermitClearedAction(state, observedAction) {
+  return getFireBreakMatchingChainEntries(state, "completed", observedAction).length > 0;
+}
+
+function compareFireBreakCandidates(left, right) {
+  const leftTime = Date.parse(left.sortAt || "");
+  const rightTime = Date.parse(right.sortAt || "");
+
+  const leftValid = Number.isFinite(leftTime);
+  const rightValid = Number.isFinite(rightTime);
+  if (leftValid && rightValid && leftTime !== rightTime) {
+    return leftTime - rightTime;
+  }
+
+  const leftText = typeof left.sortAt === "string" ? left.sortAt : "";
+  const rightText = typeof right.sortAt === "string" ? right.sortAt : "";
+  if (leftText !== rightText) {
+    return leftText.localeCompare(rightText);
+  }
+
+  return left.fingerprint.localeCompare(right.fingerprint);
+}
+
+function buildFireBreakResolvedItem(state, observedAction) {
+  const permittedEntries = getFireBreakMatchingChainEntries(state, "permitted", observedAction);
+  const completedEntries = getFireBreakMatchingChainEntries(state, "completed", observedAction);
+  const sourceRefs = dedupeWorkItems([
+    `hook_runtime:observedAction:${observedAction.fingerprint}`,
+    ...permittedEntries.map((entry) => entry.entryId),
+  ]);
+  const evidenceRefs = dedupeWorkItems(
+    [
+      ...completedEntries.map((entry) => entry.entryId),
+      ...permittedEntries.flatMap((entry) => [
+        entry.payload && typeof entry.payload.permitRef === "string" ? entry.payload.permitRef : null,
+        entry.payload && typeof entry.payload.authorizationRef === "string"
+          ? entry.payload.authorizationRef
+          : null,
+      ]),
+    ].filter(Boolean)
+  );
+
+  return {
+    itemId: `hook_firebreak_resolved_${observedAction.fingerprint.slice(0, 12)}`,
+    summary: `${observedAction.workItem} completed after permit-cleared HARD_STOP governance passage in this session.`,
+    stateLabel: FIRE_BREAK_STATE_LABELS.RESOLVED_THIS_SESSION,
+    sourceRefs,
+    evidenceRefs,
+  };
+}
+
+function buildFireBreakMissingItem(state, blockedAttempt) {
+  const blockedEntries = getFireBreakMatchingChainEntries(state, "blocked", blockedAttempt);
+
+  return {
+    itemId: `hook_firebreak_missing_${blockedAttempt.fingerprint.slice(0, 12)}`,
+    summary: `${blockedAttempt.workItem} is blocked in hook-runtime governance and was not later permit-cleared and completed in this session.`,
+    stateLabel: FIRE_BREAK_STATE_LABELS.MISSING_NOW,
+    sourceRefs: dedupeWorkItems([
+      `hook_runtime:blockedAttempt:${blockedAttempt.fingerprint}`,
+      ...blockedEntries.map((entry) => entry.entryId),
+    ]),
+    evidenceRefs: [],
+  };
+}
+
+function buildFireBreakSnapshotFromState(state, createdAt) {
+  const groups = {
+    [FIRE_BREAK_GROUP_LABELS.MISSING_NOW]: [],
+    [FIRE_BREAK_GROUP_LABELS.STILL_UNRESOLVED]: [],
+    [FIRE_BREAK_GROUP_LABELS.AGING_INTO_RISK]: [],
+    [FIRE_BREAK_GROUP_LABELS.RESOLVED_THIS_SESSION]: [],
+  };
+
+  const resolvedCandidates = [];
+  const missingCandidates = [];
+  const resolvedFingerprints = new Set();
+
+  for (const observedAction of Array.isArray(state.observedActions) ? state.observedActions : []) {
+    if (!isPermittedHardStopObservedAction(observedAction)) {
+      continue;
+    }
+
+    if (resolvedFingerprints.has(observedAction.fingerprint)) {
+      continue;
+    }
+
+    if (!hasCompletedPermitClearedAction(state, observedAction)) {
+      continue;
+    }
+
+    resolvedCandidates.push({
+      fingerprint: observedAction.fingerprint,
+      sortAt: observedAction.lastObservedAt || observedAction.firstObservedAt || createdAt,
+      item: buildFireBreakResolvedItem(state, observedAction),
+    });
+    resolvedFingerprints.add(observedAction.fingerprint);
+  }
+
+  const missingFingerprints = new Set();
+  for (const blockedAttempt of Array.isArray(state.blockedAttempts) ? state.blockedAttempts : []) {
+    if (!blockedAttempt || typeof blockedAttempt !== "object" || Array.isArray(blockedAttempt)) {
+      continue;
+    }
+
+    if (typeof blockedAttempt.fingerprint !== "string" || blockedAttempt.fingerprint.trim() === "") {
+      continue;
+    }
+
+    if (resolvedFingerprints.has(blockedAttempt.fingerprint) || missingFingerprints.has(blockedAttempt.fingerprint)) {
+      continue;
+    }
+
+    missingCandidates.push({
+      fingerprint: blockedAttempt.fingerprint,
+      sortAt: blockedAttempt.blockedAt || createdAt,
+      item: buildFireBreakMissingItem(state, blockedAttempt),
+    });
+    missingFingerprints.add(blockedAttempt.fingerprint);
+  }
+
+  resolvedCandidates.sort(compareFireBreakCandidates);
+  missingCandidates.sort(compareFireBreakCandidates);
+
+  groups[FIRE_BREAK_GROUP_LABELS.RESOLVED_THIS_SESSION] = resolvedCandidates.map((candidate) => candidate.item);
+  groups[FIRE_BREAK_GROUP_LABELS.MISSING_NOW] = missingCandidates.map((candidate) => candidate.item);
+
+  return {
+    boardLabel: FIRE_BREAK_BOARD_LABEL,
+    sessionId: state.sessionId,
+    precedence: [...FIRE_BREAK_PRECEDENCE],
+    groups,
+    source: "hook_runtime",
+    projectionType: "hook_runtime_governance_health_snapshot",
+    projectionNote:
+      "Hook-derived governance-health snapshot for /fire-break; not canonical OpenItemsBoard.projectBoard output.",
+    derivedAt: createdAt,
+  };
+}
+
 function buildBlockingFindingSignature(findings) {
   return sha1(
     stableStringify(
@@ -1043,6 +1240,8 @@ function handleStop(input, config, options) {
     const now = resolveNow(options);
     ensurePersistedBrief(state, config, now);
     state.persistedReceipt = buildPersistedReceiptFromState(state, now);
+    // Route-compatible hook snapshot only; this is not the canonical Open Items Board projection.
+    state.lastFireBreak = buildFireBreakSnapshotFromState(state, now);
 
     const walkEvaluation = buildWalkEvaluationFromState(state);
     const blockingFindings = walkEvaluation.findings.filter((finding) =>

@@ -391,3 +391,60 @@ Block A does not widen:
 - `ForemansWalk`
 
 This is a hook-runtime session-state widening only. `MIGRATIONS.md` remains unchanged.
+
+## Block B: Hook-Derived Fire-Break Snapshot (Wave 7A)
+
+Block B closes the `/fire-break` seam by persisting a hook-derived governance-health snapshot that is route-compatible with `FireBreakSkill` but is not the canonical `OpenItemsBoard.projectBoard()` projection.
+
+### Persisted Session State Addition
+
+- `lastFireBreak` - hook-derived governance-health snapshot with fixed `boardLabel`, fixed precedence, fixed group keys, and route-compatible item objects for `/fire-break`
+
+`lastFireBreak` is derived only from governance data the hook runtime honestly has at `Stop`. It is tagged `source: "hook_runtime"` and `projectionType: "hook_runtime_governance_health_snapshot"` to keep the distinction explicit.
+
+### Allowed Sources
+
+The hook-derived snapshot may use only:
+
+- `blockedAttempts`
+- `observedActions`
+- permit-cleared HARD_STOP actions that also have matching completed chain evidence in the current session
+- existing chain references already present in current session state
+
+The hook runtime does not claim or imply input from `omissionFindings`, `continuityEntries`, `standingRiskView`, or canonical `currentSessionResolvedOutcomes`.
+
+### Group Mapping Rules
+
+- `Resolved this session` - permit-cleared HARD_STOP actions completed this session; this is documented as hook-runtime governance passage, not continuity resolution
+- `Aging into risk` - always empty in this hook-derived snapshot
+- `Still unresolved` - always empty in this hook-derived snapshot
+- `Missing now` - unique blocked HARD_STOP actions not later permit-cleared and completed in this session
+
+### Precedence And Dedupe
+
+The persisted snapshot preserves fixed `/fire-break` precedence:
+
+1. `Resolved this session`
+2. `Aging into risk`
+3. `Still unresolved`
+4. `Missing now`
+
+Dedupe is by action fingerprint. If the same action is blocked and later permit-cleared plus completed, it appears only in `Resolved this session`.
+
+### Stop And Render Path
+
+At `Stop`, the hook runtime derives `lastFireBreak` from current session governance state and persists it alongside the existing session record. `PreCompact` preservation and compact `SessionStart` rehydration carry `lastFireBreak` forward unchanged.
+
+`scripts/render-skill.js` now renders `/fire-break` from `state.lastFireBreak` when present. When `lastFireBreak` is absent, the wrapper returns a truthful HOLD instead of reconstructing a board view from conversation state.
+
+### Contract Boundaries
+
+Block B does not widen or modify:
+
+- `OpenItemsBoard`
+- `FireBreakSkill`
+- omission coverage
+- continuity ledger
+- standing-risk engines
+
+This is hook-runtime session-state persistence only. `MIGRATIONS.md` remains unchanged.
