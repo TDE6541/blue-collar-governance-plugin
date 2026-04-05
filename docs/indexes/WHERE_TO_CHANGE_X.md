@@ -87,6 +87,11 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/PERMIT_SKILL.md` for the Wave 5B `/permit` gate decision surface contract boundaries and invariants.
 - Change `docs/specs/LOCKOUT_SKILL.md` for the Wave 5B `/lockout` LOTO validation surface contract boundaries and invariants.
 
+## Wave 7 Truth Lock
+
+- Change `docs/specs/WAVE7_TRUTH_LOCK.md` for the Wave 7 Block 0 umbrella truth lock: C1 `/walk` persistence seam, C2 `/fire-break` persistence seam, C3 plugin-native foreign-repo deny delivery, Work Order as the only intake pilot for Wave 7, current shipped truth that Work Order is still skin/render only, and the parked/out-of-scope list (package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work).
+- Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when the Wave 7 Block 0 front-door sync for C1/C2/C3, Work Order-only intake wording, or the parked list changes.
+
 ## Wave 6A Runtime Truth
 
 - Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for Wave 6A Slice 3 fail-closed hook hardening, Block B enforcement matrix (ConfigChange/CwdChanged/FileChanged), Block C live chain population (PostToolUse/PostToolUseFailure/chain writes), and Block D permit/lockout runtime closure.

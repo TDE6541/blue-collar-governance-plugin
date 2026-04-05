@@ -114,6 +114,13 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - **No universal project compatibility claim.** The plugin has been proven on its own repo, on governed-workflow, and on one foreign production repo (FieldPoint). Broader compatibility is not yet validated.
 - **No multi-agent governance.** This is single-session, single-operator enforcement.
 
+## Wave 7 Truth Lock
+
+- Wave 7 Block 0 is a docs-only truth lock at `docs/specs/WAVE7_TRUTH_LOCK.md`.
+- Wave 7 names C1 `/walk` persistence seam, C2 `/fire-break` persistence seam, and C3 plugin-native foreign-repo deny delivery.
+- Work Order is the only intake pilot for Wave 7, and current shipped truth is narrower: Work Order exists today as a skin/render surface only, not as a shipped intake runtime.
+- Parked/out of scope in Wave 7 Block 0: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
+
 ## Proof
 
 - **Golden tests:** 345 tests, 0 failures (`node --test tests/golden/*.golden.test.js`)

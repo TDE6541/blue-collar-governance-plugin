@@ -111,6 +111,9 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4 and later proof/integration work, remains pending. Hook/runtime slices through Wave 6A (Slice 3 + Blocks B/C/D) and Wave 6B (Block A InstructionsLoaded) are now shipped.
+- Wave 7 Block 0 truth lock is now implemented at `docs/specs/WAVE7_TRUTH_LOCK.md`.
+- Wave 7 names C1 `/walk` persistence seam, C2 `/fire-break` persistence seam, and C3 plugin-native foreign-repo deny delivery. Work Order is the only intake pilot for Wave 7, and current shipped truth is that Work Order exists today as a skin/render surface only, not as a shipped intake runtime.
+- Parked/out of scope in Wave 7 Block 0: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect signed off 2026-04-03.
 - `package.json` is absent; local plugin artifact structure is shipped, but package metadata, marketplace installation, and publishing surfaces are not implemented.
 - Canon specs for current scope:
@@ -130,6 +133,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/CONTROL_ROD_MODE.md`
   - `docs/specs/FOREMANS_WALK_ENGINE.md`
   - `docs/specs/WAVE5_OPERATOR_PRODUCT.md`
+  - `docs/specs/WAVE7_TRUTH_LOCK.md`
   - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`
   - `docs/specs/SKIN_FRAMEWORK.md`
   - `docs/specs/OPERATOR_TRUST_LEDGER.md`
