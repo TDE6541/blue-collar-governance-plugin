@@ -107,7 +107,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Standalone and plugin hook registration should be treated as alternate modes until simultaneous loading is explicitly proven.
 - Compressed Governance Health skills are read/query/render-only surfaces where `/prevention-record` renders explicit captured governance signals and `/rights` renders a static manual declaration.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Skill topology is now 28 skills (26 from Wave 5 + `/loto-clearance` and `/issue-permit` from Wave 6B).
+- Skill topology is now 30 skills (26 from Wave 5 + `/loto-clearance`, `/issue-permit`, `/work-order-intake`, and `/work-order-scaffold`).
 - SessionBrief no-widening remains hard-locked; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4 and later proof/integration work, remains pending. Hook/runtime slices through Wave 6A (Slice 3 + Blocks B/C/D) and Wave 6B (Block A InstructionsLoaded) are now shipped.
@@ -115,8 +115,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - C1 `/walk` persistence seam is closed: hook runtime persists `persistedBrief`, `persistedReceipt`, and `lastWalk`, and `/walk` now renders from persisted state alone.
 - C2 `/fire-break` persistence seam is closed through persisted `lastFireBreak`, a hook-derived governance-health snapshot that is route-compatible for `/fire-break`; canonical Open Items Board engine inputs remain outside current hook-runtime scope.
 - C3 plugin-native foreign-repo deny delivery is closed: foreign repos can now receive plugin-governed deny posture through a plugin-owned, operator-invoked apply path that is deterministic and reviewable, not runtime auto-injection, and not a universal compatibility claim.
-- Work Order is the only intake pilot for Wave 7. The existing Work Order skin/render surface still exists unchanged, and the new Work Order intake pilot surface is now shipped at `docs/specs/WORK_ORDER_INTAKE.md`, `src/WorkOrderIntakeEngine.js`, and `skills/work-order-intake/SKILL.md`.
-- Block D is shipped and stops at the normalized intake object only. No scaffold bridge, protection-default bridge, SessionBrief bridge, or execution path from intake is shipped yet. Blocks E, F, and G remain open.
+- Work Order is the only intake pilot for Wave 7. The existing Work Order skin/render surface still exists unchanged, the new Work Order intake pilot surface is now shipped at `docs/specs/WORK_ORDER_INTAKE.md`, `src/WorkOrderIntakeEngine.js`, and `skills/work-order-intake/SKILL.md`, and the new Work Order scaffold generation surface is now shipped at `docs/specs/WORK_ORDER_SCAFFOLD.md`, `src/WorkOrderScaffoldEngine.js`, and `skills/work-order-scaffold/SKILL.md`.
+- Blocks D and E are shipped. Block E stops at the scaffold object only. No protection-default bridge, SessionBrief bridge, or execution path from intake/scaffold is shipped yet. Blocks F and G remain open.
 - Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect signed off 2026-04-03.
 - `package.json` is absent; local plugin artifact structure is shipped, but package metadata, marketplace installation, and publishing surfaces are not implemented.
@@ -138,6 +138,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/FOREMANS_WALK_ENGINE.md`
   - `docs/specs/WAVE5_OPERATOR_PRODUCT.md`
   - `docs/specs/WAVE7_TRUTH_LOCK.md`
+  - `docs/specs/WORK_ORDER_SCAFFOLD.md`
   - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`
   - `docs/specs/SKIN_FRAMEWORK.md`
   - `docs/specs/OPERATOR_TRUST_LEDGER.md`

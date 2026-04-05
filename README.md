@@ -10,7 +10,7 @@ This plugin adds a runtime governance layer to Claude Code sessions:
 - **Control rod profiles** that classify every tool action against configurable domain rules (pricing, customer data, auth, destructive ops, and more)
 - **Session closeout gating** — the session cannot close cleanly if unresolved blocking findings exist
 - **Governance state preservation** — enforcement state survives context compaction and session restarts
-- **28 operator-facing skills** for inspecting governance posture, forensic history, safety interlocks, and session health during a live session
+- **30 operator-facing skills** for inspecting governance posture, forensic history, safety interlocks, session health, and the Work Order intake pilot chain during a live session
 
 ## Why This Exists
 
@@ -65,7 +65,7 @@ Load the repo as a local Claude Code plugin:
 claude --plugin-dir /path/to/blue-collar-governance-plugin
 ```
 
-This registers the hooks and makes the 28 skills available as `/blue-collar-governance-plugin:<skill-name>`.
+This registers the hooks and makes the 30 skills available as `/blue-collar-governance-plugin:<skill-name>`.
 
 ### Standalone Repo Mode
 
@@ -100,7 +100,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Claude plugin manifest at `.claude-plugin/plugin.json`
 - Plugin hook registry at `hooks/hooks.json`
 - Fail-closed hook runtime at `src/HookRuntime.js` and `src/HookRuntimeSlice2.js`
-- 28 operator-facing skills under `skills/<name>/SKILL.md`
+- 30 operator-facing skills under `skills/<name>/SKILL.md`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance engines under `src/`
 - 345 passing golden tests under `tests/golden/`
@@ -118,8 +118,8 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 
 - Wave 7 umbrella truth lives at `docs/specs/WAVE7_TRUTH_LOCK.md`.
 - C1 `/walk` persistence seam is closed. C2 `/fire-break` persistence seam is closed through a persisted hook-derived governance-health snapshot that is route-compatible for `/fire-break`; canonical Open Items Board engine inputs remain outside current hook-runtime scope. C3 plugin-native foreign-repo deny delivery is closed: foreign repos can now receive plugin-governed deny posture through a plugin-owned, operator-invoked apply path that is deterministic and reviewable, not runtime auto-injection, and not a universal compatibility claim.
-- Work Order is the only intake pilot for Wave 7. The existing Work Order skin/render surface still exists unchanged, and the new Work Order intake pilot surface is now shipped.
-- Block D is shipped and stops at the normalized intake object only. No scaffold bridge, protection-default bridge, SessionBrief bridge, or execution path from intake is shipped yet. Blocks E, F, and G remain open.
+- Work Order is the only intake pilot for Wave 7. The existing Work Order skin/render surface still exists unchanged, the Work Order intake pilot surface is shipped, and the Work Order scaffold generation surface is shipped.
+- Blocks D and E are shipped. Block E stops at the scaffold object only. No protection-default bridge, no SessionBrief bridge, and no execution path from intake/scaffold are shipped yet. Blocks F and G remain open.
 - Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 ## Proof
 
@@ -141,7 +141,7 @@ Detailed proof documentation:
 ├── .claude-plugin/        # Claude plugin manifest
 ├── hooks/                 # Plugin hook registry and wrapper
 ├── .claude/               # Standalone path, project settings, deny rules
-├── skills/                # 28 operator-facing skills
+├── skills/                # 30 operator-facing skills
 ├── src/                   # Runtime governance engines and hook runtime
 ├── scripts/               # Render wrapper and utility scripts
 ├── tests/                 # Golden (345) and live verification

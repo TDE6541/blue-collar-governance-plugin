@@ -24,8 +24,9 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - authoritative hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections through 11 lifecycle events)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - authoritative Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - authoritative Buddy System v1 watcher-only live oversight contract baseline
-- `docs/specs/WAVE7_TRUTH_LOCK.md` - authoritative Wave 7 umbrella truth lock and post-Blocks A/B/C seam-status sync plus Block D front-door sync for C1/C2/C3, Work Order-only intake pilot, and parked scope
+- `docs/specs/WAVE7_TRUTH_LOCK.md` - authoritative Wave 7 umbrella truth lock and post-Blocks A/B/C seam-status sync plus post-Blocks D/E front-door sync for C1/C2/C3, the Work Order-only intake pilot chain, and parked scope
 - `docs/specs/WORK_ORDER_INTAKE.md` - authoritative Work Order intake pilot contract baseline
+- `docs/specs/WORK_ORDER_SCAFFOLD.md` - authoritative Work Order scaffold generation contract baseline
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/WAVE1_CLOSEOUT.md` - durable Wave 1 integration/proof closeout evidence map
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 integration/proof closeout evidence map
@@ -78,7 +79,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 4 Buddy behavior is shipped as watcher-only; multi-agent control-room behavior is not shipped.
 - Wave 4 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave4.live-oversight.live.test.js` and closeout evidence exists at `docs/WAVE4_CLOSEOUT.md`.
 - Wave 5 is one narrative wave executed as 5A / 5B.
-- Wave 5 shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, bringing the total to 28 skills. SessionBrief no-widening remains (`journeymanLevel` is not introduced).
+- Wave 5 shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, and Wave 7B Blocks D/E added `/work-order-intake` and `/work-order-scaffold`, bringing the total to 30 skills. SessionBrief no-widening remains (`journeymanLevel` is not introduced).
 - Shipped now: Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub, Wave 5A Blocks A-C, Wave 5B Blocks A-D-E1, and the read-only or thin surfaces `/control-rods`, `/fire-break`, `/census`, `/diagnose`, `/keystone`, `/eliminate`, `/buddy-status`, `/change-order`, `/callout`, `/red-tag`, `/permit`, and `/lockout`.
 - Warranty remains derived-first in Wave 5 and HoldEngine Scarcity Signal remains derived-only enrichment.
 - Shipped skill tranches remain deterministic route adapters over existing engine truth with no hidden behavior.
@@ -98,8 +99,8 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, remains pending. Wave 6 runtime, enforcement, and evidence work is shipped.
 - Wave 7 umbrella truth is implemented at `docs/specs/WAVE7_TRUTH_LOCK.md`.
 - C1 `/walk` persistence seam is closed. C2 `/fire-break` persistence seam is closed through a persisted hook-derived governance-health snapshot that is route-compatible for `/fire-break`; canonical Open Items Board engine inputs remain outside current hook-runtime scope. C3 plugin-native foreign-repo deny delivery is closed: foreign repos can now receive plugin-governed deny posture through a plugin-owned, operator-invoked apply path that is deterministic and reviewable, not runtime auto-injection, and not a universal compatibility claim. Work Order is the only intake pilot for Wave 7.
-- Current shipped truth: the existing Work Order skin/render surface still exists unchanged, and the new Work Order intake pilot surface is shipped at `docs/specs/WORK_ORDER_INTAKE.md`, `src/WorkOrderIntakeEngine.js`, `skills/work-order-intake/SKILL.md`, and `tests/golden/WorkOrderIntakeEngine.golden.test.js`.
-- Block D is shipped and stops at the normalized intake object only. No scaffold bridge, protection-default bridge, SessionBrief bridge, or execution path from intake is shipped yet. Blocks E, F, and G remain open.
+- Current shipped truth: the existing Work Order skin/render surface still exists unchanged, the new Work Order intake pilot surface is shipped at `docs/specs/WORK_ORDER_INTAKE.md`, `src/WorkOrderIntakeEngine.js`, `skills/work-order-intake/SKILL.md`, and `tests/golden/WorkOrderIntakeEngine.golden.test.js`, and the Work Order scaffold generation surface is shipped at `docs/specs/WORK_ORDER_SCAFFOLD.md`, `src/WorkOrderScaffoldEngine.js`, `skills/work-order-scaffold/SKILL.md`, and `tests/golden/WorkOrderScaffoldEngine.golden.test.js`.
+- Blocks D and E are shipped. Block E stops at the scaffold object only. No protection-default bridge, SessionBrief bridge, or execution path from intake/scaffold is shipped yet. Blocks F and G remain open.
 - Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 - Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.
 - `docs/indexes/` contains navigation support for governed maintenance.
