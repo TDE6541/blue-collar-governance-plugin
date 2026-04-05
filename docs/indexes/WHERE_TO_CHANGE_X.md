@@ -89,7 +89,7 @@ Use this index to find the right canon surface before making a change.
 
 ## Wave 7 Truth Lock
 
-- Change `docs/specs/WAVE7_TRUTH_LOCK.md` for the Wave 7 umbrella truth: C1 `/walk` closed, C2 `/fire-break` closed via a persisted hook-derived governance-health snapshot that is route-compatible for `/fire-break` (not canonical Open Items Board persistence), C3 plugin-native foreign-repo deny delivery open, Work Order as the only intake pilot for Wave 7, current shipped truth that Work Order is still skin/render only, and the parked/out-of-scope list (package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work).
+- Change `docs/specs/WAVE7_TRUTH_LOCK.md` for the Wave 7 umbrella truth: C1 `/walk` closed, C2 `/fire-break` closed via a persisted hook-derived governance-health snapshot that is route-compatible for `/fire-break` (not canonical Open Items Board persistence), C3 plugin-native foreign-repo deny delivery closed through a plugin-owned, operator-invoked apply path (deterministic, reviewable, not runtime auto-injection, and not a universal compatibility claim), Work Order as the only intake pilot for Wave 7, current shipped truth that Work Order is still skin/render only, and the parked/out-of-scope list (package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work).
 - Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when the Wave 7 front-door sync for C1/C2/C3 seam status, Work Order-only intake wording, the parked list, or the canonical-engine-vs-hook-snapshot boundary changes.
 
 ## Wave 6A Runtime Truth
