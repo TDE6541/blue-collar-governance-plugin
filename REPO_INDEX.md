@@ -52,7 +52,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - Hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections through 11 lifecycle events)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - Buddy System v1 watcher-only live oversight contract baseline
-- `docs/specs/WAVE7_TRUTH_LOCK.md` - Wave 7 umbrella truth lock and post-Blocks A/B/C seam-status sync for C1/C2/C3, Work Order-only intake pilot, and parked scope
+- `docs/specs/WAVE7_TRUTH_LOCK.md` - Wave 7 umbrella truth lock and post-Blocks A/B/C seam-status sync plus Block D front-door sync for C1/C2/C3, Work Order-only intake pilot, and parked scope
+- `docs/specs/WORK_ORDER_INTAKE.md` - Work Order intake pilot contract baseline
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 closeout evidence map
 - `docs/WAVE3_CLOSEOUT.md` - durable Wave 3 closeout evidence map
 - `docs/specs/WAVE4_LIVE_OVERSIGHT.md` - Wave 4 umbrella contract and load-bearing decisions
@@ -209,7 +210,9 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Wave 6 proof pack: `docs/WAVE6_PROOF_PACK.md`. Wave 6 closeout: `docs/WAVE6_CLOSEOUT.md`.
 - Later / not yet shipped: additional Wave 5 work outside the current shipped set, including later skins beyond tranche 4, remains pending. Hook/runtime slices through Wave 6A/6B and Blocks F/G/H are now shipped.
 - Wave 7 umbrella truth is implemented at `docs/specs/WAVE7_TRUTH_LOCK.md`.
-- C1 `/walk` persistence seam is closed through persisted hook-runtime inputs and render cache. C2 `/fire-break` persistence seam is closed through persisted `lastFireBreak`, a hook-derived governance-health snapshot that is route-compatible for `/fire-break`; canonical Open Items Board engine inputs remain outside current hook-runtime scope. C3 plugin-native foreign-repo deny delivery is closed: foreign repos can now receive plugin-governed deny posture through a plugin-owned, operator-invoked apply path that is deterministic and reviewable, not runtime auto-injection, and not a universal compatibility claim. Work Order is the only intake pilot for Wave 7, and current shipped truth is that Work Order exists today as a skin/render surface only, not as a shipped intake runtime.
+- C1 `/walk` persistence seam is closed through persisted hook-runtime inputs and render cache. C2 `/fire-break` persistence seam is closed through persisted `lastFireBreak`, a hook-derived governance-health snapshot that is route-compatible for `/fire-break`; canonical Open Items Board engine inputs remain outside current hook-runtime scope. C3 plugin-native foreign-repo deny delivery is closed: foreign repos can now receive plugin-governed deny posture through a plugin-owned, operator-invoked apply path that is deterministic and reviewable, not runtime auto-injection, and not a universal compatibility claim. Work Order is the only intake pilot for Wave 7.
+- Current shipped truth: the existing Work Order skin/render surface still exists unchanged, and the new Work Order intake pilot surface is shipped at `docs/specs/WORK_ORDER_INTAKE.md`, `src/WorkOrderIntakeEngine.js`, `skills/work-order-intake/SKILL.md`, and `tests/golden/WorkOrderIntakeEngine.golden.test.js`.
+- Block D is shipped and stops at the normalized intake object only. No scaffold bridge, protection-default bridge, SessionBrief bridge, or execution path from intake is shipped yet. Blocks E, F, and G remain open.
 - Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 - Boundary hold: Block C closes foreign-repo deny delivery through operator-invoked apply; runtime auto-injection and universal compatibility remain out of scope.
 - Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.

@@ -115,7 +115,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - C1 `/walk` persistence seam is closed: hook runtime persists `persistedBrief`, `persistedReceipt`, and `lastWalk`, and `/walk` now renders from persisted state alone.
 - C2 `/fire-break` persistence seam is closed through persisted `lastFireBreak`, a hook-derived governance-health snapshot that is route-compatible for `/fire-break`; canonical Open Items Board engine inputs remain outside current hook-runtime scope.
 - C3 plugin-native foreign-repo deny delivery is closed: foreign repos can now receive plugin-governed deny posture through a plugin-owned, operator-invoked apply path that is deterministic and reviewable, not runtime auto-injection, and not a universal compatibility claim.
-- Work Order is the only intake pilot for Wave 7, and current shipped truth is that Work Order exists today as a skin/render surface only, not as a shipped intake runtime.
+- Work Order is the only intake pilot for Wave 7. The existing Work Order skin/render surface still exists unchanged, and the new Work Order intake pilot surface is now shipped at `docs/specs/WORK_ORDER_INTAKE.md`, `src/WorkOrderIntakeEngine.js`, and `skills/work-order-intake/SKILL.md`.
+- Block D is shipped and stops at the normalized intake object only. No scaffold bridge, protection-default bridge, SessionBrief bridge, or execution path from intake is shipped yet. Blocks E, F, and G remain open.
 - Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect signed off 2026-04-03.
 - `package.json` is absent; local plugin artifact structure is shipped, but package metadata, marketplace installation, and publishing surfaces are not implemented.
