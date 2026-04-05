@@ -448,3 +448,48 @@ Block B does not widen or modify:
 - standing-risk engines
 
 This is hook-runtime session-state persistence only. `MIGRATIONS.md` remains unchanged.
+
+## Block C: Operator-Invoked Deny Posture Delivery (Wave 7A)
+
+Block C closes the remaining foreign-repo deny delivery seam with a plugin-owned utility path. This is an operator-invoked delivery mechanism, not live runtime config mutation.
+
+### Delivery Utility
+
+- `scripts/apply-deny-posture.js` reads the canonical `PROJECT_HARD_STOP_DENY_RULES` export from `src/HookRuntime.js`
+- targets a foreign repo's `.claude/settings.json`
+- merges plugin deny rules into `permissions.deny`
+- preserves non-deny settings fields
+- preserves existing non-plugin deny rules
+
+### Modes
+
+- default apply: writes the merged posture and reports added vs already-present rules
+- `--dry-run`: computes the merge and reports what would change without writing
+- `--verify`: checks for the full plugin rule set and exits `1` only when required rules are missing
+
+Exit intent stays fixed:
+
+- `0` = success
+- `1` = verification failure because required rules are missing
+- `2` = hard error
+
+### Truth Boundary
+
+This utility is:
+
+- plugin-owned
+- operator-invoked
+- deterministic
+- idempotent
+- reviewable
+
+This utility is not:
+
+- automatic runtime mutation during a live Claude session
+- hook-time config mutation
+- package, install, setup, or marketplace behavior
+- a universal repo compatibility claim
+
+### Contract Boundaries
+
+Block C does not widen shared runtime contracts and does not modify hook registration or session state. It documents a delivery utility for maintainability only. `MIGRATIONS.md` remains unchanged.
