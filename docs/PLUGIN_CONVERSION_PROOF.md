@@ -38,7 +38,7 @@ Reason:
 
 The plugin artifact ships hooks and skills.
 
-The repoâ€™s current deny-first posture still depends on host-project `.claude/settings.json`:
+The repo's current deny-first posture still depends on host-project `.claude/settings.json`:
 
 - `permissions.deny` remains project-level
 - plugin root `settings.json` was not added because current Claude plugin defaults only support agent settings
