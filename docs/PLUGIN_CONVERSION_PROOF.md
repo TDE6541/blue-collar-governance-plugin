@@ -96,7 +96,7 @@ Expected truth:
 
 ### Host-project deny layer
 
-If you want the same deny-first posture as the preserved standalone repo path, add the deny rules from this repoâ€™s `.claude/settings.json` to the host projectâ€™s `.claude/settings.json`.
+If you want the same deny-first posture as the preserved standalone repo path, add the deny rules from this repo's `.claude/settings.json` to the host project's `.claude/settings.json`.
 
 ## Narrow HOLD Boundary
 
