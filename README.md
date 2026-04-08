@@ -100,10 +100,10 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Claude plugin manifest at `.claude-plugin/plugin.json`
 - Plugin hook registry at `hooks/hooks.json`
 - Fail-closed hook runtime at `src/HookRuntime.js` and `src/HookRuntimeSlice2.js`
-- Operator-facing skills under `skills/<name>/SKILL.md`
+- 31 operator-facing skills under `skills/<name>/SKILL.md`
 - Work Order pilot chain surfaces at `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`
 - Standalone compatibility path at `.claude/settings.json`
-- Runtime governance engines under `src/`
+- Runtime governance modules under `src/`, including engines, skill surfaces, and hook adapters
 - Golden and live verification under `tests/`
 - CC-native render wrapper at `scripts/render-skill.js`
 
@@ -128,7 +128,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 
 ## Proof
 
-- **Golden verification:** shipped under `tests/golden/`.
+- **Golden verification:** the current repo state passes 375 tests across 45 files under `tests/golden/`.
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
@@ -149,7 +149,7 @@ Detailed proof documentation:
 ├── hooks/                 # Plugin hook registry and wrapper
 ├── .claude/               # Standalone path, project settings, deny rules
 ├── skills/                # Operator-facing skills
-├── src/                   # Runtime governance engines and hook runtime
+├── src/                   # Runtime governance modules: engines, skill surfaces, and hook runtime
 ├── scripts/               # Render wrapper and utility scripts
 ├── tests/                 # Golden and live verification
 ├── docs/                  # Specs, proof artifacts, and indexes
