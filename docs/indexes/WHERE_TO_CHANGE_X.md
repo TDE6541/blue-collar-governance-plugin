@@ -60,7 +60,7 @@ Use this index to find the right canon surface before making a change.
 ## Wave 5 Operator Product Truth
 
 - Change `docs/specs/WAVE5_OPERATOR_PRODUCT.md` for Wave 5 umbrella truth, locked decisions, 5A/5B split, anti-goals, and no-leakage fence.
-- Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for hook runtime enforcement spine truth (Slice 2 core, Wave 6A Slice 3/Blocks B-D, Wave 6B Block A), including fail-closed command-hook scope, compaction survival/startup re-injection, Control Rod alignment, Stop/Walk closeout gate, persistent deny-layer truth, enforcement matrix (11 events), live chain population, permit gate, and InstructionsLoaded observability.
+- Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for hook runtime enforcement spine truth (Slice 2 core, Wave 6A Slice 3/Blocks B-D, Wave 6B Block A, Phase 1 lifecycle expansion), including fail-closed command-hook scope, compaction survival/startup re-injection, Control Rod alignment, Stop/Walk closeout gate, persistent deny-layer truth, enforcement matrix (19 events), live chain population, permit gate, InstructionsLoaded observability, and Phase 1 lifecycle surfaces.
 - Change `docs/specs/SKIN_FRAMEWORK.md` for shipped skin ids, supported route matrix, fallback behavior, Whiteboard default rule, and structural distinction rules.
 - Change `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` for Block 0 substrate merit rubric and decisions (Operator Trust Ledger, Warranty, Scarcity Signal, SessionBrief no-widening).
 - Change `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md` for canonical startup path, runtime proof commands/results, and package/install posture truth.
@@ -159,7 +159,7 @@ Use this index to find the right canon surface before making a change.
 - Change `src/ChangeOrderEngine.js` for Wave 4 Block B1 formal drift-governance decision behavior.
 - Change `src/BuddySystem.js` for Wave 4 Block C1 live watcher callout behavior and chain-authored event wiring.
 - Change `src/ForemansWalk.js` for Wave 3 Block C1 post-session verification findings and As-Built accountability behavior.
-- Change `src/HookRuntime.js` for hook runtime enforcement behavior across all 11 lifecycle events, including Wave 5 Slice 1/2 core paths, Wave 6A event handlers/chain writes/permit gate, and Wave 6B InstructionsLoaded observability.
+- Change `src/HookRuntime.js` for hook runtime enforcement behavior across all 19 lifecycle events, including Wave 5 Slice 1/2 core paths, Wave 6A event handlers/chain writes/permit gate, Wave 6B InstructionsLoaded observability, and Phase 1 lifecycle expansion surfaces.
 - Change `src/OperatorTrustLedger.js` for Wave 5A Block A operator trust lifecycle persistence behavior.
 - Change `src/JourneymanTrustEngine.js` for Wave 5A Block A deterministic trust decision and trust-ledger write behavior.
 - Change `src/WarrantyMonitor.js` for Wave 5A Block B derived-only warranty monitoring behavior.

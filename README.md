@@ -25,18 +25,26 @@ This plugin exists to make the load-bearing governance seams deterministic and l
 
 ## How It Works
 
-The plugin registers hooks for eleven Claude Code lifecycle events:
+The plugin registers hooks for nineteen Claude Code lifecycle events:
 
 | Event | What happens |
 |-------|-------------|
 | **SessionStart** | Injects governance context; rehydrates state after compaction |
+| **UserPromptSubmit** | Blocks prompts containing exact disallowed governance-bypass phrases |
 | **PreCompact** | Preserves governance state before context compaction |
+| **PostCompact** | Verifies governance state survived compaction; advisory only, no gating |
 | **PreToolUse** | Classifies the tool action; denies HARD_STOP domains; asks on SUPERVISED |
 | **PermissionRequest** | Resolves permission dialogs against the active control rod profile |
-| **Stop** | Evaluates a Foreman's Walk; blocks closeout if blocking findings exist |
+| **PermissionDenied** | Records denied tool actions for governed domains to the forensic chain |
 | **PostToolUse** | Records completed tool actions on classified domains to the forensic chain |
 | **PostToolUseFailure** | Records failed tool actions on classified domains to the forensic chain |
-| **ConfigChange** | Detects governance config mutation; records to forensic chain |
+| **Notification** | Records notification events for governance observability |
+| **SubagentStart** | Records subagent start; maintains bounded active-subagent state |
+| **SubagentStop** | Bounded Mini-Walk gate; blocks if unresolved governance findings exist |
+| **Stop** | Evaluates a Foreman's Walk; blocks closeout if blocking findings exist |
+| **StopFailure** | Records stop-failure error type and details to the forensic chain |
+| **SessionEnd** | Records session-end reason; clears active-subagent state |
+| **ConfigChange** | Blocks governed config sources; observes policy_settings and unknown sources |
 | **CwdChanged** | Records working-directory changes; notes when outside project root |
 | **FileChanged** | Detects external changes to governance-relevant files; records to forensic chain |
 | **InstructionsLoaded** | Records instruction-file load events for governance-layer presence observability |
@@ -128,7 +136,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 
 ## Proof
 
-- **Golden verification:** the current repo state passes 375 tests across 45 files under `tests/golden/`.
+- **Golden verification:** the current repo state passes 388 tests across 45 files under `tests/golden/`.
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.

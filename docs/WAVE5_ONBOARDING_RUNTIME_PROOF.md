@@ -44,7 +44,7 @@ They should currently be treated as alternate modes, not as one merged setup in 
 
 | Area | Current Truth |
 |---|---|
-| Hook runtime enforcement | Shipped through Wave 6B: 11 lifecycle events (`SessionStart`, `PreCompact`, `PreToolUse`, `PermissionRequest`, `Stop`, `PostToolUse`, `PostToolUseFailure`, `ConfigChange`, `CwdChanged`, `FileChanged`, `InstructionsLoaded`) |
+| Hook runtime enforcement | Shipped through Phase 1 lifecycle expansion: 19 lifecycle events (`SessionStart`, `UserPromptSubmit`, `PreCompact`, `PostCompact`, `PreToolUse`, `PermissionRequest`, `PermissionDenied`, `PostToolUse`, `PostToolUseFailure`, `Notification`, `SubagentStart`, `SubagentStop`, `Stop`, `StopFailure`, `SessionEnd`, `ConfigChange`, `CwdChanged`, `FileChanged`, `InstructionsLoaded`) |
 | Compaction survival | Shipped (`PreCompact` preservation + bounded `SessionStart` re-injection for `startup`, `compact`, `resume`) |
 | Command-hook posture | Shipped as local deterministic fail-closed logic only |
 | Plugin artifact structure | Shipped locally (`.claude-plugin/plugin.json`, `hooks/hooks.json`, `skills/<name>/SKILL.md`) |
