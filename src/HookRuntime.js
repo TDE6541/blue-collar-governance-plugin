@@ -17,6 +17,19 @@ const DEFAULT_PROFILE_ID = "conservative";
 const DEFAULT_STATE_DIRECTORY = ".claude/runtime";
 const DEFAULT_MATCHED_TOOLS = Object.freeze(["Bash", "Write", "Edit"]);
 const DEFAULT_BLOCKING_SEVERITIES = Object.freeze(["CRITICAL", "HIGH"]);
+const USER_PROMPT_BLOCK_PHRASES = Object.freeze([
+  "disable hooks",
+  "remove governance",
+  "bypass safety",
+  "turn off enforcement",
+]);
+const BLOCKABLE_CONFIG_SOURCES = new Set([
+  "user_settings",
+  "project_settings",
+  "local_settings",
+  "skills",
+]);
+const OBSERVE_ONLY_CONFIG_SOURCES = new Set(["policy_settings"]);
 const WALK_COMPLETED_APPROVAL_STATES = Object.freeze([
   "pretool_full_auto",
   "permission_full_auto_allow",
@@ -70,12 +83,20 @@ const PROJECT_HARD_STOP_DENY_RULES = Object.freeze([
 
 const KNOWN_HOOK_EVENTS = new Set([
   "SessionStart",
+  "UserPromptSubmit",
   "PreCompact",
+  "PostCompact",
   "PreToolUse",
+  "PermissionRequest",
+  "PermissionDenied",
   "PostToolUse",
   "PostToolUseFailure",
-  "PermissionRequest",
+  "Notification",
+  "SubagentStart",
+  "SubagentStop",
   "Stop",
+  "StopFailure",
+  "SessionEnd",
   "ConfigChange",
   "CwdChanged",
   "FileChanged",
@@ -84,6 +105,8 @@ const KNOWN_HOOK_EVENTS = new Set([
 
 const MAX_CHAIN_ENTRIES = 128;
 const MAX_LOADED_INSTRUCTIONS = 64;
+const MAX_ACTIVE_SUBAGENTS = 16;
+const MAX_TEXT_PREVIEW = 200;
 
 const AUTONOMY_PRIORITY = Object.freeze({
   HARD_STOP: 3,
@@ -328,8 +351,120 @@ function getStateFilePath(config, sessionId) {
   return path.join(config.projectDir, config.stateDirectory, `${sessionId}.json`);
 }
 
-function createEmptySessionState(sessionId, profile) {
+function capTail(items, maxLength) {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  if (items.length <= maxLength) {
+    return items;
+  }
+
+  return items.slice(items.length - maxLength);
+}
+
+function clipText(value, maxLength, fallback = null) {
+  if (typeof value !== "string") {
+    return fallback;
+  }
+
+  const trimmed = value.trim();
+  if (trimmed === "") {
+    return fallback;
+  }
+
+  return trimmed.slice(0, maxLength);
+}
+
+function normalizeSubagentStopGate(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {
+      lastBlockedSignature: null,
+      lastBlockedAt: null,
+      lastAgentId: null,
+    };
+  }
+
   return {
+    lastBlockedSignature:
+      typeof value.lastBlockedSignature === "string" ? value.lastBlockedSignature : null,
+    lastBlockedAt: typeof value.lastBlockedAt === "string" ? value.lastBlockedAt : null,
+    lastAgentId: typeof value.lastAgentId === "string" ? value.lastAgentId : null,
+  };
+}
+
+function normalizeActiveSubagents(items) {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  const normalized = [];
+  for (const item of items) {
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      continue;
+    }
+
+    const agentId = clipText(item.agentId, 128, null);
+    const agentType = clipText(item.agentType, 128, "unknown");
+    const startedAt = clipText(item.startedAt, 64, null);
+    if (!agentId) {
+      continue;
+    }
+
+    normalized.push({
+      agentId,
+      agentType,
+      startedAt,
+    });
+  }
+
+  return capTail(normalized, MAX_ACTIVE_SUBAGENTS);
+}
+
+function normalizeObjectOrNull(value) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : null;
+}
+
+function ensureLifecycleStateShape(state) {
+  if (!Array.isArray(state.observedActions)) {
+    state.observedActions = [];
+  }
+  if (!Array.isArray(state.blockedAttempts)) {
+    state.blockedAttempts = [];
+  }
+  if (!Array.isArray(state.chainEntries)) {
+    state.chainEntries = [];
+  }
+  if (!Array.isArray(state.activePermits)) {
+    state.activePermits = [];
+  }
+  if (!Array.isArray(state.activeAuthorizations)) {
+    state.activeAuthorizations = [];
+  }
+  if (!Array.isArray(state.loadedInstructions)) {
+    state.loadedInstructions = [];
+  }
+  if (typeof state.nextChainCounter !== "number" || state.nextChainCounter < 1) {
+    state.nextChainCounter = (state.chainEntries.length || 0) + 1;
+  }
+
+  state.loadedInstructions = capTail(state.loadedInstructions, MAX_LOADED_INSTRUCTIONS);
+  state.activeSubagents = normalizeActiveSubagents(state.activeSubagents);
+  state.subagentStopGate = normalizeSubagentStopGate(state.subagentStopGate);
+  state.lastUserPromptSubmit = normalizeObjectOrNull(state.lastUserPromptSubmit);
+  state.lastConfigChange = normalizeObjectOrNull(state.lastConfigChange);
+  state.lastPermissionDenied = normalizeObjectOrNull(state.lastPermissionDenied);
+  state.lastNotification = normalizeObjectOrNull(state.lastNotification);
+  state.lastSubagentStop = normalizeObjectOrNull(state.lastSubagentStop);
+  state.lastStopFailure = normalizeObjectOrNull(state.lastStopFailure);
+  state.lastPostCompact = normalizeObjectOrNull(state.lastPostCompact);
+  state.lastSessionEnd = normalizeObjectOrNull(state.lastSessionEnd);
+
+  return state;
+}
+
+function createEmptySessionState(sessionId, profile) {
+  return ensureLifecycleStateShape({
     version: HOOK_RUNTIME_VERSION,
     sessionId,
     profileId: profile.profileId,
@@ -340,15 +475,29 @@ function createEmptySessionState(sessionId, profile) {
     activePermits: [],
     activeAuthorizations: [],
     loadedInstructions: [],
+    activeSubagents: [],
     stopGate: {
       lastBlockedSignature: null,
       lastBlockedAt: null,
+    },
+    subagentStopGate: {
+      lastBlockedSignature: null,
+      lastBlockedAt: null,
+      lastAgentId: null,
     },
     persistedBrief: null,
     persistedReceipt: null,
     lastWalk: null,
     lastFireBreak: null,
-  };
+    lastUserPromptSubmit: null,
+    lastConfigChange: null,
+    lastPermissionDenied: null,
+    lastNotification: null,
+    lastSubagentStop: null,
+    lastStopFailure: null,
+    lastPostCompact: null,
+    lastSessionEnd: null,
+  });
 }
 
 function loadSessionState(config, sessionId) {
@@ -366,11 +515,11 @@ function loadSessionState(config, sessionId) {
     );
   }
 
-  return state;
+  return ensureLifecycleStateShape(state);
 }
 
 function saveSessionState(config, sessionId, state) {
-  writeJsonFile(getStateFilePath(config, sessionId), state);
+  writeJsonFile(getStateFilePath(config, sessionId), ensureLifecycleStateShape(state));
 }
 
 function toProjectRelativePath(filePath, projectDir) {
@@ -644,6 +793,100 @@ function resolveNow(options) {
   return (options && options.now) || new Date().toISOString();
 }
 
+function findMatchedUserPromptPhrase(prompt) {
+  if (typeof prompt !== "string" || prompt.trim() === "") {
+    return null;
+  }
+
+  return (
+    USER_PROMPT_BLOCK_PHRASES.find((phrase) => {
+      const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`(^|[^a-z])${escapedPhrase}([^a-z]|$)`, "i");
+      return regex.test(prompt);
+    }) || null
+  );
+}
+
+function normalizeConfigChangeSource(source) {
+  return clipText(source, 64, "unknown");
+}
+
+function isBlockableConfigSource(source) {
+  return BLOCKABLE_CONFIG_SOURCES.has(source);
+}
+
+function isObserveOnlyConfigSource(source) {
+  return OBSERVE_ONLY_CONFIG_SOURCES.has(source);
+}
+
+function recordActiveSubagent(state, agentId, agentType, startedAt) {
+  const nextActive = Array.isArray(state.activeSubagents) ? state.activeSubagents : [];
+  state.activeSubagents = nextActive.filter((entry) => entry.agentId !== agentId);
+  state.activeSubagents.push({
+    agentId,
+    agentType,
+    startedAt,
+  });
+  state.activeSubagents = capTail(state.activeSubagents, MAX_ACTIVE_SUBAGENTS);
+}
+
+function getActiveSubagentMatches(state, agentId) {
+  if (!Array.isArray(state.activeSubagents)) {
+    return [];
+  }
+
+  return state.activeSubagents.filter((entry) => entry.agentId === agentId);
+}
+
+function removeActiveSubagent(state, agentId) {
+  if (!Array.isArray(state.activeSubagents)) {
+    state.activeSubagents = [];
+    return;
+  }
+
+  state.activeSubagents = state.activeSubagents.filter((entry) => entry.agentId !== agentId);
+}
+
+function buildObservedToolWorkItem(toolName, toolInput, classification) {
+  if (classification && typeof classification.workItem === "string") {
+    return classification.workItem;
+  }
+
+  if (toolName === "Bash" && toolInput && typeof toolInput.command === "string") {
+    return `Bash ${clipText(toolInput.command, MAX_TEXT_PREVIEW, "")}`;
+  }
+
+  const relativePath =
+    toolInput && typeof toolInput.file_path === "string"
+      ? clipText(toolInput.file_path, MAX_TEXT_PREVIEW, null)
+      : null;
+
+  if (relativePath) {
+    return `${toolName} ${relativePath}`;
+  }
+
+  return `${toolName} request`;
+}
+
+function buildBlockingWalkFindings(state, blockingSeverities) {
+  if (
+    !state.lastWalk ||
+    typeof state.lastWalk !== "object" ||
+    Array.isArray(state.lastWalk) ||
+    !Array.isArray(state.lastWalk.findings)
+  ) {
+    return [];
+  }
+
+  return state.lastWalk.findings.filter(
+    (finding) =>
+      finding &&
+      typeof finding === "object" &&
+      typeof finding.severity === "string" &&
+      blockingSeverities.has(finding.severity)
+  );
+}
+
 function findMatchingAuthorization(state, domainId, sessionId, evaluatedAt) {
   if (!Array.isArray(state.activeAuthorizations)) {
     return null;
@@ -724,6 +967,54 @@ function evaluatePermitGate(config, classification, state, sessionId, now) {
     });
   } catch (_error) {
     return null;
+  }
+}
+
+function handleUserPromptSubmit(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const prompt = clipText(input.prompt, MAX_TEXT_PREVIEW, "");
+    const matchedPhrase = findMatchedUserPromptPhrase(input.prompt);
+
+    state.lastUserPromptSubmit = {
+      promptPreview: prompt,
+      matchedPhrase,
+      blocked: matchedPhrase !== null,
+      recordedAt: now,
+    };
+
+    if (!matchedPhrase) {
+      saveSessionState(config, input.session_id, state);
+      return {};
+    }
+
+    appendChainEntry(state, {
+      eventType: "prompt_blocked",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:UserPromptSubmit",
+      sourceLocation: `phrase:${matchedPhrase}`,
+      payload: {
+        action: "prompt_blocked",
+        matchedPhrase,
+        promptPreview: prompt,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+    return {
+      decision: "block",
+      reason: `Prompt blocked: exact disallowed phrase '${matchedPhrase}' is not permitted.`,
+    };
+  } catch (error) {
+    return {
+      decision: "block",
+      reason: `FAIL_CLOSED: UserPromptSubmit internal error: ${
+        error && typeof error.message === "string" ? error.message : "unknown"
+      }`,
+    };
   }
 }
 
@@ -893,6 +1184,580 @@ function handlePermissionRequest(input, config, options) {
           }`,
           interrupt: false,
         },
+      },
+    };
+  }
+}
+
+function handlePermissionDenied(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const toolName = clipText(input.tool_name, 64, "unknown");
+    const classification = classifyToolAction(toolName, input.tool_input, config);
+    const workItem = buildObservedToolWorkItem(toolName, input.tool_input, classification);
+    const reason = clipText(input.reason, MAX_TEXT_PREVIEW, "Permission denied by Claude Code.");
+
+    state.lastPermissionDenied = {
+      toolName,
+      workItem,
+      reason,
+      observedAt: now,
+    };
+
+    appendChainEntry(state, {
+      eventType: "permission_denied",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:PermissionDenied",
+      sourceLocation: classification ? `domain:${classification.domainId}` : `tool:${toolName}`,
+      payload: {
+        action: "permission_denied",
+        toolName,
+        workItem,
+        reason,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+    return {};
+  } catch (_error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "PermissionDenied",
+        retry: false,
+      },
+    };
+  }
+}
+
+function handleNotification(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const notificationType = clipText(input.notification_type, 64, "unknown");
+    const title = clipText(input.title, 120, null);
+    const message = clipText(input.message, MAX_TEXT_PREVIEW, "");
+
+    state.lastNotification = {
+      notificationType,
+      title,
+      message,
+      observedAt: now,
+    };
+
+    appendChainEntry(state, {
+      eventType: "notification",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:Notification",
+      sourceLocation: `type:${notificationType}`,
+      payload: {
+        action: "notification_observed",
+        notificationType,
+        title,
+        message,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+    return {};
+  } catch (error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "Notification",
+        additionalContext: `FAIL_CLOSED: Notification internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
+      },
+    };
+  }
+}
+
+function handleSubagentStart(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const agentId = clipText(input.agent_id, 128, "unknown-agent");
+    const agentType = clipText(input.agent_type, 128, "unknown");
+
+    recordActiveSubagent(state, agentId, agentType, now);
+
+    appendChainEntry(state, {
+      eventType: "subagent_start",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:SubagentStart",
+      sourceLocation: `agent:${agentType}`,
+      payload: {
+        action: "subagent_started",
+        agentId,
+        agentType,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+    return {};
+  } catch (error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "SubagentStart",
+        additionalContext: `FAIL_CLOSED: SubagentStart internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
+      },
+    };
+  }
+}
+
+function hasPermitClearedBlockedAttempt(state, blockedAttempt) {
+  return getFireBreakMatchingChainEntries(state, "permitted", blockedAttempt).length > 0;
+}
+
+function buildSubagentStopAssessment(state, config, agentId) {
+  const blockingFindings = buildBlockingWalkFindings(state, config.blockingSeverities);
+  const unclearedBlockedAttempts = (Array.isArray(state.blockedAttempts) ? state.blockedAttempts : []).filter(
+    (attempt) =>
+      attempt &&
+      typeof attempt === "object" &&
+      typeof attempt.fingerprint === "string" &&
+      !hasPermitClearedBlockedAttempt(state, attempt)
+  );
+  const matches = agentId ? getActiveSubagentMatches(state, agentId) : [];
+
+  let structuralReason = null;
+  if (!agentId) {
+    structuralReason = "missing agent id";
+  } else if (matches.length === 0) {
+    structuralReason = `no tracked SubagentStart for ${agentId}`;
+  } else if (matches.length > 1) {
+    structuralReason = `duplicate active-subagent state for ${agentId}`;
+  }
+
+  return {
+    blockingFindings,
+    unclearedBlockedAttempts,
+    structuralReason,
+  };
+}
+
+function buildSubagentStopReason(assessment) {
+  const parts = [];
+
+  if (assessment.blockingFindings.length > 0) {
+    const finding = assessment.blockingFindings[0];
+    parts.push(
+      `${assessment.blockingFindings.length} blocking Walk finding(s) already present (${finding.findingType}/${finding.severity})`
+    );
+  }
+
+  if (assessment.unclearedBlockedAttempts.length > 0) {
+    parts.push(
+      `${assessment.unclearedBlockedAttempts.length} blocked attempt(s) remain permit-uncleared`
+    );
+  }
+
+  if (assessment.structuralReason) {
+    parts.push(`subagent state unsafe: ${assessment.structuralReason}`);
+  }
+
+  return parts.join("; ");
+}
+
+function handleSubagentStop(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const agentId = clipText(input.agent_id, 128, null);
+    const agentType = clipText(input.agent_type, 128, "unknown");
+    const assessment = buildSubagentStopAssessment(state, config, agentId);
+    const isUnsafe =
+      assessment.blockingFindings.length > 0 ||
+      assessment.unclearedBlockedAttempts.length > 0 ||
+      assessment.structuralReason !== null;
+    const reason = isUnsafe ? buildSubagentStopReason(assessment) : null;
+    const signature = isUnsafe
+      ? sha1(
+          stableStringify({
+            agentId,
+            blockingFindingCount: assessment.blockingFindings.length,
+            blockingFindingSummary:
+              assessment.blockingFindings[0] && assessment.blockingFindings[0].summary,
+            unclearedBlockedAttempts: assessment.unclearedBlockedAttempts.map(
+              (attempt) => attempt.fingerprint
+            ),
+            structuralReason: assessment.structuralReason,
+          })
+        )
+      : null;
+    const repeatGuardTriggered =
+      input.stop_hook_active === true &&
+      signature !== null &&
+      signature === state.subagentStopGate.lastBlockedSignature &&
+      (agentId || null) === state.subagentStopGate.lastAgentId;
+
+    if (isUnsafe && !repeatGuardTriggered) {
+      state.subagentStopGate = {
+        lastBlockedSignature: signature,
+        lastBlockedAt: now,
+        lastAgentId: agentId,
+      };
+      state.lastSubagentStop = {
+        agentId,
+        agentType,
+        decision: "block",
+        reason,
+        blockingFindingCount: assessment.blockingFindings.length,
+        unclearedBlockedAttemptCount: assessment.unclearedBlockedAttempts.length,
+        structuralReason: assessment.structuralReason,
+        recordedAt: now,
+      };
+
+      appendChainEntry(state, {
+        eventType: "subagent_stop",
+        entryType: "OPERATOR_ACTION",
+        sourceArtifact: "hook:SubagentStop",
+        sourceLocation: `agent:${agentType}`,
+        payload: {
+          action: "subagent_stop_blocked",
+          agentId,
+          agentType,
+          blockingFindingCount: assessment.blockingFindings.length,
+          unclearedBlockedAttemptCount: assessment.unclearedBlockedAttempts.length,
+          structuralReason: assessment.structuralReason,
+        },
+        sessionId: input.session_id,
+        recordedAt: now,
+      });
+
+      saveSessionState(config, input.session_id, state);
+      return {
+        decision: "block",
+        reason: `Subagent closeout blocked: ${reason}`,
+      };
+    }
+
+    if (agentId) {
+      removeActiveSubagent(state, agentId);
+    }
+
+    state.subagentStopGate = {
+      lastBlockedSignature: null,
+      lastBlockedAt: null,
+      lastAgentId: null,
+    };
+    state.lastSubagentStop = {
+      agentId,
+      agentType,
+      decision: repeatGuardTriggered ? "allow_after_repeat_guard" : "allow",
+      reason: repeatGuardTriggered ? reason : null,
+      blockingFindingCount: assessment.blockingFindings.length,
+      unclearedBlockedAttemptCount: assessment.unclearedBlockedAttempts.length,
+      structuralReason: assessment.structuralReason,
+      recordedAt: now,
+    };
+
+    appendChainEntry(state, {
+      eventType: "subagent_stop",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:SubagentStop",
+      sourceLocation: `agent:${agentType}`,
+      payload: {
+        action: repeatGuardTriggered
+          ? "subagent_stop_repeat_guard_allowed"
+          : "subagent_stop_observed",
+        agentId,
+        agentType,
+        activeSubagentCount: Array.isArray(state.activeSubagents) ? state.activeSubagents.length : 0,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+    return {};
+  } catch (error) {
+    return {
+      decision: "block",
+      reason: `FAIL_CLOSED: SubagentStop internal error: ${
+        error && typeof error.message === "string" ? error.message : "unknown"
+      }`,
+    };
+  }
+}
+
+function readPostCompactSnapshot(config) {
+  const snapshotPath = getCompactionStateFilePath(config);
+  if (!fs.existsSync(snapshotPath)) {
+    return {
+      status: "missing",
+      detail: `No pre-compact snapshot at ${snapshotPath}.`,
+    };
+  }
+
+  try {
+    const snapshot = readJsonFile(snapshotPath);
+    ensurePlainObject(snapshot, "Compaction snapshot");
+    ensurePlainObject(snapshot.rehydration, "Compaction snapshot rehydration");
+    return {
+      status: "ok",
+      snapshot,
+    };
+  } catch (error) {
+    return {
+      status: "malformed",
+      detail:
+        error && typeof error.message === "string"
+          ? `Compaction snapshot unreadable: ${error.message}`
+          : "Compaction snapshot unreadable.",
+    };
+  }
+}
+
+function comparePostCompactState(state, snapshot) {
+  const checks = [];
+  const expected = snapshot.rehydration;
+
+  const countCheck = (label, actual, wanted) => {
+    checks.push({
+      label,
+      actual,
+      expected: wanted,
+      status: actual === wanted ? "ok" : "drift",
+    });
+  };
+
+  const presenceCheck = (label, actual, wanted) => {
+    checks.push({
+      label,
+      actual,
+      expected: wanted,
+      status: actual === wanted ? "ok" : "drift",
+    });
+  };
+
+  countCheck(
+    "observedActions",
+    Array.isArray(state.observedActions) ? state.observedActions.length : 0,
+    Array.isArray(expected.observedActions) ? expected.observedActions.length : 0
+  );
+  countCheck(
+    "blockedAttempts",
+    Array.isArray(state.blockedAttempts) ? state.blockedAttempts.length : 0,
+    Array.isArray(expected.blockedAttempts) ? expected.blockedAttempts.length : 0
+  );
+  countCheck(
+    "chainEntries",
+    Array.isArray(state.chainEntries) ? state.chainEntries.length : 0,
+    Array.isArray(expected.chainEntries) ? expected.chainEntries.length : 0
+  );
+  countCheck(
+    "activePermits",
+    Array.isArray(state.activePermits) ? state.activePermits.length : 0,
+    Array.isArray(expected.activePermits) ? expected.activePermits.length : 0
+  );
+  countCheck(
+    "activeAuthorizations",
+    Array.isArray(state.activeAuthorizations) ? state.activeAuthorizations.length : 0,
+    Array.isArray(expected.activeAuthorizations) ? expected.activeAuthorizations.length : 0
+  );
+  countCheck(
+    "loadedInstructions",
+    Array.isArray(state.loadedInstructions) ? state.loadedInstructions.length : 0,
+    Array.isArray(expected.loadedInstructions) ? expected.loadedInstructions.length : 0
+  );
+  countCheck(
+    "nextChainCounter",
+    typeof state.nextChainCounter === "number" ? state.nextChainCounter : 0,
+    typeof expected.nextChainCounter === "number" ? expected.nextChainCounter : 0
+  );
+  presenceCheck(
+    "persistedBrief",
+    state.persistedBrief ? 1 : 0,
+    expected.persistedBrief ? 1 : 0
+  );
+  presenceCheck(
+    "persistedReceipt",
+    state.persistedReceipt ? 1 : 0,
+    expected.persistedReceipt ? 1 : 0
+  );
+  presenceCheck("lastWalk", state.lastWalk ? 1 : 0, expected.lastWalk ? 1 : 0);
+  presenceCheck(
+    "lastFireBreak",
+    state.lastFireBreak ? 1 : 0,
+    expected.lastFireBreak ? 1 : 0
+  );
+
+  const driftChecks = checks.filter((check) => check.status !== "ok");
+  return {
+    status: driftChecks.length === 0 ? "verified" : "drift",
+    driftCount: driftChecks.length,
+  };
+}
+
+function buildPostCompactAdditionalContext(verificationStatus, trigger, driftCount) {
+  if (verificationStatus === "verified") {
+    return `PostCompact verifier observed preserved governance state (trigger=${trigger}). Advisory only; no gating applied.`;
+  }
+
+  if (verificationStatus === "drift") {
+    return `PostCompact verifier observed governance-state drift after compaction (trigger=${trigger}, driftCount=${driftCount}). Advisory only; no gating applied.`;
+  }
+
+  return `PostCompact verifier could not compare against preserved pre-compact state (trigger=${trigger}, status=${verificationStatus}). Advisory only; no gating applied.`;
+}
+
+function handlePostCompact(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const trigger = clipText(input.trigger, 32, "unknown");
+    const compactSummary = clipText(input.compact_summary, MAX_TEXT_PREVIEW, null);
+    const snapshotResult = readPostCompactSnapshot(config);
+
+    let verificationStatus = snapshotResult.status;
+    let driftCount = 0;
+    let detail = snapshotResult.detail || null;
+
+    if (snapshotResult.status === "ok") {
+      const comparison = comparePostCompactState(state, snapshotResult.snapshot);
+      verificationStatus = comparison.status;
+      driftCount = comparison.driftCount;
+      detail = comparison.status === "verified" ? "preserved" : `${comparison.driftCount} drift checks`;
+    }
+
+    state.lastPostCompact = {
+      trigger,
+      verificationStatus,
+      driftCount,
+      compactSummary,
+      detail,
+      checkedAt: now,
+    };
+
+    appendChainEntry(state, {
+      eventType: "post_compact",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:PostCompact",
+      sourceLocation: `trigger:${trigger}`,
+      payload: {
+        action: "post_compact_verification",
+        verificationStatus,
+        driftCount,
+        compactSummary,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+    return {
+      hookSpecificOutput: {
+        hookEventName: "PostCompact",
+        additionalContext: buildPostCompactAdditionalContext(
+          verificationStatus,
+          trigger,
+          driftCount
+        ),
+      },
+    };
+  } catch (error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "PostCompact",
+        additionalContext: `FAIL_CLOSED: PostCompact internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
+      },
+    };
+  }
+}
+
+function handleStopFailure(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const errorType = clipText(input.error, 64, "unknown");
+    const errorDetails = clipText(input.error_details, MAX_TEXT_PREVIEW, null);
+    const lastAssistantMessage = clipText(input.last_assistant_message, MAX_TEXT_PREVIEW, null);
+
+    state.lastStopFailure = {
+      errorType,
+      errorDetails,
+      lastAssistantMessage,
+      observedAt: now,
+    };
+
+    appendChainEntry(state, {
+      eventType: "stop_failure",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:StopFailure",
+      sourceLocation: `error:${errorType}`,
+      payload: {
+        action: "stop_failure",
+        errorType,
+        errorDetails,
+        lastAssistantMessage,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+  } catch (_error) {
+    return {};
+  }
+
+  return {};
+}
+
+function handleSessionEnd(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const reason = clipText(input.reason, 64, "other");
+    const activeSubagentCount = Array.isArray(state.activeSubagents)
+      ? state.activeSubagents.length
+      : 0;
+
+    state.lastSessionEnd = {
+      reason,
+      activeSubagentCount,
+      endedAt: now,
+    };
+    state.activeSubagents = [];
+    state.subagentStopGate = {
+      lastBlockedSignature: null,
+      lastBlockedAt: null,
+      lastAgentId: null,
+    };
+
+    appendChainEntry(state, {
+      eventType: "session_end",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:SessionEnd",
+      sourceLocation: `reason:${reason}`,
+      payload: {
+        action: "session_end",
+        reason,
+        activeSubagentCount,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+    return {};
+  } catch (error) {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "SessionEnd",
+        additionalContext: `FAIL_CLOSED: SessionEnd internal error: ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
       },
     };
   }
@@ -1372,31 +2237,40 @@ function handlePostToolUseFailure(input, config, options) {
 }
 
 function handleConfigChange(input, config, options) {
+  const source = normalizeConfigChangeSource(input.source);
+  const filePath = clipText(input.file_path, MAX_TEXT_PREVIEW, null);
+  const blockable = isBlockableConfigSource(source);
+
   try {
     const state = loadSessionState(config, input.session_id);
     const now = resolveNow(options);
-
-    const source =
-      typeof input.source === "string" && input.source.trim() !== ""
-        ? input.source
-        : "unknown";
-
+    const workItem = filePath
+      ? `ConfigChange source=${source} file=${filePath}`
+      : `ConfigChange source=${source}`;
     const fingerprint = createToolFingerprint("ConfigChange", {
       source,
+      filePath,
       detectedAt: now,
     });
+
+    state.lastConfigChange = {
+      source,
+      filePath,
+      decision: blockable ? "block" : "observe",
+      observedAt: now,
+    };
 
     upsertByFingerprint(state.observedActions, fingerprint, {
       fingerprint,
       toolName: "ConfigChange",
-      workItem: `ConfigChange source=${source}`,
+      workItem,
       domainId: "auth_security_surfaces",
       domainLabel: "Auth / security surfaces",
-      autonomyLevel: "SUPERVISED",
+      autonomyLevel: blockable ? "HARD_STOP" : "SUPERVISED",
       operationType: "config_change",
       relativePath: undefined,
       command: undefined,
-      approvalState: "config_change_detected",
+      approvalState: blockable ? "config_change_blocked" : "config_change_detected",
       firstObservedAt: now,
       lastObservedAt: now,
     });
@@ -1406,20 +2280,44 @@ function handleConfigChange(input, config, options) {
       entryType: "OPERATOR_ACTION",
       sourceArtifact: "hook:ConfigChange",
       sourceLocation: `source:${source}`,
-      payload: { action: "config_change_detected", source },
+      payload: {
+        action: blockable ? "config_change_blocked" : "config_change_detected",
+        source,
+        filePath,
+      },
       sessionId: input.session_id,
       recordedAt: now,
     });
 
     saveSessionState(config, input.session_id, state);
 
+    if (blockable) {
+      return {
+        decision: "block",
+        reason: `ConfigChange blocked: source '${source}' is governed and cannot be changed during the active session.`,
+      };
+    }
+
+    const postureNote = isObserveOnlyConfigSource(source)
+      ? "Managed policy settings remain observe-only."
+      : "Enforcement continues under active posture.";
+
     return {
       hookSpecificOutput: {
         hookEventName: "ConfigChange",
-        additionalContext: `Governance config change detected (source=${source}). Profile=${config.profile.profileId}. Enforcement continues under active posture.`,
+        additionalContext: `Governance config change observed (source=${source}). Profile=${config.profile.profileId}. ${postureNote}`,
       },
     };
   } catch (error) {
+    if (blockable) {
+      return {
+        decision: "block",
+        reason: `FAIL_CLOSED: ConfigChange internal error for blockable source '${source}': ${
+          error && typeof error.message === "string" ? error.message : "unknown"
+        }`,
+      };
+    }
+
     return {
       hookSpecificOutput: {
         hookEventName: "ConfigChange",
@@ -1643,6 +2541,8 @@ function runHookEvent(eventName, input, options = {}) {
         resolveNow,
         saveSessionState,
       });
+    case "UserPromptSubmit":
+      return handleUserPromptSubmit(input, config, options);
     case "PreCompact":
       return handlePreCompactSlice({
         input,
@@ -1651,16 +2551,30 @@ function runHookEvent(eventName, input, options = {}) {
         loadSessionState,
         resolveNow,
       });
+    case "PostCompact":
+      return handlePostCompact(input, config, options);
     case "PreToolUse":
       return handlePreToolUse(input, config, options);
+    case "PermissionRequest":
+      return handlePermissionRequest(input, config, options);
+    case "PermissionDenied":
+      return handlePermissionDenied(input, config, options);
     case "PostToolUse":
       return handlePostToolUse(input, config, options);
     case "PostToolUseFailure":
       return handlePostToolUseFailure(input, config, options);
-    case "PermissionRequest":
-      return handlePermissionRequest(input, config, options);
+    case "Notification":
+      return handleNotification(input, config, options);
+    case "SubagentStart":
+      return handleSubagentStart(input, config, options);
+    case "SubagentStop":
+      return handleSubagentStop(input, config, options);
     case "Stop":
       return handleStop(input, config, options);
+    case "StopFailure":
+      return handleStopFailure(input, config, options);
+    case "SessionEnd":
+      return handleSessionEnd(input, config, options);
     case "ConfigChange":
       return handleConfigChange(input, config, options);
     case "CwdChanged":

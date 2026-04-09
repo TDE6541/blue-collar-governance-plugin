@@ -21,7 +21,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/FORENSIC_CHAIN.md` - authoritative Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` - authoritative Control Rod Mode v2 deterministic HARD_STOP LOTO + Permit contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` - authoritative Foreman's Walk Engine v1 post-session verification contract baseline
-- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - authoritative hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections through 11 lifecycle events)
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - authoritative hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections + Phase 1 lifecycle expansion; 19 lifecycle events)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - authoritative Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - authoritative Buddy System v1 watcher-only live oversight contract baseline
 - `docs/specs/WAVE7_TRUTH_LOCK.md` - authoritative Wave 7 umbrella truth lock and final seam-status/front-door sync for C1/C2/C3, the Work Order-only intake/scaffold/posture pilot chain, and parked scope

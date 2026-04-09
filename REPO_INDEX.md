@@ -49,7 +49,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/FORENSIC_CHAIN.md` - Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` - Control Rod Mode v2 deterministic HARD_STOP LOTO + Permit contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` - Foreman's Walk Engine v1 post-session verification contract baseline
-- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - Hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections through 11 lifecycle events)
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - Hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections + Phase 1 lifecycle expansion; 19 lifecycle events)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - Buddy System v1 watcher-only live oversight contract baseline
 - `docs/specs/WAVE7_TRUTH_LOCK.md` - Wave 7 umbrella truth lock and final seam-status/front-door sync for C1/C2/C3, the Work Order-only intake/scaffold/posture pilot chain, and parked scope
@@ -132,7 +132,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 
 ## Current State
 
-- The repo is on `main` with `origin` configured and current shipped truth running through Wave 5 (`/lockout` surface chain plus tranche 4 skins rendering), Wave 6A (fail-closed hook hardening, 11-event enforcement matrix, live chain population, permit/lockout runtime closure), and Wave 6B (InstructionsLoaded observability, `/loto-clearance` and `/issue-permit` authoring surfaces).
+- The repo is on `main` with `origin` configured and current shipped truth running through Wave 5 (`/lockout` surface chain plus tranche 4 skins rendering), Wave 6A (fail-closed hook hardening, live chain population, permit/lockout runtime closure), Wave 6B (InstructionsLoaded observability, `/loto-clearance` and `/issue-permit` authoring surfaces), and Phase 1 lifecycle expansion (19-event enforcement matrix).
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.

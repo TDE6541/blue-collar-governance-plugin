@@ -890,17 +890,17 @@ test("HookRuntime Stop fails closed with block on corrupted state file", () => {
   assert.match(result.reason, /FAIL_CLOSED/);
 });
 
-test("HookRuntime rejects unknown hook event names", () => {
+test("HookRuntime rejects unknown parked hook event names", () => {
   const projectDir = makeTempProject();
 
   assert.throws(
     () => {
       runHookEvent(
-        "SessionEnd",
+        "TeammateIdle",
         {
           session_id: "session-unknown-event",
           cwd: projectDir,
-          hook_event_name: "SessionEnd",
+          hook_event_name: "TeammateIdle",
         },
         {
           projectDir,
@@ -915,33 +915,42 @@ test("HookRuntime rejects unknown hook event names", () => {
   );
 });
 
-test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the eleven governed events", () => {
-  assert.equal(KNOWN_HOOK_EVENTS.size, 11);
+test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the nineteen governed events", () => {
+  assert.equal(KNOWN_HOOK_EVENTS.size, 19);
   assert.equal(KNOWN_HOOK_EVENTS.has("SessionStart"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("UserPromptSubmit"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PreCompact"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("PostCompact"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PreToolUse"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("PermissionRequest"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("PermissionDenied"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PostToolUse"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PostToolUseFailure"), true);
-  assert.equal(KNOWN_HOOK_EVENTS.has("PermissionRequest"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("Notification"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("SubagentStart"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("SubagentStop"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("Stop"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("StopFailure"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("SessionEnd"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("ConfigChange"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("CwdChanged"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("FileChanged"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("InstructionsLoaded"), true);
 });
 
-// --- Wave 6A Block B: Enforcement Matrix v1 Tests ---
+// --- ConfigChange enforcement upgrade tests ---
 
-test("HookRuntime ConfigChange records observation and returns advisory context", () => {
+test("HookRuntime ConfigChange blocks project_settings changes", () => {
   const projectDir = makeTempProject();
 
   const result = runHookEvent(
     "ConfigChange",
     {
-      session_id: "session-config-change",
+      session_id: "session-config-block",
       cwd: projectDir,
       hook_event_name: "ConfigChange",
-      source: "settings.json",
+      source: "project_settings",
+      file_path: path.join(projectDir, ".claude", "settings.json"),
     },
     {
       projectDir,
@@ -949,28 +958,24 @@ test("HookRuntime ConfigChange records observation and returns advisory context"
     }
   );
 
-  assert.equal(result.hookSpecificOutput.hookEventName, "ConfigChange");
-  assert.match(result.hookSpecificOutput.additionalContext, /config change detected/i);
-  assert.match(result.hookSpecificOutput.additionalContext, /source=settings\.json/);
+  assert.equal(result.decision, "block");
+  assert.match(result.reason, /project_settings/);
 
-  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-config-change");
-  const configAction = state.observedActions.find(
-    (a) => a.operationType === "config_change"
-  );
-  assert.ok(configAction, "Should record a config_change observation");
-  assert.equal(configAction.domainId, "auth_security_surfaces");
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-config-block");
+  assert.equal(state.lastConfigChange.source, "project_settings");
+  assert.equal(state.lastConfigChange.decision, "block");
 });
 
-test("HookRuntime ConfigChange does not return a blocking decision", () => {
+test("HookRuntime ConfigChange observes policy_settings without blocking", () => {
   const projectDir = makeTempProject();
 
   const result = runHookEvent(
     "ConfigChange",
     {
-      session_id: "session-config-no-block",
+      session_id: "session-config-policy",
       cwd: projectDir,
       hook_event_name: "ConfigChange",
-      source: "settings.json",
+      source: "policy_settings",
     },
     {
       projectDir,
@@ -979,14 +984,40 @@ test("HookRuntime ConfigChange does not return a blocking decision", () => {
   );
 
   assert.equal(result.hookSpecificOutput.hookEventName, "ConfigChange");
+  assert.match(result.hookSpecificOutput.additionalContext, /observe-only/i);
   assert.equal(result.decision, undefined);
-  assert.equal(
-    result.hookSpecificOutput.permissionDecision,
-    undefined
-  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-config-policy");
+  assert.equal(state.lastConfigChange.source, "policy_settings");
+  assert.equal(state.lastConfigChange.decision, "observe");
 });
 
-test("HookRuntime ConfigChange fails closed with advisory on corrupted state", () => {
+test("HookRuntime ConfigChange observes unknown sources without blocking", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "ConfigChange",
+    {
+      session_id: "session-config-unknown",
+      cwd: projectDir,
+      hook_event_name: "ConfigChange",
+      source: "settings.json",
+    },
+    {
+      projectDir,
+      now: "2026-04-03T10:02:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.hookEventName, "ConfigChange");
+  assert.equal(result.decision, undefined);
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-config-unknown");
+  assert.equal(state.lastConfigChange.source, "settings.json");
+  assert.equal(state.lastConfigChange.decision, "observe");
+});
+
+test("HookRuntime ConfigChange fails closed with block on corrupted state for blockable source", () => {
   const projectDir = makeTempProject();
   const config = resolveRuntimeConfig(projectDir);
   const statePath = getStateFilePath(config, "session-config-corrupt");
@@ -999,16 +1030,16 @@ test("HookRuntime ConfigChange fails closed with advisory on corrupted state", (
       session_id: "session-config-corrupt",
       cwd: projectDir,
       hook_event_name: "ConfigChange",
-      source: "settings.json",
+      source: "project_settings",
     },
     {
       projectDir,
-      now: "2026-04-03T10:02:00Z",
+      now: "2026-04-03T10:03:00Z",
     }
   );
 
-  assert.equal(result.hookSpecificOutput.hookEventName, "ConfigChange");
-  assert.match(result.hookSpecificOutput.additionalContext, /FAIL_CLOSED/);
+  assert.equal(result.decision, "block");
+  assert.match(result.reason, /FAIL_CLOSED/);
 });
 
 test("HookRuntime CwdChanged records directory change and returns advisory", () => {
@@ -1264,7 +1295,7 @@ test("HookRuntime ConfigChange writes OPERATOR_ACTION chain entry", () => {
       session_id: "session-chain-config",
       cwd: projectDir,
       hook_event_name: "ConfigChange",
-      source: "settings.json",
+      source: "project_settings",
     },
     {
       projectDir,
@@ -1278,7 +1309,7 @@ test("HookRuntime ConfigChange writes OPERATOR_ACTION chain entry", () => {
   );
   assert.ok(chainConfig, "Should have a ConfigChange chain entry");
   assert.equal(chainConfig.entryType, "OPERATOR_ACTION");
-  assert.equal(chainConfig.payload.action, "config_change_detected");
+  assert.equal(chainConfig.payload.action, "config_change_blocked");
 });
 
 test("HookRuntime FileChanged writes OPERATOR_ACTION chain entry", () => {
@@ -1850,4 +1881,509 @@ test("HookRuntime InstructionsLoaded state survives compaction", () => {
   const rehydrated = loadSessionState(config, "session-instr-compact-dst");
   assert.equal(rehydrated.loadedInstructions.length, 1);
   assert.equal(rehydrated.loadedInstructions[0].filePath, "/project/CLAUDE.md");
+});
+
+test("HookRuntime UserPromptSubmit blocks only approved exact phrases", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "UserPromptSubmit",
+    {
+      session_id: "session-prompt-block",
+      cwd: projectDir,
+      hook_event_name: "UserPromptSubmit",
+      prompt: "Please DISABLE HOOKS before you continue.",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:00:00Z",
+    }
+  );
+
+  assert.equal(result.decision, "block");
+  assert.match(result.reason, /disable hooks/i);
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-prompt-block");
+  assert.equal(state.lastUserPromptSubmit.blocked, true);
+  assert.equal(state.lastUserPromptSubmit.matchedPhrase, "disable hooks");
+  assert.equal(state.chainEntries[0].entryType, "OPERATOR_ACTION");
+  assert.equal(state.chainEntries[0].payload.action, "prompt_blocked");
+});
+
+test("HookRuntime UserPromptSubmit does not fuzzy-block near misses", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "UserPromptSubmit",
+    {
+      session_id: "session-prompt-allow",
+      cwd: projectDir,
+      hook_event_name: "UserPromptSubmit",
+      prompt: "Please turn off enforcements after the review.",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:01:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-prompt-allow");
+  assert.equal(state.lastUserPromptSubmit.blocked, false);
+  assert.equal(state.lastUserPromptSubmit.matchedPhrase, null);
+  assert.equal(state.chainEntries.length, 0);
+});
+
+test("HookRuntime PermissionDenied records observer state without retry", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "PermissionDenied",
+    {
+      session_id: "session-permission-denied",
+      cwd: projectDir,
+      hook_event_name: "PermissionDenied",
+      tool_name: "Bash",
+      tool_input: {
+        command: "rm -rf /tmp/build",
+        description: "Clean build directory",
+      },
+      reason: "Auto mode denied: command targets a path outside the project",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:02:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-permission-denied");
+  assert.equal(state.lastPermissionDenied.toolName, "Bash");
+  assert.match(state.lastPermissionDenied.reason, /Auto mode denied/);
+  assert.equal(state.chainEntries[0].payload.action, "permission_denied");
+});
+
+test("HookRuntime Notification records observer state only", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "Notification",
+    {
+      session_id: "session-notification",
+      cwd: projectDir,
+      hook_event_name: "Notification",
+      notification_type: "permission_prompt",
+      title: "Permission needed",
+      message: "Claude needs your permission to use Bash",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:03:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-notification");
+  assert.equal(state.lastNotification.notificationType, "permission_prompt");
+  assert.equal(state.chainEntries[0].payload.action, "notification_observed");
+});
+
+test("HookRuntime SubagentStart records bounded active subagent state", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "SubagentStart",
+    {
+      session_id: "session-subagent-start",
+      cwd: projectDir,
+      hook_event_name: "SubagentStart",
+      agent_id: "agent-01",
+      agent_type: "Explore",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:04:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-subagent-start");
+  assert.equal(state.activeSubagents.length, 1);
+  assert.equal(state.activeSubagents[0].agentId, "agent-01");
+  assert.equal(state.chainEntries[0].payload.action, "subagent_started");
+});
+
+test("HookRuntime SubagentStop stays bounded and does not read transcripts or instantiate ForemansWalk", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-subagent-stop-safe";
+  const config = resolveRuntimeConfig(projectDir);
+
+  runHookEvent(
+    "SubagentStart",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "SubagentStart",
+      agent_id: "agent-safe",
+      agent_type: "Explore",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:05:00Z",
+    }
+  );
+
+  const { ForemansWalk } = require("../../src/ForemansWalk");
+  let walkCalls = 0;
+  const originalEvaluate = ForemansWalk.prototype.evaluate;
+  ForemansWalk.prototype.evaluate = function patchedEvaluate() {
+    walkCalls += 1;
+    return originalEvaluate.apply(this, arguments);
+  };
+
+  const agentTranscriptPath = path.join(projectDir, "subagents", "agent-safe.jsonl");
+  const originalReadFileSync = fs.readFileSync;
+  fs.readFileSync = function patchedReadFileSync(filePath) {
+    if (String(filePath) === agentTranscriptPath) {
+      throw new Error("SubagentStop should not read agent transcripts");
+    }
+    return originalReadFileSync.apply(this, arguments);
+  };
+
+  try {
+    const result = runHookEvent(
+      "SubagentStop",
+      {
+        session_id: sessionId,
+        cwd: projectDir,
+        hook_event_name: "SubagentStop",
+        stop_hook_active: false,
+        agent_id: "agent-safe",
+        agent_type: "Explore",
+        agent_transcript_path: agentTranscriptPath,
+        last_assistant_message: "All done.",
+      },
+      {
+        projectDir,
+        now: "2026-04-04T09:06:00Z",
+      }
+    );
+
+    assert.deepEqual(result, {});
+  } finally {
+    fs.readFileSync = originalReadFileSync;
+    ForemansWalk.prototype.evaluate = originalEvaluate;
+  }
+
+  assert.equal(walkCalls, 0);
+  const state = loadSessionState(config, sessionId);
+  assert.equal(state.activeSubagents.length, 0);
+  assert.equal(state.lastSubagentStop.decision, "allow");
+});
+
+test("HookRuntime SubagentStop blocks when blocking Walk findings already exist in state", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-subagent-stop-blocking-walk";
+  const config = resolveRuntimeConfig(projectDir);
+
+  runHookEvent(
+    "SubagentStart",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "SubagentStart",
+      agent_id: "agent-blocking",
+      agent_type: "Explore",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:07:00Z",
+    }
+  );
+
+  const state = loadSessionState(config, sessionId);
+  state.lastWalk = {
+    findings: [
+      {
+        findingType: "TRUTHFULNESS_GAP",
+        severity: "HIGH",
+        summary: "Blocking finding still open",
+      },
+    ],
+  };
+  saveSessionState(config, sessionId, state);
+
+  const result = runHookEvent(
+    "SubagentStop",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "SubagentStop",
+      stop_hook_active: false,
+      agent_id: "agent-blocking",
+      agent_type: "Explore",
+      agent_transcript_path: path.join(projectDir, "subagents", "agent-blocking.jsonl"),
+      last_assistant_message: "Done.",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:08:00Z",
+    }
+  );
+
+  assert.equal(result.decision, "block");
+  assert.match(result.reason, /blocking Walk finding/);
+});
+
+test("HookRuntime SubagentStop blocks when blocked attempts remain permit-uncleared", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-subagent-stop-blocked-attempt";
+
+  runHookEvent(
+    "PreToolUse",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "pricing-engine.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { changed: true };",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:09:00Z",
+    }
+  );
+
+  runHookEvent(
+    "SubagentStart",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "SubagentStart",
+      agent_id: "agent-blocked-attempt",
+      agent_type: "Explore",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:10:00Z",
+    }
+  );
+
+  const result = runHookEvent(
+    "SubagentStop",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "SubagentStop",
+      stop_hook_active: false,
+      agent_id: "agent-blocked-attempt",
+      agent_type: "Explore",
+      agent_transcript_path: path.join(projectDir, "subagents", "agent-blocked-attempt.jsonl"),
+      last_assistant_message: "Done.",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:11:00Z",
+    }
+  );
+
+  assert.equal(result.decision, "block");
+  assert.match(result.reason, /permit-uncleared/);
+});
+
+test("HookRuntime PostCompact verifies preserved governance state without decision control", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+
+  runHookEvent(
+    "SessionStart",
+    {
+      session_id: "session-postcompact-src",
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "startup",
+    },
+    { projectDir, now: "2026-04-04T09:11:30Z" }
+  );
+
+  runHookEvent(
+    "InstructionsLoaded",
+    {
+      session_id: "session-postcompact-src",
+      cwd: projectDir,
+      hook_event_name: "InstructionsLoaded",
+      file_path: "/project/CLAUDE.md",
+      memory_type: "Project",
+      load_reason: "session_start",
+    },
+    { projectDir, now: "2026-04-04T09:12:00Z" }
+  );
+
+  runHookEvent(
+    "PreCompact",
+    {
+      session_id: "session-postcompact-src",
+      cwd: projectDir,
+      hook_event_name: "PreCompact",
+      trigger: "manual",
+    },
+    { projectDir, now: "2026-04-04T09:13:00Z" }
+  );
+
+  runHookEvent(
+    "SessionStart",
+    {
+      session_id: "session-postcompact-dst",
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "compact",
+    },
+    { projectDir, now: "2026-04-04T09:14:00Z" }
+  );
+
+  const result = runHookEvent(
+    "PostCompact",
+    {
+      session_id: "session-postcompact-dst",
+      cwd: projectDir,
+      hook_event_name: "PostCompact",
+      trigger: "manual",
+      compact_summary: "Summary of the compacted conversation.",
+    },
+    { projectDir, now: "2026-04-04T09:15:00Z" }
+  );
+
+  assert.equal(result.decision, undefined);
+  assert.equal(result.hookSpecificOutput.hookEventName, "PostCompact");
+  assert.match(result.hookSpecificOutput.additionalContext, /Advisory only/);
+
+  const state = loadSessionState(config, "session-postcompact-dst");
+  assert.equal(state.lastPostCompact.verificationStatus, "verified");
+  const postCompactEntry = state.chainEntries.find(
+    (entry) => entry.sourceArtifact === "hook:PostCompact"
+  );
+  assert.ok(postCompactEntry, "Should record PostCompact verification");
+});
+
+test("HookRuntime StopFailure records bounded error state", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "StopFailure",
+    {
+      session_id: "session-stop-failure",
+      cwd: projectDir,
+      hook_event_name: "StopFailure",
+      error: "rate_limit",
+      error_details: "Too many requests",
+      last_assistant_message: "API Error: Rate limit reached",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:16:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-stop-failure");
+  assert.equal(state.lastStopFailure.errorType, "rate_limit");
+  assert.equal(state.lastStopFailure.errorDetails, "Too many requests");
+  assert.equal(state.chainEntries[0].payload.action, "stop_failure");
+});
+
+test("HookRuntime SessionEnd records reason and clears active subagents", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-end-observer";
+
+  runHookEvent(
+    "SubagentStart",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "SubagentStart",
+      agent_id: "agent-end",
+      agent_type: "Explore",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:17:00Z",
+    }
+  );
+
+  const result = runHookEvent(
+    "SessionEnd",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "SessionEnd",
+      reason: "other",
+    },
+    {
+      projectDir,
+      now: "2026-04-04T09:18:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.lastSessionEnd.reason, "other");
+  assert.equal(state.activeSubagents.length, 0);
+  assert.equal(state.chainEntries.at(-1).payload.action, "session_end");
+});
+
+test("Repo hook registrations reflect the approved Phase 1 structural set", () => {
+  const settingsJson = JSON.parse(
+    fs.readFileSync(path.resolve(__dirname, "../../.claude/settings.json"), "utf8")
+  );
+  const pluginHooksJson = JSON.parse(
+    fs.readFileSync(path.resolve(__dirname, "../../hooks/hooks.json"), "utf8")
+  );
+
+  const expectedEvents = [
+    "SessionStart",
+    "UserPromptSubmit",
+    "PreCompact",
+    "PostCompact",
+    "PreToolUse",
+    "PermissionRequest",
+    "PermissionDenied",
+    "PostToolUse",
+    "PostToolUseFailure",
+    "Notification",
+    "SubagentStart",
+    "SubagentStop",
+    "Stop",
+    "StopFailure",
+    "SessionEnd",
+    "ConfigChange",
+    "CwdChanged",
+    "InstructionsLoaded",
+    "FileChanged",
+  ].sort();
+  const parkedEvents = [
+    "TaskCreated",
+    "TaskCompleted",
+    "TeammateIdle",
+    "WorktreeCreate",
+    "WorktreeRemove",
+    "Elicitation",
+    "ElicitationResult",
+  ];
+
+  assert.deepEqual(Object.keys(settingsJson.hooks).sort(), expectedEvents);
+  assert.deepEqual(Object.keys(pluginHooksJson.hooks).sort(), expectedEvents);
+  assert.equal(settingsJson.hooks.PermissionDenied[0].matcher, "Bash|Write|Edit");
+  assert.equal(pluginHooksJson.hooks.PermissionDenied[0].matcher, "Bash|Write|Edit");
+  assert.equal(settingsJson.hooks.FileChanged[0].matcher, ".claude/settings.json");
+  assert.equal(pluginHooksJson.hooks.FileChanged[0].matcher, ".claude/settings.json");
+
+  for (const eventName of parkedEvents) {
+    assert.equal(Object.prototype.hasOwnProperty.call(settingsJson.hooks, eventName), false);
+    assert.equal(Object.prototype.hasOwnProperty.call(pluginHooksJson.hooks, eventName), false);
+  }
 });
