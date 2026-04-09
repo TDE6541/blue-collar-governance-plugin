@@ -49,7 +49,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/FORENSIC_CHAIN.md` - Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` - Control Rod Mode v2 deterministic HARD_STOP LOTO + Permit contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` - Foreman's Walk Engine v1 post-session verification contract baseline
-- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - Hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections + Phase 1 lifecycle expansion; 19 lifecycle events)
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - Hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections + Phase 1/2 lifecycle expansion; 21 lifecycle events)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - Buddy System v1 watcher-only live oversight contract baseline
 - `docs/specs/WAVE7_TRUTH_LOCK.md` - Wave 7 umbrella truth lock and final seam-status/front-door sync for C1/C2/C3, the Work Order-only intake/scaffold/posture pilot chain, and parked scope
@@ -126,6 +126,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/WAVE6_CLOSEOUT.md` - durable Wave 6 full closeout evidence map
 - `docs/WAVE6_PROOF_PACK.md` - Wave 6 evaluator-facing proof pack
 - `docs/WAVE7_CLOSEOUT.md` - durable Wave 7 closeout evidence map
+- `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` - durable Phase 2 lifecycle expansion closeout evidence map
 - `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md` - durable Phase 1 lifecycle expansion closeout evidence map
 - `scripts/render-skill.js` - CC-native render wrapper for proof surface dispatch
 - `CLAUDE.md` - current session posture and closeout expectations
@@ -133,8 +134,9 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 
 ## Current State
 
-- The repo is on `main` with `origin` configured and current shipped truth running through Wave 5 (`/lockout` surface chain plus tranche 4 skins rendering), Wave 6A (fail-closed hook hardening, live chain population, permit/lockout runtime closure), Wave 6B (InstructionsLoaded observability, `/loto-clearance` and `/issue-permit` authoring surfaces), and Phase 1 lifecycle expansion (19-event enforcement matrix).
-- Phase 1 lifecycle expansion closeout is captured at `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md`, including current 19-event truth, remaining proof HOLDs, and historical 11-event time-point context for Wave 6/Wave 7 artifacts.
+- The repo is on `main` with `origin` configured and current shipped truth running through Wave 5 (`/lockout` surface chain plus tranche 4 skins rendering), Wave 6A (fail-closed hook hardening, live chain population, permit/lockout runtime closure), Wave 6B (InstructionsLoaded observability, `/loto-clearance` and `/issue-permit` authoring surfaces), and Phase 2 lifecycle expansion (21-event enforcement matrix).
+- Phase 2 lifecycle expansion closeout is captured at `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md`, including current 21-event truth, bounded MCP observability proof, and front-door sync status.
+- Phase 1 lifecycle expansion closeout remains the historical 19-event waypoint at `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md`.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.

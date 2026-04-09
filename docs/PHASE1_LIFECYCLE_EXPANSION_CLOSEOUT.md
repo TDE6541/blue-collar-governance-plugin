@@ -1,15 +1,15 @@
 # PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT
-**Status:** Phase 1 lifecycle expansion shipped; docs/history closeout prepared for Architect review
+**Status:** Historical Phase 1 lifecycle expansion closeout preserved as the 19-event waypoint
 **Date:** 2026-04-08
 
 ## Purpose
 
-This artifact is the durable closeout record for the Phase 1 lifecycle expansion aftermath. It captures shipped scope, current verification posture, and historical continuity across older closeouts.
+This artifact is the durable closeout record for the Phase 1 lifecycle expansion aftermath. It captures the Phase 1 shipped scope, the verification posture at that time, and historical continuity across older and newer closeouts.
 
 ## What shipped
 
 - Hook runtime lifecycle handling expanded from 11 events to 19 events.
-- Front-door truth surfaces are synced to the current 19-event lifecycle posture.
+- Front-door truth surfaces were synced at Phase 1 closeout time to the then-current 19-event lifecycle posture.
 - Verification snapshot is captured for full golden regression, HookRuntime golden coverage, and live hook-runtime integration coverage.
 - Historical records were preserved as time-point truth rather than rewritten.
 
@@ -29,7 +29,7 @@ This artifact is the durable closeout record for the Phase 1 lifecycle expansion
 
 ## Current proof posture
 
-- The runtime now ships 19 handled lifecycle events.
+- At Phase 1 closeout time, the runtime shipped 19 handled lifecycle events.
 - Legacy enforcement paths retain live proof posture (including live hook-runtime and external enforcement evidence already captured in prior proof surfaces).
 - Newly added Phase 1 handlers are currently covered by structural validation plus golden regression.
 - Natural live-trigger proof for those newly added handlers is still pending.
@@ -37,7 +37,7 @@ This artifact is the durable closeout record for the Phase 1 lifecycle expansion
 ## Historical count note
 
 - `docs/WAVE6_CLOSEOUT.md` and `docs/WAVE7_CLOSEOUT.md` remain correct as point-in-time records when they report 11 handled lifecycle events.
-- Current front-door truth reporting 19 handled lifecycle events is also correct for the present repo state.
+- Front-door truth reporting 19 handled lifecycle events was correct for the Phase 1 repo state at closeout time.
 - This is expected time progression, not a contradiction.
 
 ## Remaining HOLDs
@@ -47,16 +47,16 @@ This artifact is the durable closeout record for the Phase 1 lifecycle expansion
 
 ## Front-door sync status
 
-- This closeout records and supports current front-door lifecycle truth at 19 events.
+- This closeout records and supports the Phase 1 front-door lifecycle truth at 19 events.
 - Historical Wave 6/Wave 7 closeouts remain intact and unmodified as time-point artifacts.
 
 ## Next action
 
-- Hand back to Claude Code for merge-lane review and authority.
-- Preserve the remaining HOLD until natural live-trigger proof is captured for newly added handlers.
+- Preserve this artifact as the historical Phase 1 waypoint.
+- See `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` for the current 21-event lifecycle posture.
 
 ## Signoff status
 
-- Closeout artifact status: COMPLETE (docs/history pass).
+- Closeout artifact status: COMPLETE (historical docs pass).
 - Merge authority: Claude Code.
 - Final signoff authority: Tim (Architect).

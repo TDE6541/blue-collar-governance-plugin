@@ -25,7 +25,7 @@ This plugin exists to make the load-bearing governance seams deterministic and l
 
 ## How It Works
 
-The plugin registers hooks for nineteen Claude Code lifecycle events:
+The plugin registers hooks for twenty-one Claude Code lifecycle events:
 
 | Event | What happens |
 |-------|-------------|
@@ -44,6 +44,8 @@ The plugin registers hooks for nineteen Claude Code lifecycle events:
 | **Stop** | Evaluates a Foreman's Walk; blocks closeout if blocking findings exist |
 | **StopFailure** | Records stop-failure error type and details to the forensic chain |
 | **SessionEnd** | Records session-end reason; clears active-subagent state |
+| **Elicitation** | Records bounded observe-only MCP input requests; no response control or raw payload dump |
+| **ElicitationResult** | Records bounded observe-only MCP input results; no response override or behavioral mutation |
 | **ConfigChange** | Blocks governed config sources; observes policy_settings and unknown sources |
 | **CwdChanged** | Records working-directory changes; notes when outside project root |
 | **FileChanged** | Detects external changes to governance-relevant files; records to forensic chain |
@@ -136,16 +138,17 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 
 ## Proof
 
-- **Golden verification:** the current repo state passes 388 tests across 45 files under `tests/golden/`.
+- **Golden verification:** the current repo state passes 398 tests across 45 files under `tests/golden/`.
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
-- **Lifecycle expansion proof boundary:** 19 lifecycle events are shipped; legacy/runtime-covered paths have live proof, while newly added Phase 1 handlers currently have structural + golden proof pending natural live-trigger coverage.
+- **Lifecycle expansion proof boundary:** 21 lifecycle events are shipped; `Elicitation` and `ElicitationResult` now have bounded live proof, while the remaining newly added Phase 1 observer handlers still carry structural + golden proof pending natural live-trigger coverage.
 
 Detailed proof documentation:
 
 - `docs/WAVE7_CLOSEOUT.md` — Wave 7 closeout evidence map
-- `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 1 lifecycle expansion closeout, current proof posture, and historical 11-to-19 count note
+- `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 2 lifecycle expansion closeout, current 21-event proof posture, and MCP observe-only boundary
+- `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 1 lifecycle expansion closeout and 11-to-19 count note
 - `docs/BLUE_COLLAR_CODING_THESIS.md` — bounded thesis rider for the first front door
 - `docs/WAVE6_PROOF_PACK.md` — Wave 6 proof pack (fail-closed, enforcement breadth, cross-repo governance)
 - `docs/PLUGIN_CONVERSION_PROOF.md` — plugin validation and local smoke runbook

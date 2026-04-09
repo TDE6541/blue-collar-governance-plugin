@@ -44,7 +44,7 @@ They should currently be treated as alternate modes, not as one merged setup in 
 
 | Area | Current Truth |
 |---|---|
-| Hook runtime enforcement | Shipped through Phase 1 lifecycle expansion: 19 lifecycle events (`SessionStart`, `UserPromptSubmit`, `PreCompact`, `PostCompact`, `PreToolUse`, `PermissionRequest`, `PermissionDenied`, `PostToolUse`, `PostToolUseFailure`, `Notification`, `SubagentStart`, `SubagentStop`, `Stop`, `StopFailure`, `SessionEnd`, `ConfigChange`, `CwdChanged`, `FileChanged`, `InstructionsLoaded`) |
+| Hook runtime enforcement | Shipped through Phase 2 lifecycle expansion: 21 lifecycle events (`SessionStart`, `UserPromptSubmit`, `PreCompact`, `PostCompact`, `PreToolUse`, `PermissionRequest`, `PermissionDenied`, `PostToolUse`, `PostToolUseFailure`, `Notification`, `SubagentStart`, `SubagentStop`, `Stop`, `StopFailure`, `SessionEnd`, `Elicitation`, `ElicitationResult`, `ConfigChange`, `CwdChanged`, `FileChanged`, `InstructionsLoaded`) |
 | Compaction survival | Shipped (`PreCompact` preservation + bounded `SessionStart` re-injection for `startup`, `compact`, `resume`) |
 | Command-hook posture | Shipped as local deterministic fail-closed logic only |
 | Plugin artifact structure | Shipped locally (`.claude-plugin/plugin.json`, `hooks/hooks.json`, `skills/<name>/SKILL.md`) |
@@ -61,12 +61,12 @@ They should currently be treated as alternate modes, not as one merged setup in 
 
 ## Reproducible Runtime Proof Snapshot
 
-Point-in-time note: this table is a 2026-04-02 snapshot. For current Phase 1 lifecycle expansion verification counts and proof posture boundaries, see `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md`.
+Point-in-time note: this table is a 2026-04-09 snapshot. For current Phase 2 lifecycle expansion verification counts and proof posture boundaries, see `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md`.
 
-| Command | Result (2026-04-02) |
+| Command | Result (2026-04-09) |
 |---|---|
-| `node --test tests/golden/HookRuntime.golden.test.js` | PASS (`10` passed, `0` failed) |
-| `node --test tests/live/wave5.hook-runtime.live.test.js` | PASS (`3` passed, `0` failed) |
+| `node --test tests/golden/HookRuntime.golden.test.js` | PASS (`71` passed, `0` failed) |
+| `node --test tests/live/wave5.hook-runtime.live.test.js` | PASS (`6` passed, `0` failed) |
 | `claude --version` | PASS (`2.0.76`) |
 | `claude plugin --help` | PASS |
 | `if (Test-Path 'package.json') { 'PACKAGE_JSON_PRESENT' } else { 'PACKAGE_JSON_ABSENT' }` | `PACKAGE_JSON_ABSENT` |
