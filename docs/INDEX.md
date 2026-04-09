@@ -21,7 +21,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/FORENSIC_CHAIN.md` - authoritative Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` - authoritative Control Rod Mode v2 deterministic HARD_STOP LOTO + Permit contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` - authoritative Foreman's Walk Engine v1 post-session verification contract baseline
-- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - authoritative hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections + Phase 1/2 lifecycle expansion; 21 lifecycle events)
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - authoritative hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections + Phase 1/2 lifecycle expansion + Phase 3 Blocks A/B; 24 lifecycle events with `WorktreeCreate` and `WorktreeRemove` pending)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - authoritative Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - authoritative Buddy System v1 watcher-only live oversight contract baseline
 - `docs/specs/WAVE7_TRUTH_LOCK.md` - authoritative Wave 7 umbrella truth lock and final seam-status/front-door sync for C1/C2/C3, the Work Order-only intake/scaffold/posture pilot chain, and parked scope
@@ -69,6 +69,8 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/WAVE6_CLOSEOUT.md` - durable Wave 6 full closeout evidence map
 - `docs/WAVE6_PROOF_PACK.md` - Wave 6 evaluator-facing proof pack
 - `docs/WAVE7_CLOSEOUT.md` - durable Wave 7 closeout evidence map
+- `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md` - durable Phase 3 lifecycle expansion closeout evidence map
+- `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md` - durable Phase 3 structural lane closeout evidence map
 - `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` - durable Phase 2 lifecycle expansion closeout evidence map
 - `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md` - durable Phase 1 lifecycle expansion closeout evidence map
 
@@ -108,7 +110,9 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Blocks D, E, F, and G are shipped. The chain stops at reviewed artifacts only: intake object, scaffold object, and posture map. No protection-default bridge, SessionBrief bridge, hook-runtime integration, or execution path from intake/scaffold/posture is shipped.
 - Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 - Wave 7 closeout evidence map is implemented at `docs/WAVE7_CLOSEOUT.md`, and the bounded thesis rider is implemented at `docs/BLUE_COLLAR_CODING_THESIS.md`.
-- Phase 2 lifecycle expansion closeout is implemented at `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving current 21-event truth, bounded MCP observability proof, and front-door sync status.
+- Phase 3 lifecycle expansion closeout is implemented at `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving current 24-event truth, `WorktreeCreate`/`WorktreeRemove` pending boundary truth, and front-door sync status.
+- Phase 3 structural lane closeout is implemented at `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md`, preserving the A/B shipped and C held record.
+- Phase 2 lifecycle expansion closeout is implemented at `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving the historical 21-event waypoint and bounded MCP observability proof.
 - Phase 1 lifecycle expansion closeout is implemented at `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving the historical 19-event waypoint and 11-event time-point context.
 - Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.
 - `docs/indexes/` contains navigation support for governed maintenance.

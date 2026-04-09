@@ -25,7 +25,7 @@ This plugin exists to make the load-bearing governance seams deterministic and l
 
 ## How It Works
 
-The plugin registers hooks for twenty-one Claude Code lifecycle events:
+The plugin registers hooks for twenty-four Claude Code lifecycle events:
 
 | Event | What happens |
 |-------|-------------|
@@ -41,8 +41,11 @@ The plugin registers hooks for twenty-one Claude Code lifecycle events:
 | **Notification** | Records notification events for governance observability |
 | **SubagentStart** | Records subagent start; maintains bounded active-subagent state |
 | **SubagentStop** | Bounded Mini-Walk gate; blocks if unresolved governance findings exist |
+| **TaskCreated** | Tracks a bounded session-local task registry keyed by `task_id` |
+| **TaskCompleted** | Observes completion against that registry; writes bounded additive evidence for matched, mismatch, or orphan completion |
 | **Stop** | Evaluates a Foreman's Walk; blocks closeout if blocking findings exist |
 | **StopFailure** | Records stop-failure error type and details to the forensic chain |
+| **TeammateIdle** | Observe-only idle signal; writes additive evidence only when related open tasks remain |
 | **SessionEnd** | Records session-end reason; clears active-subagent state |
 | **Elicitation** | Records bounded observe-only MCP input requests; no response control or raw payload dump |
 | **ElicitationResult** | Records bounded observe-only MCP input results; no response override or behavioral mutation |
@@ -138,16 +141,18 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 
 ## Proof
 
-- **Golden verification:** the current repo state passes 398 tests across 45 files under `tests/golden/`.
+- **Golden verification:** the current repo state passes 406 tests in full golden regression.
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
-- **Lifecycle expansion proof boundary:** 21 lifecycle events are shipped; `Elicitation` and `ElicitationResult` now have bounded live proof, while the remaining newly added Phase 1 observer handlers still carry structural + golden proof pending natural live-trigger coverage.
+- **Lifecycle expansion proof boundary:** 24 handled official lifecycle events are shipped; `TaskCreated`, `TaskCompleted`, and `TeammateIdle` now have bounded proof; `WorktreeCreate` and `WorktreeRemove` remain pending, and `Setup` remains unclaimed.
 
 Detailed proof documentation:
 
 - `docs/WAVE7_CLOSEOUT.md` — Wave 7 closeout evidence map
-- `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 2 lifecycle expansion closeout, current 21-event proof posture, and MCP observe-only boundary
+- `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 3 finish-lane closeout, current 24-event posture, and public/history sync status
+- `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md` — Phase 3 structural closeout (Blocks A/B shipped, Block C held)
+- `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 2 lifecycle expansion closeout and 21-event waypoint
 - `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 1 lifecycle expansion closeout and 11-to-19 count note
 - `docs/BLUE_COLLAR_CODING_THESIS.md` — bounded thesis rider for the first front door
 - `docs/WAVE6_PROOF_PACK.md` — Wave 6 proof pack (fail-closed, enforcement breadth, cross-repo governance)
