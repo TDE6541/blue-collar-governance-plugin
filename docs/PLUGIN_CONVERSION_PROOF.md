@@ -38,7 +38,7 @@ Reason:
 
 The plugin artifact ships hooks and skills.
 
-The repoâ€™s current deny-first posture still depends on host-project `.claude/settings.json`:
+The repo's current deny-first posture still depends on host-project `.claude/settings.json`:
 
 - `permissions.deny` remains project-level
 - plugin root `settings.json` was not added because current Claude plugin defaults only support agent settings
@@ -96,7 +96,7 @@ Expected truth:
 
 ### Host-project deny layer
 
-If you want the same deny-first posture as the preserved standalone repo path, add the deny rules from this repoâ€™s `.claude/settings.json` to the host projectâ€™s `.claude/settings.json`.
+If you want the same deny-first posture as the preserved standalone repo path, add the deny rules from this repo's `.claude/settings.json` to the host project's `.claude/settings.json`.
 
 ## Narrow HOLD Boundary
 
