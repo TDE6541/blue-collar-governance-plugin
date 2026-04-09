@@ -140,10 +140,12 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
+- **Lifecycle expansion proof boundary:** 19 lifecycle events are shipped; legacy/runtime-covered paths have live proof, while newly added Phase 1 handlers currently have structural + golden proof pending natural live-trigger coverage.
 
 Detailed proof documentation:
 
 - `docs/WAVE7_CLOSEOUT.md` — Wave 7 closeout evidence map
+- `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 1 lifecycle expansion closeout, current proof posture, and historical 11-to-19 count note
 - `docs/BLUE_COLLAR_CODING_THESIS.md` — bounded thesis rider for the first front door
 - `docs/WAVE6_PROOF_PACK.md` — Wave 6 proof pack (fail-closed, enforcement breadth, cross-repo governance)
 - `docs/PLUGIN_CONVERSION_PROOF.md` — plugin validation and local smoke runbook
