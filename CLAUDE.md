@@ -202,6 +202,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - `raw/governed-workflow/` contains governed-workflow source docs and skills as reference inputs only.
 - `raw/starters/` contains starter/template source material only.
 - Reference inputs do not override canon and do not create runtime claims by themselves.
+- `docs/OWASP_AGENTIC_MAPPING.md` is a public reviewer-facing OWASP positioning/proof artifact; it is not a runtime contract baseline and does not widen package/install/marketplace claims.
 
 ## Required Sync Surfaces
 

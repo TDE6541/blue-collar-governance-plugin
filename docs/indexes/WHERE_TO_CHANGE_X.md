@@ -10,6 +10,7 @@ Use this index to find the right canon surface before making a change.
 - Change `CLAUDE.md` for AI operating posture, sync blockers, and closeout expectations.
 - Change `REPO_INDEX.md` for top-level repo navigation.
 - Change `docs/PLUGIN_CONVERSION_PROOF.md` for plugin conversion validation notes, deny-rule install truth, and local smoke runbook.
+- Change `docs/OWASP_AGENTIC_MAPPING.md` for public reviewer-facing OWASP security mapping/positioning copy (proof artifact; not runtime canon).
 
 ## Governance And Session Rules
 

@@ -155,6 +155,7 @@ Detailed proof documentation:
 - `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 2 lifecycle expansion closeout and 21-event waypoint
 - `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 1 lifecycle expansion closeout and 11-to-19 count note
 - `docs/BLUE_COLLAR_CODING_THESIS.md` — bounded thesis rider for the first front door
+- `docs/OWASP_AGENTIC_MAPPING.md` — public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
 - `docs/WAVE6_PROOF_PACK.md` — Wave 6 proof pack (fail-closed, enforcement breadth, cross-repo governance)
 - `docs/PLUGIN_CONVERSION_PROOF.md` — plugin validation and local smoke runbook
 - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` — hook runtime contract baseline

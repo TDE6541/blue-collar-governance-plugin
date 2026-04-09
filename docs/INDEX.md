@@ -30,6 +30,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/WORK_ORDER_POSTURE.md` - authoritative Work Order posture map contract baseline
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
+- `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
 - `docs/WAVE1_CLOSEOUT.md` - durable Wave 1 integration/proof closeout evidence map
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 integration/proof closeout evidence map
 - `docs/WAVE3_CLOSEOUT.md` - durable Wave 3 integration/proof closeout evidence map
