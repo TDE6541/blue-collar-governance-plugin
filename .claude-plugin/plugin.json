@@ -1,7 +1,12 @@
 {
   "name": "blue-collar-governance-plugin",
-  "version": "0.1.0",
-  "description": "Governed Claude Code hooks and skills with deterministic local enforcement.",
+  "version": "1.0.0",
+  "description": "Deterministic governance plugin for Claude Code with fail-closed hooks, forensic history, and post-session verification.",
+  "author": {
+    "name": "Tim Deavenport",
+    "url": "https://github.com/TDE6541"
+  },
+  "license": "MIT",
   "homepage": "https://github.com/TDE6541/blue-collar-governance-plugin",
   "repository": "https://github.com/TDE6541/blue-collar-governance-plugin",
   "skills": "./skills/",
