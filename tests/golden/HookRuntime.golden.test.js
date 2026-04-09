@@ -915,8 +915,8 @@ test("HookRuntime rejects unknown parked hook event names", () => {
   );
 });
 
-test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the nineteen governed events", () => {
-  assert.equal(KNOWN_HOOK_EVENTS.size, 19);
+test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the twenty-one governed events", () => {
+  assert.equal(KNOWN_HOOK_EVENTS.size, 21);
   assert.equal(KNOWN_HOOK_EVENTS.has("SessionStart"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("UserPromptSubmit"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PreCompact"), true);
@@ -932,6 +932,8 @@ test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the nineteen governed event
   assert.equal(KNOWN_HOOK_EVENTS.has("Stop"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("StopFailure"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("SessionEnd"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("Elicitation"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("ElicitationResult"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("ConfigChange"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("CwdChanged"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("FileChanged"), true);
@@ -2336,7 +2338,281 @@ test("HookRuntime SessionEnd records reason and clears active subagents", () => 
   assert.equal(state.chainEntries.at(-1).payload.action, "session_end");
 });
 
-test("Repo hook registrations reflect the approved Phase 1 structural set", () => {
+// --- Phase 2 MCP Lifecycle Observability Tests ---
+
+test("HookRuntime Elicitation records bounded normalized observation", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "Elicitation",
+    {
+      session_id: "session-elicitation",
+      cwd: projectDir,
+      hook_event_name: "Elicitation",
+      mcp_server_name: "github",
+      message: "Please authenticate to continue.",
+      mode: "form",
+      elicitation_id: "elicit-001",
+      requested_schema: {
+        type: "object",
+        properties: {
+          username: { type: "string" },
+          otp: { type: "string" },
+        },
+        required: ["username"],
+      },
+    },
+    { projectDir, now: "2026-04-09T09:00:00Z" }
+  );
+
+  assert.deepEqual(result, {});
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-elicitation");
+  assert.equal(state.lastElicitation.eventType, "Elicitation");
+  assert.equal(state.lastElicitation.mcpServerName, "github");
+  assert.equal(state.lastElicitation.messagePreview, "Please authenticate to continue.");
+  assert.equal(state.lastElicitation.mode, "form");
+  assert.equal(state.lastElicitation.elicitationId, "elicit-001");
+  assert.equal(state.lastElicitation.hasRequestedSchema, true);
+  assert.equal(state.lastElicitation.requestedSchemaShape, "object");
+  assert.equal(state.lastElicitation.requestedSchemaType, "object");
+  assert.equal(state.lastElicitation.requestedFieldCount, 2);
+  assert.equal(state.lastElicitation.requiredFieldCount, 1);
+});
+
+test("HookRuntime Elicitation normalizes URL mode without storing raw URL", () => {
+  const projectDir = makeTempProject();
+
+  runHookEvent(
+    "Elicitation",
+    {
+      session_id: "session-elicitation-url",
+      cwd: projectDir,
+      hook_event_name: "Elicitation",
+      mcp_server_name: "slack",
+      message: "Complete browser sign-in.",
+      mode: "url",
+      url: "https://auth.example.com/login?token=secret",
+    },
+    { projectDir, now: "2026-04-09T09:01:00Z" }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-elicitation-url");
+  const entry = state.chainEntries.find((item) => item.sourceArtifact === "hook:Elicitation");
+  assert.equal(state.lastElicitation.hasUrl, true);
+  assert.equal(state.lastElicitation.urlOrigin, "https://auth.example.com");
+  assert.equal(state.lastElicitation.hasRequestedSchema, false);
+  assert.equal(state.lastElicitation.requestedSchemaShape, "absent");
+  assert.ok(entry, "Should have an Elicitation chain entry");
+  assert.equal(entry.payload.urlOrigin, "https://auth.example.com");
+  assert.equal(entry.payload.url, undefined);
+});
+
+test("HookRuntime Elicitation tolerates malformed optional payload shapes", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "Elicitation",
+    {
+      session_id: "session-elicitation-malformed",
+      cwd: projectDir,
+      hook_event_name: "Elicitation",
+      mcp_server_name: "custom-server",
+      requested_schema: 42,
+      url: "not a url",
+    },
+    { projectDir, now: "2026-04-09T09:02:00Z" }
+  );
+
+  assert.deepEqual(result, {});
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-elicitation-malformed");
+  assert.equal(state.lastElicitation.messagePreview, "");
+  assert.equal(state.lastElicitation.mode, null);
+  assert.equal(state.lastElicitation.hasUrl, true);
+  assert.equal(state.lastElicitation.urlOrigin, null);
+  assert.equal(state.lastElicitation.requestedSchemaShape, "number");
+  assert.equal(state.lastElicitation.requestedFieldCount, 0);
+});
+
+test("HookRuntime Elicitation writes OPERATOR_ACTION chain entry without control output", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "Elicitation",
+    {
+      session_id: "session-elicitation-chain",
+      cwd: projectDir,
+      hook_event_name: "Elicitation",
+      mcp_server_name: "github",
+      message: "Authenticate.",
+      mode: "form",
+      requested_schema: {
+        type: "object",
+        properties: { code: { type: "string" } },
+      },
+    },
+    { projectDir, now: "2026-04-09T09:03:00Z" }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-elicitation-chain");
+  const entry = state.chainEntries.find((item) => item.sourceArtifact === "hook:Elicitation");
+  assert.ok(entry, "Should have an Elicitation chain entry");
+  assert.equal(entry.entryType, "OPERATOR_ACTION");
+  assert.equal(entry.payload.action, "elicitation_observed");
+  assert.equal(entry.payload.eventType, "Elicitation");
+  assert.equal(entry.payload.mcpServerName, "github");
+  assert.equal(result.decision, undefined);
+  assert.equal(result.hookSpecificOutput, undefined);
+});
+
+test("HookRuntime Elicitation stays non-governing on corrupted state", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  const statePath = getStateFilePath(config, "session-elicitation-corrupt");
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, "{bad json", "utf8");
+
+  const result = runHookEvent(
+    "Elicitation",
+    {
+      session_id: "session-elicitation-corrupt",
+      cwd: projectDir,
+      hook_event_name: "Elicitation",
+      mcp_server_name: "github",
+      message: "Authenticate.",
+    },
+    { projectDir, now: "2026-04-09T09:04:00Z" }
+  );
+
+  assert.deepEqual(result, {});
+});
+
+test("HookRuntime ElicitationResult records bounded normalized observation", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "ElicitationResult",
+    {
+      session_id: "session-elicitation-result",
+      cwd: projectDir,
+      hook_event_name: "ElicitationResult",
+      mcp_server_name: "github",
+      action: "accept",
+      mode: "form",
+      elicitation_id: "elicit-002",
+      content: { username: "alice", otp: "123456" },
+    },
+    { projectDir, now: "2026-04-09T09:05:00Z" }
+  );
+
+  assert.deepEqual(result, {});
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-elicitation-result");
+  assert.equal(state.lastElicitationResult.eventType, "ElicitationResult");
+  assert.equal(state.lastElicitationResult.mcpServerName, "github");
+  assert.equal(state.lastElicitationResult.action, "accept");
+  assert.equal(state.lastElicitationResult.mode, "form");
+  assert.equal(state.lastElicitationResult.elicitationId, "elicit-002");
+  assert.equal(state.lastElicitationResult.hasContent, true);
+  assert.equal(state.lastElicitationResult.contentShape, "object");
+  assert.equal(state.lastElicitationResult.contentFieldCount, 2);
+});
+
+test("HookRuntime ElicitationResult handles missing optional fields without overrides", () => {
+  const projectDir = makeTempProject();
+
+  runHookEvent(
+    "ElicitationResult",
+    {
+      session_id: "session-elicitation-result-minimal",
+      cwd: projectDir,
+      hook_event_name: "ElicitationResult",
+      mcp_server_name: "slack",
+      action: "decline",
+    },
+    { projectDir, now: "2026-04-09T09:06:00Z" }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-elicitation-result-minimal");
+  assert.equal(state.lastElicitationResult.mode, null);
+  assert.equal(state.lastElicitationResult.elicitationId, null);
+  assert.equal(state.lastElicitationResult.hasContent, false);
+  assert.equal(state.lastElicitationResult.contentShape, "absent");
+  assert.equal(state.lastElicitationResult.contentFieldCount, 0);
+});
+
+test("HookRuntime ElicitationResult summarizes malformed content without storing values", () => {
+  const projectDir = makeTempProject();
+
+  runHookEvent(
+    "ElicitationResult",
+    {
+      session_id: "session-elicitation-result-malformed",
+      cwd: projectDir,
+      hook_event_name: "ElicitationResult",
+      mcp_server_name: "custom-server",
+      action: "accept",
+      content: ["alice", "123456"],
+    },
+    { projectDir, now: "2026-04-09T09:07:00Z" }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-elicitation-result-malformed");
+  assert.equal(state.lastElicitationResult.contentShape, "array");
+  assert.equal(state.lastElicitationResult.contentFieldCount, 2);
+});
+
+test("HookRuntime ElicitationResult writes OPERATOR_ACTION chain entry without action override", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "ElicitationResult",
+    {
+      session_id: "session-elicitation-result-chain",
+      cwd: projectDir,
+      hook_event_name: "ElicitationResult",
+      mcp_server_name: "github",
+      action: "cancel",
+    },
+    { projectDir, now: "2026-04-09T09:08:00Z" }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), "session-elicitation-result-chain");
+  const entry = state.chainEntries.find((item) => item.sourceArtifact === "hook:ElicitationResult");
+  assert.ok(entry, "Should have an ElicitationResult chain entry");
+  assert.equal(entry.entryType, "OPERATOR_ACTION");
+  assert.equal(entry.payload.action, "elicitation_result_observed");
+  assert.equal(entry.payload.resultAction, "cancel");
+  assert.equal(entry.payload.eventType, "ElicitationResult");
+  assert.equal(entry.payload.mcpServerName, "github");
+  assert.equal(result.decision, undefined);
+  assert.equal(result.hookSpecificOutput, undefined);
+});
+
+test("HookRuntime ElicitationResult stays non-governing on corrupted state", () => {
+  const projectDir = makeTempProject();
+  const config = resolveRuntimeConfig(projectDir);
+  const statePath = getStateFilePath(config, "session-elicitation-result-corrupt");
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, "{bad json", "utf8");
+
+  const result = runHookEvent(
+    "ElicitationResult",
+    {
+      session_id: "session-elicitation-result-corrupt",
+      cwd: projectDir,
+      hook_event_name: "ElicitationResult",
+      mcp_server_name: "github",
+      action: "accept",
+      content: { code: "123456" },
+    },
+    { projectDir, now: "2026-04-09T09:09:00Z" }
+  );
+
+  assert.deepEqual(result, {});
+});
+test("Repo hook registrations reflect the approved Phase 2 MCP observability set", () => {
   const settingsJson = JSON.parse(
     fs.readFileSync(path.resolve(__dirname, "../../.claude/settings.json"), "utf8")
   );
@@ -2360,6 +2636,8 @@ test("Repo hook registrations reflect the approved Phase 1 structural set", () =
     "Stop",
     "StopFailure",
     "SessionEnd",
+    "Elicitation",
+    "ElicitationResult",
     "ConfigChange",
     "CwdChanged",
     "InstructionsLoaded",
@@ -2371,8 +2649,6 @@ test("Repo hook registrations reflect the approved Phase 1 structural set", () =
     "TeammateIdle",
     "WorktreeCreate",
     "WorktreeRemove",
-    "Elicitation",
-    "ElicitationResult",
   ];
 
   assert.deepEqual(Object.keys(settingsJson.hooks).sort(), expectedEvents);
@@ -2381,6 +2657,10 @@ test("Repo hook registrations reflect the approved Phase 1 structural set", () =
   assert.equal(pluginHooksJson.hooks.PermissionDenied[0].matcher, "Bash|Write|Edit");
   assert.equal(settingsJson.hooks.FileChanged[0].matcher, ".claude/settings.json");
   assert.equal(pluginHooksJson.hooks.FileChanged[0].matcher, ".claude/settings.json");
+  assert.equal(Object.prototype.hasOwnProperty.call(settingsJson.hooks.Elicitation[0], "matcher"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(pluginHooksJson.hooks.Elicitation[0], "matcher"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(settingsJson.hooks.ElicitationResult[0], "matcher"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(pluginHooksJson.hooks.ElicitationResult[0], "matcher"), false);
 
   for (const eventName of parkedEvents) {
     assert.equal(Object.prototype.hasOwnProperty.call(settingsJson.hooks, eventName), false);

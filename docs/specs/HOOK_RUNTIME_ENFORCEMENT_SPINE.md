@@ -1,5 +1,5 @@
 # HOOK_RUNTIME_ENFORCEMENT_SPINE.md
-**Status:** Hook runtime enforcement spine contract baseline (Slice 2 core + Wave 6A Slice 3/Blocks B-D + Wave 6B Block A + Phase 1 lifecycle structural lane; 19 lifecycle events)
+**Status:** Hook runtime enforcement spine contract baseline (Slice 2 core + Wave 6A Slice 3/Blocks B-D + Wave 6B Block A + Phase 1 lifecycle structural lane + Phase 2 MCP observe-only lane; 21 lifecycle events)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -531,6 +531,40 @@ Both `.claude/settings.json` and `hooks/hooks.json` register the same handled ev
 ### Contract Boundaries
 
 Phase 1 does not widen:
+
+- `ForensicChain`
+- `ForemansWalk`
+- `ControlRodMode`
+- `SessionBrief`
+- `SessionReceipt`
+
+All additive chain writes continue to use existing entry types only (`EVIDENCE`, `OPERATOR_ACTION`). `MIGRATIONS.md` remains unchanged.
+
+## Phase 2 MCP Lifecycle Observability Expansion
+
+Phase 2 widens handled lifecycle coverage from 19 to 21 by adding `Elicitation` and `ElicitationResult` as observe-only MCP lifecycle events. Official Claude Code hook docs allow these MCP lifecycle hooks to run as command or HTTP handlers, to match on MCP server name, and to block via exit code `2`; this phase intentionally does not use that control path. The runtime parses, normalizes, routes, and records additive observational evidence only.
+
+### New Event Handling
+
+| Event | Can block? | Behavior |
+|---|---|---|
+| `Elicitation` | No | Observer-only. Records bounded MCP user-input request state and additive chain entries. Preserves `mcp_server_name`, `elicitation_id`, `mode`, a clipped `message` preview, URL origin only when parseable, and requested-schema shape/count summary. Does not dump raw requested schema, raw URL text, or return decision output. |
+| `ElicitationResult` | No | Observer-only. Records bounded MCP user-input result state and additive chain entries. Preserves `mcp_server_name`, `action`, `elicitation_id`, `mode`, and content shape/count summary. Does not dump raw `content`, does not auto-accept/decline/cancel, and does not override the MCP response path. |
+
+### Registration Boundary
+
+Both `.claude/settings.json` and `hooks/hooks.json` register `Elicitation` and `ElicitationResult` without matchers. The official matcher surface is MCP server name, but this phase does not narrow or govern by server name; it only records additive runtime evidence when the events occur.
+
+### Chain Boundary
+
+Phase 2 reuses the existing additive hook-runtime chain envelope and existing entry types only:
+
+- `Elicitation` writes an `OPERATOR_ACTION` chain entry with `eventType: "elicitation"` and observer action `elicitation_observed`.
+- `ElicitationResult` writes an `OPERATOR_ACTION` chain entry with `eventType: "elicitation_result"`, observer action `elicitation_result_observed`, and the MCP result action preserved separately as `resultAction`.
+
+### Contract Boundaries
+
+Phase 2 does not widen:
 
 - `ForensicChain`
 - `ForemansWalk`

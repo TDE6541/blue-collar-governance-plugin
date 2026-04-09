@@ -97,6 +97,8 @@ const KNOWN_HOOK_EVENTS = new Set([
   "Stop",
   "StopFailure",
   "SessionEnd",
+  "Elicitation",
+  "ElicitationResult",
   "ConfigChange",
   "CwdChanged",
   "FileChanged",
@@ -459,6 +461,8 @@ function ensureLifecycleStateShape(state) {
   state.lastStopFailure = normalizeObjectOrNull(state.lastStopFailure);
   state.lastPostCompact = normalizeObjectOrNull(state.lastPostCompact);
   state.lastSessionEnd = normalizeObjectOrNull(state.lastSessionEnd);
+  state.lastElicitation = normalizeObjectOrNull(state.lastElicitation);
+  state.lastElicitationResult = normalizeObjectOrNull(state.lastElicitationResult);
 
   return state;
 }
@@ -497,6 +501,8 @@ function createEmptySessionState(sessionId, profile) {
     lastStopFailure: null,
     lastPostCompact: null,
     lastSessionEnd: null,
+    lastElicitation: null,
+    lastElicitationResult: null,
   });
 }
 
@@ -805,6 +811,123 @@ function findMatchedUserPromptPhrase(prompt) {
       return regex.test(prompt);
     }) || null
   );
+}
+
+function isPlainObjectValue(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function summarizeStructuredInput(value) {
+  if (value === undefined) {
+    return {
+      present: false,
+      shape: "absent",
+      fieldCount: 0,
+    };
+  }
+
+  if (Array.isArray(value)) {
+    return {
+      present: true,
+      shape: "array",
+      fieldCount: value.length,
+    };
+  }
+
+  if (isPlainObjectValue(value)) {
+    return {
+      present: true,
+      shape: "object",
+      fieldCount: Object.keys(value).length,
+    };
+  }
+
+  return {
+    present: true,
+    shape: typeof value,
+    fieldCount: 0,
+  };
+}
+
+function summarizeRequestedSchema(requestedSchema) {
+  const summary = summarizeStructuredInput(requestedSchema);
+  if (!summary.present) {
+    return {
+      hasRequestedSchema: false,
+      requestedSchemaShape: "absent",
+      requestedSchemaType: null,
+      requestedFieldCount: 0,
+      requiredFieldCount: 0,
+    };
+  }
+
+  const requestedFieldCount =
+    isPlainObjectValue(requestedSchema) && isPlainObjectValue(requestedSchema.properties)
+      ? Object.keys(requestedSchema.properties).length
+      : 0;
+  const requiredFieldCount =
+    isPlainObjectValue(requestedSchema) && Array.isArray(requestedSchema.required)
+      ? requestedSchema.required.filter(
+          (value) => typeof value === "string" && value.trim() !== ""
+        ).length
+      : 0;
+
+  return {
+    hasRequestedSchema: true,
+    requestedSchemaShape: summary.shape,
+    requestedSchemaType:
+      summary.shape === "object" ? clipText(requestedSchema.type, 32, null) : null,
+    requestedFieldCount,
+    requiredFieldCount,
+  };
+}
+
+function summarizeUrlOrigin(url) {
+  const urlValue = clipText(url, MAX_TEXT_PREVIEW, null);
+  if (!urlValue) {
+    return {
+      hasUrl: false,
+      urlOrigin: null,
+    };
+  }
+
+  try {
+    return {
+      hasUrl: true,
+      urlOrigin: new URL(urlValue).origin,
+    };
+  } catch (_error) {
+    return {
+      hasUrl: true,
+      urlOrigin: null,
+    };
+  }
+}
+
+function buildElicitationRecord(input) {
+  return {
+    eventType: "Elicitation",
+    mcpServerName: clipText(input.mcp_server_name, 128, "unknown"),
+    messagePreview: clipText(input.message, MAX_TEXT_PREVIEW, ""),
+    mode: clipText(input.mode, 32, null),
+    elicitationId: clipText(input.elicitation_id, 128, null),
+    ...summarizeUrlOrigin(input.url),
+    ...summarizeRequestedSchema(input.requested_schema),
+  };
+}
+
+function buildElicitationResultRecord(input) {
+  const contentSummary = summarizeStructuredInput(input.content);
+  return {
+    eventType: "ElicitationResult",
+    mcpServerName: clipText(input.mcp_server_name, 128, "unknown"),
+    action: clipText(input.action, 32, "unknown"),
+    mode: clipText(input.mode, 32, null),
+    elicitationId: clipText(input.elicitation_id, 128, null),
+    hasContent: contentSummary.present,
+    contentShape: contentSummary.shape,
+    contentFieldCount: contentSummary.fieldCount,
+  };
 }
 
 function normalizeConfigChangeSource(source) {
@@ -1763,6 +1886,71 @@ function handleSessionEnd(input, config, options) {
   }
 }
 
+function handleElicitation(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const record = buildElicitationRecord(input);
+
+    state.lastElicitation = {
+      ...record,
+      observedAt: now,
+    };
+
+    appendChainEntry(state, {
+      eventType: "elicitation",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:Elicitation",
+      sourceLocation: "mcp:" + record.mcpServerName,
+      payload: {
+        action: "elicitation_observed",
+        ...record,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+  } catch (_error) {
+    return {};
+  }
+
+  return {};
+}
+
+function handleElicitationResult(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const record = buildElicitationResultRecord(input);
+
+    state.lastElicitationResult = {
+      ...record,
+      observedAt: now,
+    };
+
+    appendChainEntry(state, {
+      eventType: "elicitation_result",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:ElicitationResult",
+      sourceLocation: "mcp:" + record.mcpServerName,
+      payload: {
+        ...record,
+        action: "elicitation_result_observed",
+        resultAction: record.action,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+  } catch (_error) {
+    return {};
+  }
+
+  return {};
+}
+
 function createHookDerivedBriefSnapshot(sessionId, controlRodProfile, createdAt) {
   return {
     briefId: `hook_brief_${sessionId}`,
@@ -2575,6 +2763,10 @@ function runHookEvent(eventName, input, options = {}) {
       return handleStopFailure(input, config, options);
     case "SessionEnd":
       return handleSessionEnd(input, config, options);
+    case "Elicitation":
+      return handleElicitation(input, config, options);
+    case "ElicitationResult":
+      return handleElicitationResult(input, config, options);
     case "ConfigChange":
       return handleConfigChange(input, config, options);
     case "CwdChanged":

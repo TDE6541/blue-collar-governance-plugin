@@ -156,6 +156,26 @@
         ]
       }
     ],
+    "Elicitation": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
+    "ElicitationResult": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
     "ConfigChange": [
       {
         "hooks": [

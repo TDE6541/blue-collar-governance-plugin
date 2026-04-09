@@ -10,6 +10,7 @@ const path = require("node:path");
 const {
   createEmptySessionState,
   getCompactionStateFilePath,
+  loadSessionState,
   resolveRuntimeConfig,
   runHookEvent,
   saveSessionState,
@@ -327,6 +328,73 @@ test("Wave7A walk render live proof: persisted runtime state survives compaction
     typeof walkRender.sessionSource === "string" &&
       walkRender.sessionSource.endsWith(`${targetSessionId}.json`)
   );
+});
+test("Wave5 hook runtime live proof: Elicitation request path stays observe-only while writing bounded evidence", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "Elicitation",
+    {
+      session_id: "wave5_hook_live_elicitation",
+      cwd: projectDir,
+      hook_event_name: "Elicitation",
+      mcp_server_name: "github",
+      message: "Please authenticate to continue.",
+      mode: "form",
+      elicitation_id: "elicit-live-001",
+      requested_schema: {
+        type: "object",
+        properties: { username: { type: "string" } },
+      },
+    },
+    { projectDir, now: "2026-04-09T10:00:00Z" }
+  );
+
+  assert.deepEqual(result, {});
+
+  const state = loadSessionState(
+    resolveRuntimeConfig(projectDir),
+    "wave5_hook_live_elicitation"
+  );
+  const entry = state.chainEntries.find((item) => item.sourceArtifact === "hook:Elicitation");
+  assert.equal(state.lastElicitation.mcpServerName, "github");
+  assert.equal(state.lastElicitation.requestedFieldCount, 1);
+  assert.ok(entry, "Should have an Elicitation chain entry");
+  assert.equal(entry.payload.action, "elicitation_observed");
+});
+
+test("Wave5 hook runtime live proof: ElicitationResult response path stays observe-only while writing bounded evidence", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "ElicitationResult",
+    {
+      session_id: "wave5_hook_live_elicitation_result",
+      cwd: projectDir,
+      hook_event_name: "ElicitationResult",
+      mcp_server_name: "github",
+      action: "accept",
+      mode: "form",
+      elicitation_id: "elicit-live-002",
+      content: { username: "alice", otp: "123456" },
+    },
+    { projectDir, now: "2026-04-09T10:01:00Z" }
+  );
+
+  assert.deepEqual(result, {});
+
+  const state = loadSessionState(
+    resolveRuntimeConfig(projectDir),
+    "wave5_hook_live_elicitation_result"
+  );
+  const entry = state.chainEntries.find(
+    (item) => item.sourceArtifact === "hook:ElicitationResult"
+  );
+  assert.equal(state.lastElicitationResult.action, "accept");
+  assert.equal(state.lastElicitationResult.contentFieldCount, 2);
+  assert.ok(entry, "Should have an ElicitationResult chain entry");
+  assert.equal(entry.payload.action, "elicitation_result_observed");
+  assert.equal(entry.payload.resultAction, "accept");
 });
 test("Wave5 hook runtime live proof: malformed hook posture throws before any allow path can proceed", () => {
   const projectDir = makeTempProject();
