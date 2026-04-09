@@ -56,6 +56,11 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/WORK_ORDER_INTAKE.md` - Work Order intake pilot contract baseline
 - `docs/specs/WORK_ORDER_SCAFFOLD.md` - governed scaffold generation contract baseline for the Work Order intake pilot
 - `docs/specs/WORK_ORDER_POSTURE.md` - visible Work Order posture map contract baseline for the Work Order intake pilot
+- `docs/specs/B_PRIME_RESTORATION_PHASE1_TRUTH_LOCK.md` - B' Phase 1 structural truth lock for restoration scope boundaries and migration guard
+- `docs/specs/RESTORATION_ENGINE.md` - B' Phase 1 RestorationEngine contract baseline (`UNVERIFIED`/`VERIFIED` only)
+- `docs/specs/RESOLVE_SKILL.md` - B' Phase 1 `/resolve` authoring surface contract baseline
+- `docs/specs/RESTORATION_SKILL.md` - B' Phase 1 `/restoration` read/query/render contract baseline
+- `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` - durable B' Phase 1 finish-lane closeout evidence map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 closeout evidence map
@@ -142,6 +147,10 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Structural lane detail for the shipped Phase 3 A/B seam work is preserved at `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md`.
 - Phase 2 lifecycle expansion closeout remains the historical 21-event waypoint at `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md`.
 - Phase 1 lifecycle expansion closeout remains the historical 19-event waypoint at `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md`.
+- B' Phase 1 restoration lane is shipped on `main`: `RestorationEngine`, `RestorationProjectionAdapter`, `/resolve`, and `/restoration` are implemented and bounded.
+- Verification states for restoration are exactly `UNVERIFIED` and `VERIFIED`; `PARTIAL` remains deferred.
+- Board projection remains continuity-linked and verified-only; manual-only and walk-only restored items stay visible on `/restoration` and do not enter Board projection unless continuity-linked and verified.
+- B' Phase 1 closeout is captured at `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md`; no shared contract widening shipped and `MIGRATIONS.md` remains unchanged.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.

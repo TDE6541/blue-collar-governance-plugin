@@ -102,6 +102,15 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/BLUE_COLLAR_CODING_THESIS.md` for the bounded thesis rider: runtime trust layer origin, first bounded front door, one intake pilot only, and no overclaim.
 - Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when the Wave 7 front-door sync for C1/C2/C3 seam status, Work Order-only pilot wording, intake/scaffold/posture boundary wording, closeout/thesis front-door links, the parked list, or the canonical-engine-vs-hook-snapshot boundary changes.
 
+## B' Restoration Phase 1 Truth
+
+- Change `docs/specs/B_PRIME_RESTORATION_PHASE1_TRUTH_LOCK.md` for Phase 1 restoration scope, frozen boundaries, Board-projection lock, persistence lock, and migration guard.
+- Change `docs/specs/RESTORATION_ENGINE.md` for `RestorationEngine` source-type, outcome, and verification-state contract truth (`UNVERIFIED`/`VERIFIED` only).
+- Change `docs/specs/RESOLVE_SKILL.md` for `/resolve` authoring behavior, deterministic projection-eligibility output, and `OPERATOR_ACTION` append shape.
+- Change `docs/specs/RESTORATION_SKILL.md` for `/restoration` read/query/render behavior, continuity-linked verified-only Board projection, and manual-only/walk-only visibility boundary.
+- Change `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` for the durable B' Phase 1 finish-lane closeout (acceptance status, HOLDs, blast radius, and signoff posture).
+- Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when front-door discoverability or bounded shipped-truth wording for B' Phase 1 changes.
+
 ## Wave 6A Runtime Truth
 
 - Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for Wave 6A Slice 3 fail-closed hook hardening, Block B enforcement matrix (ConfigChange/CwdChanged/FileChanged), Block C live chain population (PostToolUse/PostToolUseFailure/chain writes), and Block D permit/lockout runtime closure.

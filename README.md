@@ -115,6 +115,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Fail-closed hook runtime at `src/HookRuntime.js` and `src/HookRuntimeSlice2.js`
 - 31 operator-facing skills under `skills/<name>/SKILL.md`
 - Work Order pilot chain surfaces at `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`
+- B' Phase 1 restoration surfaces at `/resolve` and `/restoration`, backed by `RestorationEngine` and `RestorationProjectionAdapter`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance modules under `src/`, including engines, skill surfaces, and hook adapters
 - Golden and live verification under `tests/`
@@ -128,6 +129,14 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - The chain stops at reviewed artifacts only: intake object, scaffold object, and posture map.
 - No SessionBrief bridge, hook-runtime integration, or execution path from intake/scaffold/posture is shipped.
 
+## B' Restoration Phase 1
+
+- B' Phase 1 ships `RestorationEngine`, `RestorationProjectionAdapter`, `/resolve`, and `/restoration`.
+- Verification states are exactly `UNVERIFIED` and `VERIFIED`; `PARTIAL` remains deferred.
+- Board projection is continuity-linked and verified-only.
+- Manual-only and walk-only restored items stay visible on `/restoration` and do not enter Board projection unless continuity-linked and verified.
+- No shared contract widening ships in Phase 1; `MIGRATIONS.md` remains unchanged.
+
 ## What This Does Not Do
 
 - **No npm package or marketplace install.** There is no `package.json`. Load the repo directly with `--plugin-dir`.
@@ -138,6 +147,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - **No universal project compatibility claim.** The plugin has been proven on its own repo, on governed-workflow, and on one foreign production repo (FieldPoint). Broader compatibility is not yet validated.
 - **No multi-agent governance.** This is single-session, single-operator enforcement.
 - **No trust-transfer or certificate claims.** That work remains parked.
+- **No `PARTIAL` restoration verification state in Phase 1.** Verification states are locked to `UNVERIFIED` and `VERIFIED`.
 
 ## Proof
 
@@ -150,6 +160,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 Detailed proof documentation:
 
 - `docs/WAVE7_CLOSEOUT.md` — Wave 7 closeout evidence map
+- `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` — B' Phase 1 finish-lane closeout, acceptance status, and bounded HOLDs
 - `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 3 finish-lane closeout, current 24-event posture, and public/history sync status
 - `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md` — Phase 3 structural closeout (Blocks A/B shipped, Block C held)
 - `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 2 lifecycle expansion closeout and 21-event waypoint

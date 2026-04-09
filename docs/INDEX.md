@@ -28,6 +28,11 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/WORK_ORDER_INTAKE.md` - authoritative Work Order intake pilot contract baseline
 - `docs/specs/WORK_ORDER_SCAFFOLD.md` - authoritative Work Order scaffold generation contract baseline
 - `docs/specs/WORK_ORDER_POSTURE.md` - authoritative Work Order posture map contract baseline
+- `docs/specs/B_PRIME_RESTORATION_PHASE1_TRUTH_LOCK.md` - authoritative B' Phase 1 structural truth lock for restoration boundaries and migration guard
+- `docs/specs/RESTORATION_ENGINE.md` - authoritative B' Phase 1 RestorationEngine contract baseline (`UNVERIFIED`/`VERIFIED` only)
+- `docs/specs/RESOLVE_SKILL.md` - authoritative B' Phase 1 `/resolve` authoring surface contract baseline
+- `docs/specs/RESTORATION_SKILL.md` - authoritative B' Phase 1 `/restoration` read/query/render contract baseline
+- `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` - durable B' Phase 1 finish-lane closeout evidence map
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
@@ -111,6 +116,9 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Blocks D, E, F, and G are shipped. The chain stops at reviewed artifacts only: intake object, scaffold object, and posture map. No protection-default bridge, SessionBrief bridge, hook-runtime integration, or execution path from intake/scaffold/posture is shipped.
 - Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 - Wave 7 closeout evidence map is implemented at `docs/WAVE7_CLOSEOUT.md`, and the bounded thesis rider is implemented at `docs/BLUE_COLLAR_CODING_THESIS.md`.
+- B' Phase 1 restoration lane is shipped: `RestorationEngine`, `RestorationProjectionAdapter`, `/resolve`, and `/restoration` are implemented with verification states locked to `UNVERIFIED` and `VERIFIED` (`PARTIAL` deferred).
+- B' Phase 1 board projection remains continuity-linked and verified-only; manual-only and walk-only restored items stay on `/restoration` unless continuity-linked and verified.
+- B' Phase 1 closeout is implemented at `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md`; no shared-contract widening shipped and `MIGRATIONS.md` remains unchanged.
 - Phase 3 lifecycle expansion closeout is implemented at `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving current 24-event truth, `WorktreeCreate`/`WorktreeRemove` pending boundary truth, and front-door sync status.
 - Phase 3 structural lane closeout is implemented at `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md`, preserving the A/B shipped and C held record.
 - Phase 2 lifecycle expansion closeout is implemented at `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving the historical 21-event waypoint and bounded MCP observability proof.
