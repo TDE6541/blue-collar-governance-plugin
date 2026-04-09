@@ -1,5 +1,5 @@
 # HOOK_RUNTIME_ENFORCEMENT_SPINE.md
-**Status:** Hook runtime enforcement spine contract baseline (Slice 2 core + Wave 6A Slice 3/Blocks B-D + Wave 6B Block A; 11 lifecycle events)
+**Status:** Hook runtime enforcement spine contract baseline (Slice 2 core + Wave 6A Slice 3/Blocks B-D + Wave 6B Block A + Phase 1 lifecycle structural lane; 19 lifecycle events)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -493,3 +493,49 @@ This utility is not:
 ### Contract Boundaries
 
 Block C does not widen shared runtime contracts and does not modify hook registration or session state. It documents a delivery utility for maintainability only. `MIGRATIONS.md` remains unchanged.
+
+## Phase 1 Structural Lifecycle Expansion
+
+Phase 1 widens handled lifecycle coverage from 11 to 19 without reopening parked scope. This is a structural hook-runtime slice only: no Agent tool classification, no multi-agent control room, no TaskCreated/TaskCompleted/TeammateIdle handling, no WorktreeCreate/WorktreeRemove handling, and no package/install/marketplace claims.
+
+### New Event Handling
+
+| Event | Can block? | Behavior |
+|---|---|---|
+| `UserPromptSubmit` | Yes, narrow only | Blocks only when the submitted prompt contains one of four exact case-insensitive phrases: `disable hooks`, `remove governance`, `bypass safety`, or `turn off enforcement`. No fuzzy or semantic matching. Blocked prompt attempts write additive `OPERATOR_ACTION` chain entries. |
+| `PermissionDenied` | No | Observer-only. Records denied matched-tool events in bounded state and additive chain entries. Does not request retry. |
+| `Notification` | No | Observer-only. Records bounded notification type/title/message state and additive chain entries. No decision control. |
+| `SubagentStart` | No | Observer-only. Records subagent start and maintains bounded active-subagent state. Does not inject governance instructions into the subagent. |
+| `SubagentStop` | Yes, bounded Mini-Walk only | Uses session state only. Does not instantiate `ForemansWalk`, does not read `agent_transcript_path`, and does not build a second findings substrate. May block only when blocking Walk findings are already present in session state, blocked attempts remain permit-uncleared, or bounded active-subagent state is structurally unsafe. |
+| `StopFailure` | No | Observer-only. Records error type/details through additive chain/state paths. Output remains non-governing. |
+| `PostCompact` | No | Verify-only. Compares current post-compact governance state against the preserved pre-compact snapshot, emits advisory context, and writes additive verification trail entries. No gating power is claimed. |
+| `SessionEnd` | No | Observer/finalizer only. Records end reason through additive chain/state paths and clears bounded active-subagent state. |
+
+### ConfigChange Upgrade
+
+`ConfigChange` remains source-governed only:
+
+- `policy_settings` -> observe only
+- `user_settings` -> blockable
+- `project_settings` -> blockable
+- `local_settings` -> blockable
+- `skills` -> blockable
+- unknown or missing source -> observe only
+
+Blockable sources return top-level `decision: "block"` and do not rely on tool/domain classification. `policy_settings` remains advisory only.
+
+### Registration Boundary
+
+Both `.claude/settings.json` and `hooks/hooks.json` register the same handled event set for this phase. `PermissionDenied` remains matcher-scoped to `Bash|Write|Edit`; the new lifecycle observers (`UserPromptSubmit`, `Notification`, `SubagentStart`, `SubagentStop`, `StopFailure`, `PostCompact`, `SessionEnd`) register without matchers.
+
+### Contract Boundaries
+
+Phase 1 does not widen:
+
+- `ForensicChain`
+- `ForemansWalk`
+- `ControlRodMode`
+- `SessionBrief`
+- `SessionReceipt`
+
+All additive chain writes continue to use existing entry types only (`EVIDENCE`, `OPERATOR_ACTION`). `MIGRATIONS.md` remains unchanged.
