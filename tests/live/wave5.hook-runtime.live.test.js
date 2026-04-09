@@ -396,6 +396,90 @@ test("Wave5 hook runtime live proof: ElicitationResult response path stays obser
   assert.equal(entry.payload.action, "elicitation_result_observed");
   assert.equal(entry.payload.resultAction, "accept");
 });
+test("Hook runtime live proof: TaskCreated and TaskCompleted keep registry state bounded while writing completion evidence", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "wave5_hook_live_task_registry";
+
+  const created = runHookEvent(
+    "TaskCreated",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCreated",
+      task_id: "task-live-001",
+      task_subject: "Implement lifecycle seam",
+      task_description: "Track task registry in hook runtime",
+      teammate_name: "implementer",
+      team_name: "my-project",
+    },
+    { projectDir, now: "2026-04-09T10:02:00Z" }
+  );
+
+  const completed = runHookEvent(
+    "TaskCompleted",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCompleted",
+      task_id: "task-live-001",
+      task_subject: "Implement lifecycle seam",
+      task_description: "Track task registry in hook runtime",
+      teammate_name: "implementer",
+      team_name: "my-project",
+    },
+    { projectDir, now: "2026-04-09T10:03:00Z" }
+  );
+
+  assert.deepEqual(created, {});
+  assert.deepEqual(completed, {});
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.trackedTasks.length, 0);
+  assert.equal(state.lastTaskLifecycle.eventType, "TaskCompleted");
+  assert.equal(state.lastTaskLifecycle.outcome, "completed");
+  assert.equal(state.chainEntries[0].payload.action, "task_completed");
+});
+
+test("Hook runtime live proof: TeammateIdle stays observe-only while surfacing open-task evidence", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "wave5_hook_live_teammate_idle";
+
+  runHookEvent(
+    "TaskCreated",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCreated",
+      task_id: "task-live-002",
+      task_subject: "Hold open task",
+      teammate_name: "researcher",
+      team_name: "my-project",
+    },
+    { projectDir, now: "2026-04-09T10:04:00Z" }
+  );
+
+  const result = runHookEvent(
+    "TeammateIdle",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TeammateIdle",
+      teammate_name: "researcher",
+      team_name: "my-project",
+    },
+    { projectDir, now: "2026-04-09T10:05:00Z" }
+  );
+
+  assert.deepEqual(result, {});
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  const entry = state.chainEntries.find((item) => item.sourceArtifact === "hook:TeammateIdle");
+  assert.equal(state.lastTeammateIdle.openTaskCount, 1);
+  assert.deepEqual(state.lastTeammateIdle.openTaskIds, ["task-live-002"]);
+  assert.ok(entry, "Should have a TeammateIdle chain entry");
+  assert.equal(entry.payload.action, "teammate_idle_with_open_tasks");
+});
+
 test("Wave5 hook runtime live proof: malformed hook posture throws before any allow path can proceed", () => {
   const projectDir = makeTempProject();
   const brokenSettingsPath = path.join(projectDir, ".claude", "settings.json");

@@ -9,6 +9,7 @@ const MAX_OBSERVED_ACTIONS = 128;
 const MAX_BLOCKED_ATTEMPTS = 128;
 const MAX_CHAIN_ENTRIES = 128;
 const MAX_LOADED_INSTRUCTIONS = 64;
+const MAX_TRACKED_TASKS = 64;
 const SESSION_START_SOURCES = new Set(["startup", "resume", "clear", "compact"]);
 const RECOVERY_SOURCES = new Set(["compact", "resume"]);
 
@@ -96,6 +97,7 @@ function createFallbackEmptyState(sessionId, profile) {
     activePermits: [],
     activeAuthorizations: [],
     loadedInstructions: [],
+    trackedTasks: [],
     stopGate: {
       lastBlockedSignature: null,
       lastBlockedAt: null,
@@ -104,6 +106,8 @@ function createFallbackEmptyState(sessionId, profile) {
     persistedReceipt: null,
     lastWalk: null,
     lastFireBreak: null,
+    lastTaskLifecycle: null,
+    lastTeammateIdle: null,
   };
 }
 
@@ -140,6 +144,9 @@ function ensureSessionStateShape(state, sessionId, profile, createEmptySessionSt
   base.loadedInstructions = Array.isArray(sourceState.loadedInstructions)
     ? cloneJsonValue(sourceState.loadedInstructions).slice(-MAX_LOADED_INSTRUCTIONS)
     : [];
+  base.trackedTasks = Array.isArray(sourceState.trackedTasks)
+    ? cloneJsonValue(sourceState.trackedTasks).slice(-MAX_TRACKED_TASKS)
+    : [];
   base.stopGate = normalizeStopGate(sourceState.stopGate);
   base.persistedBrief = cloneObjectOrNull(sourceState.persistedBrief);
   base.persistedReceipt = cloneObjectOrNull(sourceState.persistedReceipt);
@@ -151,6 +158,8 @@ function ensureSessionStateShape(state, sessionId, profile, createEmptySessionSt
     sourceState.lastFireBreak && typeof sourceState.lastFireBreak === "object" && !Array.isArray(sourceState.lastFireBreak)
       ? cloneJsonValue(sourceState.lastFireBreak)
       : null;
+  base.lastTaskLifecycle = cloneObjectOrNull(sourceState.lastTaskLifecycle);
+  base.lastTeammateIdle = cloneObjectOrNull(sourceState.lastTeammateIdle);
 
   if (
     sourceState.sessionStart &&
@@ -430,6 +439,9 @@ function applyRecoveredState(state, recoveredState) {
   state.loadedInstructions = Array.isArray(recoveredState.loadedInstructions)
     ? cloneJsonValue(recoveredState.loadedInstructions).slice(-MAX_LOADED_INSTRUCTIONS)
     : [];
+  state.trackedTasks = Array.isArray(recoveredState.trackedTasks)
+    ? cloneJsonValue(recoveredState.trackedTasks).slice(-MAX_TRACKED_TASKS)
+    : [];
   state.stopGate = normalizeStopGate(recoveredState.stopGate);
   state.persistedBrief = cloneObjectOrNull(recoveredState.persistedBrief);
   state.persistedReceipt = cloneObjectOrNull(recoveredState.persistedReceipt);
@@ -445,6 +457,8 @@ function applyRecoveredState(state, recoveredState) {
     !Array.isArray(recoveredState.lastFireBreak)
       ? cloneJsonValue(recoveredState.lastFireBreak)
       : null;
+  state.lastTaskLifecycle = cloneObjectOrNull(recoveredState.lastTaskLifecycle);
+  state.lastTeammateIdle = cloneObjectOrNull(recoveredState.lastTeammateIdle);
   state.profileId = recoveredState.profileId || state.profileId;
 }
 
@@ -453,10 +467,13 @@ function hasMeaningfulSessionState(state) {
     (Array.isArray(state.observedActions) && state.observedActions.length > 0) ||
     (Array.isArray(state.blockedAttempts) && state.blockedAttempts.length > 0) ||
     (Array.isArray(state.chainEntries) && state.chainEntries.length > 0) ||
+    (Array.isArray(state.trackedTasks) && state.trackedTasks.length > 0) ||
     (state.persistedBrief && typeof state.persistedBrief === "object") ||
     (state.persistedReceipt && typeof state.persistedReceipt === "object") ||
     (state.lastWalk && typeof state.lastWalk === "object") ||
-    (state.lastFireBreak && typeof state.lastFireBreak === "object")
+    (state.lastFireBreak && typeof state.lastFireBreak === "object") ||
+    (state.lastTaskLifecycle && typeof state.lastTaskLifecycle === "object") ||
+    (state.lastTeammateIdle && typeof state.lastTeammateIdle === "object")
   );
 }
 
@@ -579,6 +596,9 @@ function handlePreCompactSlice({ input, config, options, loadSessionState, resol
       loadedInstructions: Array.isArray(state.loadedInstructions)
         ? cloneJsonValue(state.loadedInstructions).slice(-MAX_LOADED_INSTRUCTIONS)
         : [],
+      trackedTasks: Array.isArray(state.trackedTasks)
+        ? cloneJsonValue(state.trackedTasks).slice(-MAX_TRACKED_TASKS)
+        : [],
       stopGate: normalizeStopGate(state.stopGate),
       persistedBrief: cloneObjectOrNull(state.persistedBrief),
       persistedReceipt: cloneObjectOrNull(state.persistedReceipt),
@@ -590,6 +610,8 @@ function handlePreCompactSlice({ input, config, options, loadSessionState, resol
         state.lastFireBreak && typeof state.lastFireBreak === "object" && !Array.isArray(state.lastFireBreak)
           ? cloneJsonValue(state.lastFireBreak)
           : null,
+      lastTaskLifecycle: cloneObjectOrNull(state.lastTaskLifecycle),
+      lastTeammateIdle: cloneObjectOrNull(state.lastTeammateIdle),
     },
   };
 

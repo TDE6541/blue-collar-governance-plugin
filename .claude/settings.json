@@ -154,6 +154,26 @@
         ]
       }
     ],
+    "TaskCreated": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
@@ -165,6 +185,16 @@
       }
     ],
     "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
       {
         "hooks": [
           {

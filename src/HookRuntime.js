@@ -94,8 +94,11 @@ const KNOWN_HOOK_EVENTS = new Set([
   "Notification",
   "SubagentStart",
   "SubagentStop",
+  "TaskCreated",
+  "TaskCompleted",
   "Stop",
   "StopFailure",
+  "TeammateIdle",
   "SessionEnd",
   "Elicitation",
   "ElicitationResult",
@@ -108,6 +111,8 @@ const KNOWN_HOOK_EVENTS = new Set([
 const MAX_CHAIN_ENTRIES = 128;
 const MAX_LOADED_INSTRUCTIONS = 64;
 const MAX_ACTIVE_SUBAGENTS = 16;
+const MAX_TRACKED_TASKS = 64;
+const MAX_IDLE_OPEN_TASK_REFS = 8;
 const MAX_TEXT_PREVIEW = 200;
 
 const AUTONOMY_PRIORITY = Object.freeze({
@@ -423,6 +428,39 @@ function normalizeActiveSubagents(items) {
   return capTail(normalized, MAX_ACTIVE_SUBAGENTS);
 }
 
+function normalizeTrackedTasks(items) {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  const normalized = [];
+  const seenTaskIds = new Set();
+
+  for (const item of items) {
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      continue;
+    }
+
+    const taskId = clipText(item.taskId, 128, null);
+    if (!taskId || seenTaskIds.has(taskId)) {
+      continue;
+    }
+
+    seenTaskIds.add(taskId);
+    normalized.push({
+      taskId,
+      taskSubject: clipText(item.taskSubject, MAX_TEXT_PREVIEW, "Untitled task"),
+      taskDescription: clipText(item.taskDescription, MAX_TEXT_PREVIEW, null),
+      teammateName: clipText(item.teammateName, 128, null),
+      teamName: clipText(item.teamName, 128, null),
+      createdAt: clipText(item.createdAt, 64, null),
+      lastTouchedAt: clipText(item.lastTouchedAt, 64, clipText(item.createdAt, 64, null)),
+    });
+  }
+
+  return capTail(normalized, MAX_TRACKED_TASKS);
+}
+
 function normalizeObjectOrNull(value) {
   return value && typeof value === "object" && !Array.isArray(value) ? value : null;
 }
@@ -446,18 +484,24 @@ function ensureLifecycleStateShape(state) {
   if (!Array.isArray(state.loadedInstructions)) {
     state.loadedInstructions = [];
   }
+  if (!Array.isArray(state.trackedTasks)) {
+    state.trackedTasks = [];
+  }
   if (typeof state.nextChainCounter !== "number" || state.nextChainCounter < 1) {
     state.nextChainCounter = (state.chainEntries.length || 0) + 1;
   }
 
   state.loadedInstructions = capTail(state.loadedInstructions, MAX_LOADED_INSTRUCTIONS);
   state.activeSubagents = normalizeActiveSubagents(state.activeSubagents);
+  state.trackedTasks = normalizeTrackedTasks(state.trackedTasks);
   state.subagentStopGate = normalizeSubagentStopGate(state.subagentStopGate);
   state.lastUserPromptSubmit = normalizeObjectOrNull(state.lastUserPromptSubmit);
   state.lastConfigChange = normalizeObjectOrNull(state.lastConfigChange);
   state.lastPermissionDenied = normalizeObjectOrNull(state.lastPermissionDenied);
   state.lastNotification = normalizeObjectOrNull(state.lastNotification);
   state.lastSubagentStop = normalizeObjectOrNull(state.lastSubagentStop);
+  state.lastTaskLifecycle = normalizeObjectOrNull(state.lastTaskLifecycle);
+  state.lastTeammateIdle = normalizeObjectOrNull(state.lastTeammateIdle);
   state.lastStopFailure = normalizeObjectOrNull(state.lastStopFailure);
   state.lastPostCompact = normalizeObjectOrNull(state.lastPostCompact);
   state.lastSessionEnd = normalizeObjectOrNull(state.lastSessionEnd);
@@ -480,6 +524,7 @@ function createEmptySessionState(sessionId, profile) {
     activeAuthorizations: [],
     loadedInstructions: [],
     activeSubagents: [],
+    trackedTasks: [],
     stopGate: {
       lastBlockedSignature: null,
       lastBlockedAt: null,
@@ -498,6 +543,8 @@ function createEmptySessionState(sessionId, profile) {
     lastPermissionDenied: null,
     lastNotification: null,
     lastSubagentStop: null,
+    lastTaskLifecycle: null,
+    lastTeammateIdle: null,
     lastStopFailure: null,
     lastPostCompact: null,
     lastSessionEnd: null,
@@ -968,6 +1015,111 @@ function removeActiveSubagent(state, agentId) {
   }
 
   state.activeSubagents = state.activeSubagents.filter((entry) => entry.agentId !== agentId);
+}
+
+function buildTaskIdentityFromInput(input) {
+  const taskId = clipText(input.task_id, 128, null);
+  if (!taskId) {
+    throw new Error("Hook input is missing 'task_id'.");
+  }
+
+  return {
+    taskId,
+    taskSubject: clipText(input.task_subject, MAX_TEXT_PREVIEW, "Untitled task"),
+    taskDescription: clipText(input.task_description, MAX_TEXT_PREVIEW, null),
+    teammateName: clipText(input.teammate_name, 128, null),
+    teamName: clipText(input.team_name, 128, null),
+  };
+}
+
+function createTrackedTaskRecord(taskIdentity, observedAt, previousRecord = null) {
+  return {
+    ...taskIdentity,
+    createdAt:
+      previousRecord && typeof previousRecord.createdAt === "string"
+        ? previousRecord.createdAt
+        : observedAt,
+    lastTouchedAt: observedAt,
+  };
+}
+
+function ensureTrackedTasks(state) {
+  if (!Array.isArray(state.trackedTasks)) {
+    state.trackedTasks = [];
+  }
+
+  state.trackedTasks = normalizeTrackedTasks(state.trackedTasks);
+  return state.trackedTasks;
+}
+
+function findTrackedTaskIndex(state, taskId) {
+  return ensureTrackedTasks(state).findIndex((task) => task.taskId === taskId);
+}
+
+function upsertTrackedTask(state, taskIdentity, observedAt) {
+  const trackedTasks = ensureTrackedTasks(state);
+  const existingIndex = trackedTasks.findIndex((task) => task.taskId === taskIdentity.taskId);
+  const existingTask = existingIndex >= 0 ? trackedTasks[existingIndex] : null;
+  const nextTask = createTrackedTaskRecord(taskIdentity, observedAt, existingTask);
+
+  if (existingIndex >= 0) {
+    trackedTasks[existingIndex] = nextTask;
+  } else {
+    trackedTasks.push(nextTask);
+  }
+
+  state.trackedTasks = capTail(trackedTasks, MAX_TRACKED_TASKS);
+  return existingTask;
+}
+
+function removeTrackedTask(state, taskId) {
+  const existingIndex = findTrackedTaskIndex(state, taskId);
+  if (existingIndex < 0) {
+    return null;
+  }
+
+  const trackedTasks = ensureTrackedTasks(state);
+  const [trackedTask] = trackedTasks.splice(existingIndex, 1);
+  state.trackedTasks = trackedTasks;
+  return trackedTask;
+}
+
+function compareTaskIdentity(expectedTask, actualTask) {
+  const mismatchFields = [];
+  const fields = [
+    ["taskSubject", expectedTask.taskSubject, actualTask.taskSubject],
+    ["taskDescription", expectedTask.taskDescription, actualTask.taskDescription],
+    ["teammateName", expectedTask.teammateName, actualTask.teammateName],
+    ["teamName", expectedTask.teamName, actualTask.teamName],
+  ];
+
+  for (const [fieldName, expectedValue, actualValue] of fields) {
+    if ((expectedValue || null) !== (actualValue || null)) {
+      mismatchFields.push(fieldName);
+    }
+  }
+
+  return mismatchFields;
+}
+
+function getIdleRelevantTrackedTasks(state, teammateName, teamName) {
+  const trackedTasks = ensureTrackedTasks(state);
+
+  if (teammateName) {
+    const teammateMatches = trackedTasks.filter((task) => task.teammateName === teammateName);
+    if (teammateMatches.length > 0) {
+      return teammateMatches;
+    }
+  }
+
+  if (teamName) {
+    const teamMatches = trackedTasks.filter((task) => task.teamName === teamName);
+    if (teamMatches.length > 0) {
+      return teamMatches;
+    }
+  }
+
+  return [];
 }
 
 function buildObservedToolWorkItem(toolName, toolInput, classification) {
@@ -1612,6 +1764,179 @@ function handleSubagentStop(input, config, options) {
   }
 }
 
+function handleTaskCreated(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const taskIdentity = buildTaskIdentityFromInput(input);
+    const existingTask = upsertTrackedTask(state, taskIdentity, now);
+    const mismatchFields = existingTask ? compareTaskIdentity(existingTask, taskIdentity) : [];
+    const outcome = existingTask
+      ? mismatchFields.length > 0
+        ? "registry_mismatch"
+        : "tracked_refresh"
+      : "tracked";
+
+    state.lastTaskLifecycle = {
+      eventType: "TaskCreated",
+      outcome,
+      taskId: taskIdentity.taskId,
+      taskSubject: taskIdentity.taskSubject,
+      teammateName: taskIdentity.teammateName,
+      teamName: taskIdentity.teamName,
+      mismatchFields,
+      trackedTaskCount: state.trackedTasks.length,
+      observedAt: now,
+    };
+
+    if (existingTask && mismatchFields.length > 0) {
+      appendChainEntry(state, {
+        eventType: "task_created",
+        entryType: "OPERATOR_ACTION",
+        sourceArtifact: "hook:TaskCreated",
+        sourceLocation: `task:${taskIdentity.taskId}`,
+        payload: {
+          action: "task_registry_mismatch",
+          taskId: taskIdentity.taskId,
+          taskSubject: taskIdentity.taskSubject,
+          taskDescription: taskIdentity.taskDescription,
+          teammateName: taskIdentity.teammateName,
+          teamName: taskIdentity.teamName,
+          mismatchFields,
+          trackedTaskSubject: existingTask.taskSubject,
+          trackedTaskDescription: existingTask.taskDescription,
+          trackedTeammateName: existingTask.teammateName,
+          trackedTeamName: existingTask.teamName,
+        },
+        sessionId: input.session_id,
+        recordedAt: now,
+      });
+    }
+
+    saveSessionState(config, input.session_id, state);
+    return {};
+  } catch (error) {
+    return {
+      systemMessage: `FAIL_CLOSED: TaskCreated internal error: ${
+        error && typeof error.message === "string" ? error.message : "unknown"
+      }`,
+    };
+  }
+}
+
+function handleTaskCompleted(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const taskIdentity = buildTaskIdentityFromInput(input);
+    const trackedTask = removeTrackedTask(state, taskIdentity.taskId);
+    const mismatchFields = trackedTask ? compareTaskIdentity(trackedTask, taskIdentity) : [];
+    const outcome = !trackedTask
+      ? "orphaned"
+      : mismatchFields.length > 0
+        ? "completion_mismatch"
+        : "completed";
+    const action = !trackedTask
+      ? "task_completion_orphaned"
+      : mismatchFields.length > 0
+        ? "task_completion_mismatch"
+        : "task_completed";
+
+    state.lastTaskLifecycle = {
+      eventType: "TaskCompleted",
+      outcome,
+      taskId: taskIdentity.taskId,
+      taskSubject: taskIdentity.taskSubject,
+      teammateName: taskIdentity.teammateName,
+      teamName: taskIdentity.teamName,
+      mismatchFields,
+      trackedTaskCount: ensureTrackedTasks(state).length,
+      observedAt: now,
+    };
+
+    appendChainEntry(state, {
+      eventType: "task_completed",
+      entryType: "OPERATOR_ACTION",
+      sourceArtifact: "hook:TaskCompleted",
+      sourceLocation: `task:${taskIdentity.taskId}`,
+      payload: {
+        action,
+        taskId: taskIdentity.taskId,
+        taskSubject: taskIdentity.taskSubject,
+        taskDescription: taskIdentity.taskDescription,
+        teammateName: taskIdentity.teammateName,
+        teamName: taskIdentity.teamName,
+        mismatchFields,
+        trackedTaskSubject: trackedTask ? trackedTask.taskSubject : null,
+        trackedTaskDescription: trackedTask ? trackedTask.taskDescription : null,
+        trackedTeammateName: trackedTask ? trackedTask.teammateName : null,
+        trackedTeamName: trackedTask ? trackedTask.teamName : null,
+      },
+      sessionId: input.session_id,
+      recordedAt: now,
+    });
+
+    saveSessionState(config, input.session_id, state);
+    return {};
+  } catch (error) {
+    return {
+      systemMessage: `FAIL_CLOSED: TaskCompleted internal error: ${
+        error && typeof error.message === "string" ? error.message : "unknown"
+      }`,
+    };
+  }
+}
+
+function handleTeammateIdle(input, config, options) {
+  try {
+    const state = loadSessionState(config, input.session_id);
+    const now = resolveNow(options);
+    const teammateName = clipText(input.teammate_name, 128, null);
+    const teamName = clipText(input.team_name, 128, null);
+    const trackedTaskCount = ensureTrackedTasks(state).length;
+    const relevantTasks = getIdleRelevantTrackedTasks(state, teammateName, teamName);
+    const openTaskIds = relevantTasks
+      .slice(0, MAX_IDLE_OPEN_TASK_REFS)
+      .map((task) => task.taskId);
+
+    state.lastTeammateIdle = {
+      teammateName,
+      teamName,
+      trackedTaskCount,
+      openTaskCount: relevantTasks.length,
+      openTaskIds,
+      observedAt: now,
+    };
+
+    if (relevantTasks.length > 0) {
+      appendChainEntry(state, {
+        eventType: "teammate_idle",
+        entryType: "OPERATOR_ACTION",
+        sourceArtifact: "hook:TeammateIdle",
+        sourceLocation: teammateName ? `teammate:${teammateName}` : `team:${teamName || "unknown"}`,
+        payload: {
+          action: "teammate_idle_with_open_tasks",
+          teammateName,
+          teamName,
+          openTaskCount: relevantTasks.length,
+          openTaskIds,
+        },
+        sessionId: input.session_id,
+        recordedAt: now,
+      });
+    }
+
+    saveSessionState(config, input.session_id, state);
+    return {};
+  } catch (error) {
+    return {
+      systemMessage: `FAIL_CLOSED: TeammateIdle internal error: ${
+        error && typeof error.message === "string" ? error.message : "unknown"
+      }`,
+    };
+  }
+}
+
 function readPostCompactSnapshot(config) {
   const snapshotPath = getCompactionStateFilePath(config);
   if (!fs.existsSync(snapshotPath)) {
@@ -1693,6 +2018,11 @@ function comparePostCompactState(state, snapshot) {
     Array.isArray(expected.loadedInstructions) ? expected.loadedInstructions.length : 0
   );
   countCheck(
+    "trackedTasks",
+    Array.isArray(state.trackedTasks) ? state.trackedTasks.length : 0,
+    Array.isArray(expected.trackedTasks) ? expected.trackedTasks.length : 0
+  );
+  countCheck(
     "nextChainCounter",
     typeof state.nextChainCounter === "number" ? state.nextChainCounter : 0,
     typeof expected.nextChainCounter === "number" ? expected.nextChainCounter : 0
@@ -1712,6 +2042,16 @@ function comparePostCompactState(state, snapshot) {
     "lastFireBreak",
     state.lastFireBreak ? 1 : 0,
     expected.lastFireBreak ? 1 : 0
+  );
+  presenceCheck(
+    "lastTaskLifecycle",
+    state.lastTaskLifecycle ? 1 : 0,
+    expected.lastTaskLifecycle ? 1 : 0
+  );
+  presenceCheck(
+    "lastTeammateIdle",
+    state.lastTeammateIdle ? 1 : 0,
+    expected.lastTeammateIdle ? 1 : 0
   );
 
   const driftChecks = checks.filter((check) => check.status !== "ok");
@@ -2757,10 +3097,16 @@ function runHookEvent(eventName, input, options = {}) {
       return handleSubagentStart(input, config, options);
     case "SubagentStop":
       return handleSubagentStop(input, config, options);
+    case "TaskCreated":
+      return handleTaskCreated(input, config, options);
+    case "TaskCompleted":
+      return handleTaskCompleted(input, config, options);
     case "Stop":
       return handleStop(input, config, options);
     case "StopFailure":
       return handleStopFailure(input, config, options);
+    case "TeammateIdle":
+      return handleTeammateIdle(input, config, options);
     case "SessionEnd":
       return handleSessionEnd(input, config, options);
     case "Elicitation":

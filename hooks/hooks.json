@@ -126,6 +126,26 @@
         ]
       }
     ],
+    "TaskCreated": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
@@ -137,6 +157,16 @@
       }
     ],
     "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/run-governance-hook.js\""
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
       {
         "hooks": [
           {

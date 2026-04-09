@@ -1,5 +1,5 @@
 # HOOK_RUNTIME_ENFORCEMENT_SPINE.md
-**Status:** Hook runtime enforcement spine contract baseline (Slice 2 core + Wave 6A Slice 3/Blocks B-D + Wave 6B Block A + Phase 1 lifecycle structural lane + Phase 2 MCP observe-only lane; 21 lifecycle events)
+**Status:** Hook runtime enforcement spine contract baseline (Slice 2 core + Wave 6A Slice 3/Blocks B-D + Wave 6B Block A + Phase 1 lifecycle structural lane + Phase 2 MCP observe-only lane + Phase 3 task/idle structural lane; 24 lifecycle events)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -565,6 +565,59 @@ Phase 2 reuses the existing additive hook-runtime chain envelope and existing en
 ### Contract Boundaries
 
 Phase 2 does not widen:
+
+- `ForensicChain`
+- `ForemansWalk`
+- `ControlRodMode`
+- `SessionBrief`
+- `SessionReceipt`
+
+All additive chain writes continue to use existing entry types only (`EVIDENCE`, `OPERATOR_ACTION`). `MIGRATIONS.md` remains unchanged.
+
+## Phase 3 Remaining Lifecycle Seams (Blocks A/B Shipped, Block C Held)
+
+Phase 3 widens handled lifecycle coverage from 21 to 24 by adding `TaskCreated`, `TaskCompleted`, and `TeammateIdle` in a bounded way while keeping worktree lifecycle seams parked. Task lifecycle state stays session-local and compaction-safe; `TeammateIdle` remains observe-only.
+
+### New Event Handling
+
+| Event | Can block? | Behavior |
+|---|---|---|
+| `TaskCreated` | No in this phase | Tracks a bounded session-local task registry keyed by `task_id`. Normal-path creates do not write chain entries. Re-creating the same `task_id` with changed bounded metadata writes an additive `OPERATOR_ACTION` mismatch entry. No task-stop or continue control is claimed. |
+| `TaskCompleted` | No in this phase | Compares completion input against the session-local task registry. Writes chain entries only for matched completion, completion mismatch, or orphaned completion. Removes the tracked task after comparison so the registry remains bounded. No task-completion gate is claimed. |
+| `TeammateIdle` | No in this phase | Observe-only. Records bounded teammate-idle state and writes additive evidence only when the same teammate or team still has tracked open tasks. Does not continue/stop teammates and does not claim team-governance control. |
+
+### Session State
+
+- `trackedTasks: []` — bounded session-local task registry (MAX_TRACKED_TASKS = 64)
+- `lastTaskLifecycle` — last task create/complete observation outcome
+- `lastTeammateIdle` — last teammate-idle observation with bounded open-task refs
+
+These fields survive `PreCompact` preservation and compact `SessionStart` rehydration. They do not widen shared contracts or public runtime claims.
+
+### Registration Boundary
+
+Both `.claude/settings.json` and `hooks/hooks.json` register `TaskCreated`, `TaskCompleted`, and `TeammateIdle` without matchers.
+
+`WorktreeCreate` and `WorktreeRemove` remain unregistered and therefore fail closed as unknown events in this phase.
+
+### Chain Boundary
+
+Phase 3 reuses the existing additive hook-runtime chain envelope and existing entry types only:
+
+- `TaskCreated` writes no normal-path chain entry.
+- `TaskCreated` writes an `OPERATOR_ACTION` entry only for `task_registry_mismatch` on reused `task_id`.
+- `TaskCompleted` writes `OPERATOR_ACTION` entries with actions `task_completed`, `task_completion_mismatch`, or `task_completion_orphaned`.
+- `TeammateIdle` writes an `OPERATOR_ACTION` entry only for `teammate_idle_with_open_tasks`.
+
+This keeps task lifecycle out of naive birth/death chain spam while still surfacing meaningful completion and anomaly evidence.
+
+### Block C Hold
+
+`WorktreeCreate` remains held because the official contract replaces default git worktree behavior, requires raw absolute-path stdout on success, and would need a sharper wrapper/orchestration contract than this bounded lane claims. `WorktreeRemove` remains parked with it.
+
+### Contract Boundaries
+
+Phase 3 does not widen:
 
 - `ForensicChain`
 - `ForemansWalk`

@@ -890,17 +890,18 @@ test("HookRuntime Stop fails closed with block on corrupted state file", () => {
   assert.match(result.reason, /FAIL_CLOSED/);
 });
 
-test("HookRuntime rejects unknown parked hook event names", () => {
+test("HookRuntime rejects remaining parked worktree hook event names", () => {
   const projectDir = makeTempProject();
 
   assert.throws(
     () => {
       runHookEvent(
-        "TeammateIdle",
+        "WorktreeCreate",
         {
           session_id: "session-unknown-event",
           cwd: projectDir,
-          hook_event_name: "TeammateIdle",
+          hook_event_name: "WorktreeCreate",
+          name: "feature-auth",
         },
         {
           projectDir,
@@ -915,8 +916,8 @@ test("HookRuntime rejects unknown parked hook event names", () => {
   );
 });
 
-test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the twenty-one governed events", () => {
-  assert.equal(KNOWN_HOOK_EVENTS.size, 21);
+test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the twenty-four governed events", () => {
+  assert.equal(KNOWN_HOOK_EVENTS.size, 24);
   assert.equal(KNOWN_HOOK_EVENTS.has("SessionStart"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("UserPromptSubmit"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("PreCompact"), true);
@@ -929,8 +930,11 @@ test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the twenty-one governed eve
   assert.equal(KNOWN_HOOK_EVENTS.has("Notification"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("SubagentStart"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("SubagentStop"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("TaskCreated"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("TaskCompleted"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("Stop"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("StopFailure"), true);
+  assert.equal(KNOWN_HOOK_EVENTS.has("TeammateIdle"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("SessionEnd"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("Elicitation"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("ElicitationResult"), true);
@@ -938,6 +942,354 @@ test("HookRuntime KNOWN_HOOK_EVENTS contains exactly the twenty-one governed eve
   assert.equal(KNOWN_HOOK_EVENTS.has("CwdChanged"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("FileChanged"), true);
   assert.equal(KNOWN_HOOK_EVENTS.has("InstructionsLoaded"), true);
+});
+
+test("HookRuntime TaskCreated tracks session-local tasks without chain spam", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-task-created";
+
+  const result = runHookEvent(
+    "TaskCreated",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCreated",
+      task_id: "task-001",
+      task_subject: "Implement user authentication",
+      task_description: "Add login and signup endpoints",
+      teammate_name: "implementer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:00:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.trackedTasks.length, 1);
+  assert.equal(state.trackedTasks[0].taskId, "task-001");
+  assert.equal(state.lastTaskLifecycle.eventType, "TaskCreated");
+  assert.equal(state.lastTaskLifecycle.outcome, "tracked");
+  assert.equal(state.chainEntries.length, 0);
+});
+
+test("HookRuntime TaskCreated writes mismatch evidence when the same task id changes shape", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-task-create-mismatch";
+
+  runHookEvent(
+    "TaskCreated",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCreated",
+      task_id: "task-001",
+      task_subject: "Implement user authentication",
+      task_description: "Add login and signup endpoints",
+      teammate_name: "implementer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:01:00Z",
+    }
+  );
+
+  runHookEvent(
+    "TaskCreated",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCreated",
+      task_id: "task-001",
+      task_subject: "Implement auth flow",
+      task_description: "Add login and signup endpoints",
+      teammate_name: "implementer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:02:00Z",
+    }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.trackedTasks.length, 1);
+  assert.equal(state.trackedTasks[0].taskSubject, "Implement auth flow");
+  assert.equal(state.lastTaskLifecycle.outcome, "registry_mismatch");
+  assert.deepEqual(state.lastTaskLifecycle.mismatchFields, ["taskSubject"]);
+  assert.equal(state.chainEntries.length, 1);
+  assert.equal(state.chainEntries[0].payload.action, "task_registry_mismatch");
+});
+
+test("HookRuntime TaskCompleted writes matched completion evidence and clears the tracked task", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-task-complete-match";
+
+  runHookEvent(
+    "TaskCreated",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCreated",
+      task_id: "task-002",
+      task_subject: "Wire governance docs",
+      task_description: "Sync task closeout docs",
+      teammate_name: "writer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:03:00Z",
+    }
+  );
+
+  const result = runHookEvent(
+    "TaskCompleted",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCompleted",
+      task_id: "task-002",
+      task_subject: "Wire governance docs",
+      task_description: "Sync task closeout docs",
+      teammate_name: "writer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:04:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.trackedTasks.length, 0);
+  assert.equal(state.lastTaskLifecycle.outcome, "completed");
+  assert.equal(state.chainEntries.length, 1);
+  assert.equal(state.chainEntries[0].payload.action, "task_completed");
+});
+
+test("HookRuntime TaskCompleted writes orphan evidence when no tracked task exists", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-task-complete-orphan";
+
+  const result = runHookEvent(
+    "TaskCompleted",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCompleted",
+      task_id: "task-003",
+      task_subject: "Run tests",
+      teammate_name: "tester",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:05:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.lastTaskLifecycle.outcome, "orphaned");
+  assert.equal(state.chainEntries.length, 1);
+  assert.equal(state.chainEntries[0].payload.action, "task_completion_orphaned");
+});
+
+test("HookRuntime TaskCompleted writes mismatch evidence when completion diverges from the tracked task", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-task-complete-mismatch";
+
+  runHookEvent(
+    "TaskCreated",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCreated",
+      task_id: "task-004",
+      task_subject: "Ship proof pack",
+      task_description: "Prepare proof artifacts",
+      teammate_name: "reviewer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:06:00Z",
+    }
+  );
+
+  runHookEvent(
+    "TaskCompleted",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCompleted",
+      task_id: "task-004",
+      task_subject: "Ship proof-pack",
+      task_description: "Prepare proof artifacts",
+      teammate_name: "reviewer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:07:00Z",
+    }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.trackedTasks.length, 0);
+  assert.equal(state.lastTaskLifecycle.outcome, "completion_mismatch");
+  assert.deepEqual(state.lastTaskLifecycle.mismatchFields, ["taskSubject"]);
+  assert.equal(state.chainEntries.length, 1);
+  assert.equal(state.chainEntries[0].payload.action, "task_completion_mismatch");
+});
+
+test("HookRuntime TeammateIdle stays observe-only when no related tracked tasks remain", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-teammate-idle-safe";
+
+  runHookEvent(
+    "TaskCreated",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCreated",
+      task_id: "task-005",
+      task_subject: "Prepare notes",
+      teammate_name: "writer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:08:00Z",
+    }
+  );
+
+  const result = runHookEvent(
+    "TeammateIdle",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TeammateIdle",
+      teammate_name: "reviewer",
+      team_name: "other-team",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:09:00Z",
+    }
+  );
+
+  assert.deepEqual(result, {});
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.lastTeammateIdle.openTaskCount, 0);
+  assert.equal(state.lastTeammateIdle.trackedTaskCount, 1);
+  assert.equal(state.chainEntries.length, 0);
+});
+
+test("HookRuntime TeammateIdle writes bounded evidence when related tracked tasks remain open", () => {
+  const projectDir = makeTempProject();
+  const sessionId = "session-teammate-idle-open-tasks";
+
+  runHookEvent(
+    "TaskCreated",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCreated",
+      task_id: "task-006",
+      task_subject: "Prepare diff",
+      teammate_name: "implementer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:10:00Z",
+    }
+  );
+
+  runHookEvent(
+    "TeammateIdle",
+    {
+      session_id: sessionId,
+      cwd: projectDir,
+      hook_event_name: "TeammateIdle",
+      teammate_name: "implementer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:11:00Z",
+    }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), sessionId);
+  assert.equal(state.lastTeammateIdle.openTaskCount, 1);
+  assert.deepEqual(state.lastTeammateIdle.openTaskIds, ["task-006"]);
+  assert.equal(state.chainEntries.length, 1);
+  assert.equal(state.chainEntries[0].payload.action, "teammate_idle_with_open_tasks");
+});
+
+test("HookRuntime trackedTasks survive compaction and compact SessionStart rehydrates task lifecycle state", () => {
+  const projectDir = makeTempProject();
+  const sourceSessionId = "session-task-compact-source";
+  const targetSessionId = "session-task-compact-target";
+
+  runHookEvent(
+    "TaskCreated",
+    {
+      session_id: sourceSessionId,
+      cwd: projectDir,
+      hook_event_name: "TaskCreated",
+      task_id: "task-007",
+      task_subject: "Carry task across compact",
+      teammate_name: "implementer",
+      team_name: "my-project",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:12:00Z",
+    }
+  );
+
+  runHookEvent(
+    "PreCompact",
+    {
+      session_id: sourceSessionId,
+      cwd: projectDir,
+      hook_event_name: "PreCompact",
+      trigger: "manual",
+      custom_instructions: "",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:13:00Z",
+    }
+  );
+
+  runHookEvent(
+    "SessionStart",
+    {
+      session_id: targetSessionId,
+      cwd: projectDir,
+      hook_event_name: "SessionStart",
+      source: "compact",
+    },
+    {
+      projectDir,
+      now: "2026-04-09T11:14:00Z",
+    }
+  );
+
+  const state = loadSessionState(resolveRuntimeConfig(projectDir), targetSessionId);
+  assert.equal(state.trackedTasks.length, 1);
+  assert.equal(state.trackedTasks[0].taskId, "task-007");
+  assert.equal(state.lastTaskLifecycle.eventType, "TaskCreated");
+  assert.equal(state.lastTaskLifecycle.taskId, "task-007");
 });
 
 // --- ConfigChange enforcement upgrade tests ---
@@ -2633,8 +2985,11 @@ test("Repo hook registrations reflect the approved Phase 2 MCP observability set
     "Notification",
     "SubagentStart",
     "SubagentStop",
+    "TaskCreated",
+    "TaskCompleted",
     "Stop",
     "StopFailure",
+    "TeammateIdle",
     "SessionEnd",
     "Elicitation",
     "ElicitationResult",
@@ -2644,9 +2999,6 @@ test("Repo hook registrations reflect the approved Phase 2 MCP observability set
     "FileChanged",
   ].sort();
   const parkedEvents = [
-    "TaskCreated",
-    "TaskCompleted",
-    "TeammateIdle",
     "WorktreeCreate",
     "WorktreeRemove",
   ];
