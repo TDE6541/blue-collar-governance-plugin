@@ -61,6 +61,8 @@ They should currently be treated as alternate modes, not as one merged setup in 
 
 ## Reproducible Runtime Proof Snapshot
 
+Point-in-time note: this table is a 2026-04-02 snapshot. For current Phase 1 lifecycle expansion verification counts and proof posture boundaries, see `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md`.
+
 | Command | Result (2026-04-02) |
 |---|---|
 | `node --test tests/golden/HookRuntime.golden.test.js` | PASS (`10` passed, `0` failed) |

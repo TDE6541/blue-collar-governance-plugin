@@ -69,6 +69,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/WAVE6_CLOSEOUT.md` - durable Wave 6 full closeout evidence map
 - `docs/WAVE6_PROOF_PACK.md` - Wave 6 evaluator-facing proof pack
 - `docs/WAVE7_CLOSEOUT.md` - durable Wave 7 closeout evidence map
+- `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md` - durable Phase 1 lifecycle expansion closeout evidence map
 
 ## Current State
 
@@ -106,6 +107,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Blocks D, E, F, and G are shipped. The chain stops at reviewed artifacts only: intake object, scaffold object, and posture map. No protection-default bridge, SessionBrief bridge, hook-runtime integration, or execution path from intake/scaffold/posture is shipped.
 - Parked/out of scope in Wave 7: package/install, marketplace, Agent governance, multi-agent governance, trust-transfer/certificate work, second intake skin, and future-gated Anthropic work.
 - Wave 7 closeout evidence map is implemented at `docs/WAVE7_CLOSEOUT.md`, and the bounded thesis rider is implemented at `docs/BLUE_COLLAR_CODING_THESIS.md`.
+- Phase 1 lifecycle expansion closeout is implemented at `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving current 19-event truth and historical 11-event time-point context.
 - Not claimed / not verified: `package.json` is absent; local plugin artifact structure is shipped, but marketplace installation, compatibility-layer claims, and end-to-end runtime setup claims remain unverified.
 - `docs/indexes/` contains navigation support for governed maintenance.
 - `docs/schemas/` is not present because no shared runtime schema has been established yet.

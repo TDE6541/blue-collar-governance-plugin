@@ -65,6 +65,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/WAVE5_BLOCK0_SUBSTRATE_GATE.md` for Block 0 substrate merit rubric and decisions (Operator Trust Ledger, Warranty, Scarcity Signal, SessionBrief no-widening).
 - Change `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md` for canonical startup path, runtime proof commands/results, and package/install posture truth.
 - Change `docs/WAVE5_CLOSEOUT.md` for the durable Wave 5 evidence map and final signoff-readiness state.
+- Change `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md` for durable Phase 1 lifecycle expansion closeout truth, proof posture boundaries, and historical 11-to-19 count continuity notes.
 - Change `docs/specs/OPERATOR_TRUST_LEDGER.md` for Wave 5A Block A operator trust lifecycle substrate contract shape and invariants.
 - Change `docs/specs/JOURNEYMAN_TRUST_ENGINE.md` for Wave 5A Block A deterministic trust decision contract shape and boundaries.
 - Change `docs/specs/WARRANTY_MONITOR.md` for Wave 5A Block B derived-only warranty monitoring contract shape and invariants.

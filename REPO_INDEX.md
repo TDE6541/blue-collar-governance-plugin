@@ -126,6 +126,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/WAVE6_CLOSEOUT.md` - durable Wave 6 full closeout evidence map
 - `docs/WAVE6_PROOF_PACK.md` - Wave 6 evaluator-facing proof pack
 - `docs/WAVE7_CLOSEOUT.md` - durable Wave 7 closeout evidence map
+- `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md` - durable Phase 1 lifecycle expansion closeout evidence map
 - `scripts/render-skill.js` - CC-native render wrapper for proof surface dispatch
 - `CLAUDE.md` - current session posture and closeout expectations
 - `README.md` - repo identity and current implementation truth
@@ -133,6 +134,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 ## Current State
 
 - The repo is on `main` with `origin` configured and current shipped truth running through Wave 5 (`/lockout` surface chain plus tranche 4 skins rendering), Wave 6A (fail-closed hook hardening, live chain population, permit/lockout runtime closure), Wave 6B (InstructionsLoaded observability, `/loto-clearance` and `/issue-permit` authoring surfaces), and Phase 1 lifecycle expansion (19-event enforcement matrix).
+- Phase 1 lifecycle expansion closeout is captured at `docs/PHASE1_LIFECYCLE_EXPANSION_CLOSEOUT.md`, including current 19-event truth, remaining proof HOLDs, and historical 11-event time-point context for Wave 6/Wave 7 artifacts.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.
