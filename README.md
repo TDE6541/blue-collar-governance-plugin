@@ -113,9 +113,10 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Claude plugin manifest at `.claude-plugin/plugin.json`
 - Plugin hook registry at `hooks/hooks.json`
 - Fail-closed hook runtime at `src/HookRuntime.js` and `src/HookRuntimeSlice2.js`
-- 31 operator-facing skills under `skills/<name>/SKILL.md`
+- 34 operator-facing skills under `skills/<name>/SKILL.md`
 - Work Order pilot chain surfaces at `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`
 - B' Phase 1 restoration surfaces at `/resolve` and `/restoration`, backed by `RestorationEngine` and `RestorationProjectionAdapter`
+- Confidence Gradient Phase 1 surfaces at `/confidence`, backed by `ConfidenceGradientEngine` and `ConfidenceSkill`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance modules under `src/`, including engines, skill surfaces, and hook adapters
 - Golden and live verification under `tests/`
@@ -137,6 +138,19 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Manual-only and walk-only restored items stay visible on `/restoration` and do not enter Board projection unless continuity-linked and verified.
 - No shared contract widening ships in Phase 1; `MIGRATIONS.md` remains unchanged.
 
+## Confidence Gradient Phase 1
+
+- Confidence Gradient Phase 1 ships `ConfidenceGradientEngine` and `/confidence`.
+- Shipped marker family is slash only; semicolon family is reserved and not executable in Phase 1.
+- Tier ladder is fixed to `WATCH (///)`, `GAP (////)`, `HOLD (/////)`, and `KILL (//////)`.
+- Scanning is deterministic and stateless over explicit file snapshots only.
+- Scan fence is bounded to `src/`, `hooks/`, `scripts/`, `.claude/`, and `*.js`.
+- Parsing is line-leading only with structural delimiter rules.
+- `/confidence` is read/query/render-only with no mutation path.
+- No shared contract widening ships in Phase 1; `MIGRATIONS.md` remains unchanged.
+- Hook/lifecycle/chain/board integration, temporal behavior, and semicolon-family execution remain outside Phase 1.
+- The current repo has zero line-leading slash markers in the Phase 1 scan fence, so the real repo scan currently returns an empty report.
+
 ## What This Does Not Do
 
 - **No npm package or marketplace install.** There is no `package.json`. Load the repo directly with `--plugin-dir`.
@@ -151,16 +165,18 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 
 ## Proof
 
-- **Golden verification:** the current repo state passes 406 tests in full golden regression.
+- **Golden verification:** the current repo state passes 454 tests in full golden regression.
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
 - **Lifecycle expansion proof boundary:** 24 handled official lifecycle events are shipped; `TaskCreated`, `TaskCompleted`, and `TeammateIdle` now have bounded proof; `WorktreeCreate` and `WorktreeRemove` remain pending, and `Setup` remains unclaimed.
+- **Confidence Phase 1 boundary proof:** `/confidence` is slash-only, deterministic, and read/query/render-only; semicolon-family execution and hook/lifecycle/temporal integration are deferred.
 
 Detailed proof documentation:
 
 - `docs/WAVE7_CLOSEOUT.md` — Wave 7 closeout evidence map
 - `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` — B' Phase 1 finish-lane closeout, acceptance status, and bounded HOLDs
+- `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` — Confidence Gradient Phase 1 finish-lane closeout, acceptance status, and bounded HOLDs
 - `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 3 finish-lane closeout, current 24-event posture, and public/history sync status
 - `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md` — Phase 3 structural closeout (Blocks A/B shipped, Block C held)
 - `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 2 lifecycle expansion closeout and 21-event waypoint

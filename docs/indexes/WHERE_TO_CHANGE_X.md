@@ -111,6 +111,13 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` for the durable B' Phase 1 finish-lane closeout (acceptance status, HOLDs, blast radius, and signoff posture).
 - Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when front-door discoverability or bounded shipped-truth wording for B' Phase 1 changes.
 
+## Confidence Gradient Phase 1 Truth
+
+- Change `docs/specs/CONFIDENCE_GRADIENT_ENGINE.md` for ConfidenceGradientEngine marker family rules, tier ladder, line-leading parser behavior, scan-fence boundaries, and deterministic/stateless report contract.
+- Change `docs/specs/CONFIDENCE_SKILL.md` and `skills/confidence/SKILL.md` for `/confidence` read/query/render behavior, deterministic mapping to engine output, and no-mutation boundaries.
+- Change `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` for the durable Confidence Gradient Phase 1 finish-lane closeout (acceptance status, HOLDs, blast radius, and signoff posture).
+- Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when Confidence front-door discoverability, bounded shipped-truth wording, or proof-count references change.
+
 ## Wave 6A Runtime Truth
 
 - Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for Wave 6A Slice 3 fail-closed hook hardening, Block B enforcement matrix (ConfigChange/CwdChanged/FileChanged), Block C live chain population (PostToolUse/PostToolUseFailure/chain writes), and Block D permit/lockout runtime closure.

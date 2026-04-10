@@ -61,6 +61,9 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/RESOLVE_SKILL.md` - B' Phase 1 `/resolve` authoring surface contract baseline
 - `docs/specs/RESTORATION_SKILL.md` - B' Phase 1 `/restoration` read/query/render contract baseline
 - `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` - durable B' Phase 1 finish-lane closeout evidence map
+- `docs/specs/CONFIDENCE_GRADIENT_ENGINE.md` - Confidence Gradient Phase 1 scanner contract baseline (slash-only markers, deterministic/stateless scan, bounded source fence)
+- `docs/specs/CONFIDENCE_SKILL.md` - Confidence Gradient Phase 1 `/confidence` read/query/render contract baseline
+- `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` - durable Confidence Gradient Phase 1 finish-lane closeout evidence map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 closeout evidence map
@@ -127,6 +130,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `skills/work-order-intake/SKILL.md` - Wave 7B `/work-order-intake` operator-facing intake pilot skill artifact
 - `skills/work-order-scaffold/SKILL.md` - Wave 7B `/work-order-scaffold` operator-facing scaffold pilot skill artifact
 - `skills/work-order-posture/SKILL.md` - Wave 7B `/work-order-posture` operator-facing posture pilot skill artifact
+- `skills/confidence/SKILL.md` - Confidence Gradient Phase 1 `/confidence` operator-facing read/query/render skill artifact
 - `docs/WAVE6A_CLOSEOUT.md` - durable Wave 6A closeout evidence map
 - `docs/WAVE6B_CLOSEOUT.md` - durable Wave 6B closeout evidence map
 - `docs/WAVE6_CLOSEOUT.md` - durable Wave 6 full closeout evidence map
@@ -151,6 +155,9 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Verification states for restoration are exactly `UNVERIFIED` and `VERIFIED`; `PARTIAL` remains deferred.
 - Board projection remains continuity-linked and verified-only; manual-only and walk-only restored items stay visible on `/restoration` and do not enter Board projection unless continuity-linked and verified.
 - B' Phase 1 closeout is captured at `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md`; no shared contract widening shipped and `MIGRATIONS.md` remains unchanged.
+- Confidence Gradient Phase 1 is shipped on `main`: `ConfidenceGradientEngine` and `/confidence` are implemented with slash-only markers (`///`, `////`, `/////`, `//////`), deterministic/stateless explicit-snapshot scan behavior, line-leading parser rules, and a scan fence locked to `src/`, `hooks/`, `scripts/`, `.claude/`, and `*.js`.
+- Confidence Phase 1 remains bounded: semicolon-family is reserved and not executable, `/confidence` is read/query/render-only, no shared-contract widening shipped, and no hook/lifecycle/chain/board/temporal integration is introduced.
+- Current repo scan posture for Confidence Phase 1 is empty: zero line-leading slash markers are present in the bounded scan fence, so the real repo scan returns an empty report.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.
@@ -225,7 +232,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Wave 5 skill topology shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, and Wave 7B Blocks D/E/F added `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`, bringing the total to 31 skills.
+- Wave 5 skill topology shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, Wave 7B Blocks D/E/F added `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`, B' Phase 1 added `/resolve` and `/restoration`, and Confidence Gradient Phase 1 added `/confidence`, bringing the total to 34 skills.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.

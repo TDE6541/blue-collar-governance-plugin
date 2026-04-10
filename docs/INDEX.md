@@ -33,6 +33,9 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/RESOLVE_SKILL.md` - authoritative B' Phase 1 `/resolve` authoring surface contract baseline
 - `docs/specs/RESTORATION_SKILL.md` - authoritative B' Phase 1 `/restoration` read/query/render contract baseline
 - `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` - durable B' Phase 1 finish-lane closeout evidence map
+- `docs/specs/CONFIDENCE_GRADIENT_ENGINE.md` - authoritative Confidence Gradient Phase 1 scanner contract baseline (slash-only markers, deterministic/stateless scan, bounded source fence)
+- `docs/specs/CONFIDENCE_SKILL.md` - authoritative Confidence Gradient Phase 1 `/confidence` read/query/render contract baseline
+- `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` - durable Confidence Gradient Phase 1 finish-lane closeout evidence map
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
@@ -92,7 +95,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 4 Buddy behavior is shipped as watcher-only; multi-agent control-room behavior is not shipped.
 - Wave 4 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave4.live-oversight.live.test.js` and closeout evidence exists at `docs/WAVE4_CLOSEOUT.md`.
 - Wave 5 is one narrative wave executed as 5A / 5B.
-- Wave 5 shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, and Wave 7B Blocks D/E/F added `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`, bringing the total to 31 skills. SessionBrief no-widening remains (`journeymanLevel` is not introduced).
+- Wave 5 shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, Wave 7B Blocks D/E/F added `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`, B' Phase 1 added `/resolve` and `/restoration`, and Confidence Gradient Phase 1 added `/confidence`, bringing the total to 34 skills. SessionBrief no-widening remains (`journeymanLevel` is not introduced).
 - Shipped now: Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub, Wave 5A Blocks A-C, Wave 5B Blocks A-D-E1, and the read-only or thin surfaces `/control-rods`, `/fire-break`, `/census`, `/diagnose`, `/keystone`, `/eliminate`, `/buddy-status`, `/change-order`, `/callout`, `/red-tag`, `/permit`, and `/lockout`.
 - Warranty remains derived-first in Wave 5 and HoldEngine Scarcity Signal remains derived-only enrichment.
 - Shipped skill tranches remain deterministic route adapters over existing engine truth with no hidden behavior.
@@ -119,6 +122,9 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - B' Phase 1 restoration lane is shipped: `RestorationEngine`, `RestorationProjectionAdapter`, `/resolve`, and `/restoration` are implemented with verification states locked to `UNVERIFIED` and `VERIFIED` (`PARTIAL` deferred).
 - B' Phase 1 board projection remains continuity-linked and verified-only; manual-only and walk-only restored items stay on `/restoration` unless continuity-linked and verified.
 - B' Phase 1 closeout is implemented at `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md`; no shared-contract widening shipped and `MIGRATIONS.md` remains unchanged.
+- Confidence Gradient Phase 1 is shipped: `ConfidenceGradientEngine` and `/confidence` are implemented with slash-only markers (`///`, `////`, `/////`, `//////`), deterministic/stateless explicit-snapshot scan behavior, and a bounded scan fence (`src/`, `hooks/`, `scripts/`, `.claude/`, `*.js`).
+- Confidence Gradient Phase 1 remains bounded: semicolon-family markers are reserved and not executable, `/confidence` is read/query/render-only, no shared-contract widening ships, and no hook/lifecycle/chain/board/temporal integration is introduced.
+- Confidence Gradient Phase 1 closeout is implemented at `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md`; current repo scan posture in the bounded fence is empty (zero line-leading slash markers).
 - Phase 3 lifecycle expansion closeout is implemented at `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving current 24-event truth, `WorktreeCreate`/`WorktreeRemove` pending boundary truth, and front-door sync status.
 - Phase 3 structural lane closeout is implemented at `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md`, preserving the A/B shipped and C held record.
 - Phase 2 lifecycle expansion closeout is implemented at `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving the historical 21-event waypoint and bounded MCP observability proof.
