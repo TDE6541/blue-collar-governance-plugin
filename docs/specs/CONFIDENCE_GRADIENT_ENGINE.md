@@ -1,18 +1,21 @@
-**Status:** Confidence Gradient Phase 1 scanner baseline plus Packet 2 additive required coverage extension (v2)
+**Status:** Confidence Gradient Phase 1 scanner baseline plus Packet 2 required coverage and Packet 3 snapshot extension (v3)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
 
 This document defines the current contract baseline for `ConfidenceGradientEngine`.
 
-`ConfidenceGradientEngine` now exposes two separate surfaces:
+`ConfidenceGradientEngine` now exposes three separate surfaces:
 
 - `scan(files)`
+- `buildSnapshot(files)`
 - `evaluateRequiredCoverage(files, policy)`
 
 `scan(files)` remains the frozen Phase 1 deterministic/stateless scanner over explicit file snapshots.
 
-`evaluateRequiredCoverage(files, policy)` is a Packet 2 additive evaluator that checks explicit policy targets against the same explicit file snapshots without mutating `scan(files)` truth.
+`buildSnapshot(files)` is a Packet 3 additive snapshot builder for later file-local marker comparison.
+
+`evaluateRequiredCoverage(files, policy)` remains the Packet 2 additive evaluator that checks explicit policy targets against the same explicit file snapshots without mutating `scan(files)` truth.
 
 ## Boundary
 
@@ -21,7 +24,7 @@ This document defines the current contract baseline for `ConfidenceGradientEngin
 - exact slash-family marker detection
 - deterministic file filtering inside the approved scan fence only
 - deterministic tier totals, file-by-file marker maps, and domain grouping
-- read-only grouping vocabulary derived from existing `ControlRodMode` truth
+- additive explicit snapshot capture for Confidence-local marker identity
 - additive required coverage evaluation over explicit file snapshots and explicit policy input only
 
 This spec does not define:
@@ -29,17 +32,15 @@ This spec does not define:
 - semicolon-family executable support
 - scanning `docs/`, `skills/`, `tests/`, `raw/`, `.git/`, or `node_modules/`
 - policy file reads from disk
-- domain-keyed policy
-- glob or pattern DSL policy
-- inheritance
-- marker-family overrides
+- automatic snapshot persistence
+- rename-aware or cross-file identity
 - reviewed-clean semantics
 - score, trend, percentage, or governance-health math
 - chain writes
 - board writes
 - lifecycle behavior
 - hook-runtime integration
-- temporal logic, stale-marker aging, or cross-session identity
+- temporal logic, stale-marker aging, or cross-session continuity substrates
 - heuristics, NLP, probabilistic filtering, or filesystem-presence proof
 
 ## Public And Internal Names
@@ -47,6 +48,7 @@ This spec does not define:
 - Public/operator-facing label: `Confidence Gradient`
 - Internal build name: `ConfidenceGradientEngine`
 - Phase 1 scan report object: `ConfidenceGradientReport`
+- Packet 3 snapshot object: `ConfidenceMarkerSnapshot`
 - Packet 2 additive report object: `RequiredCoverageReport`
 
 ## Marker Family Posture
@@ -68,14 +70,14 @@ This spec does not define:
 
 ## Scan Fence
 
-Confidence scan/evaluation is bounded to exactly:
+Confidence scan, snapshot capture, and required coverage evaluation are bounded to exactly:
 
 - `src/`
 - `hooks/`
 - `scripts/`
 - `.claude/`
 
-Confidence scan/evaluation accepts exactly one file type:
+Confidence scan and snapshot capture accept exactly one file type:
 
 - `*.js`
 
@@ -178,9 +180,30 @@ The engine does not read from disk. It scans only the provided file snapshots.
 | `tierTotals` | object | Yes | Group-local totals for `WATCH`, `GAP`, `HOLD`, and `KILL`. |
 | `filePaths` | string[] | Yes | Marker-bearing file paths in deterministic order. |
 
+## Packet 3 Snapshot Additive Layer
+
+Packet 3 adds one separate snapshot surface:
+
+- `buildSnapshot(files)`
+
+It does not widen or mutate `scan(files)` output.
+
+Snapshot capture rules are:
+
+- explicit only
+- versioned
+- caller-managed
+- deterministic
+- scan-fence-scoped
+- slash-only
+- no disk reads
+- no hidden writes
+
+Snapshot contract details are locked at `docs/specs/CONFIDENCE_MARKER_SNAPSHOT.md`.
+
 ## Packet 2 Required Coverage Additive Layer
 
-Packet 2 adds one separate evaluator:
+Packet 2 keeps one separate evaluator:
 
 - `evaluateRequiredCoverage(files, policy)`
 
@@ -203,32 +226,7 @@ No policy file means no required coverage evaluation.
 - Coverage rule is exact and fixed: a target is covered when slash-family marker count is at least `1`.
 - Semicolon-family content does not satisfy required coverage.
 
-`policy` shape:
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `version` | integer | Yes | Literal `1`. |
-| `targets` | object[] | Yes | Explicit required-coverage targets. |
-
-`targets` item shape:
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `id` | string | Yes | Deterministic target id. |
-| `filePath` | string | Yes | Exact path-normalizable target path. |
-
-Forbidden policy features in this baseline:
-
-- domains
-- globs
-- pattern DSL
-- inheritance
-- marker-family overrides
-- threshold knobs beyond implicit `>= 1`
-
 ## `RequiredCoverageReport` Output Contract
-
-`RequiredCoverageReport` is a separate report family from `ConfidenceGradientReport`.
 
 | Field | Type | Required | Description |
 |---|---|---|---|
@@ -238,25 +236,6 @@ Forbidden policy features in this baseline:
 | `evaluatedTargetCount` | integer | Yes | Count of valid in-scan-input targets actually evaluated for coverage. |
 | `findings` | object[] | Yes | Missing required coverage findings only. |
 | `policyErrors` | object[] | Yes | Deterministic policy/input errors only. |
-
-`findings` item shape:
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `code` | string | Yes | Literal `REQUIRED_COVERAGE_MISSING`. |
-| `policyTargetId` | string | Yes | Target id from the policy. |
-| `filePath` | string | Yes | Normalized target file path. |
-| `domain` | object | Yes | Deterministic file-path domain result using existing grouping truth. |
-| `markerCount` | integer | Yes | Observed slash-family marker count for the target file. |
-| `minimumMarkerCount` | integer | Yes | Literal `1`. |
-
-`policyErrors` item shape:
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `code` | string | Yes | One of the approved policy error codes below. |
-| `policyTargetId` | string or null | Yes | Target id when addressable; `null` when the invalidity is not target-addressable. |
-| `filePath` | string or null | Yes | Normalized target path when addressable; `null` when the invalidity is not target-addressable. |
 
 Approved policy error vocabulary:
 
@@ -269,20 +248,7 @@ Missing required coverage finding vocabulary:
 
 - `REQUIRED_COVERAGE_MISSING`
 
-## Required Coverage Evaluation Rules
-
-- evaluation is explicit opt-in only
-- evaluation uses the same explicit `files[]` posture as `scan(files)`
-- evaluation introduces no disk reads
-- evaluation introduces no semicolon-family counting
-- evaluation introduces no reviewed-clean semantics
-- evaluation introduces no score/trend/health math
-- outside-fence targets emit `POLICY_TARGET_OUTSIDE_SCAN_FENCE`
-- malformed policy version or malformed target structure emits `POLICY_TARGET_INVALID`
-- duplicate ids or duplicate normalized target paths emit `POLICY_TARGET_DUPLICATE`
-- valid in-fence targets absent from `files[]` emit `POLICY_TARGET_NOT_IN_SCAN_INPUT`
-- engine truth for missing targets is scan-input absence only, not filesystem absence
-- required coverage findings remain separate from observed marker truth
+Required coverage contract details are locked at `docs/specs/CONFIDENCE_REQUIRED_COVERAGE.md`.
 
 ## No-Ship Boundaries
 
@@ -291,12 +257,12 @@ Do not ship any change from this engine surface that:
 - mutates `scan(files)` contract meaning
 - reads the policy file from disk inside the engine
 - widens the scan fence
-- introduces domain-first or glob-first policy behavior
-- introduces inheritance
+- introduces automatic snapshot persistence
+- introduces rename-aware or cross-file continuity
 - introduces semicolon-family support
 - introduces reviewed-clean language
 - introduces score/trend/health math
-- introduces hook/lifecycle/chain/board/temporal/identity integration
+- introduces hook/lifecycle/chain/board/temporal integration
 - implies filesystem proof for `POLICY_TARGET_NOT_IN_SCAN_INPUT`
 
 ## Contract Invariants
@@ -309,6 +275,7 @@ Do not ship any change from this engine surface that:
 - `slash` is the only shipped marker family in this baseline.
 - `semicolon` remains reserved only.
 - `scan(files)` remains frozen for existing callers.
+- Snapshot capture remains a separate additive surface and never a `scan(files)` mutation.
 - Required coverage remains a separate report family and never a `scan(files)` mutation.
 - No chain, lifecycle, runtime, or hook integration is introduced.
 
@@ -316,4 +283,6 @@ Do not ship any change from this engine surface that:
 
 - Runtime implementation exists at `src/ConfidenceGradientEngine.js`.
 - Golden proof exists at `tests/golden/ConfidenceGradientEngine.golden.test.js`.
+- Snapshot contract is further locked at `docs/specs/CONFIDENCE_MARKER_SNAPSHOT.md`.
 - Required coverage policy contract is further locked at `docs/specs/CONFIDENCE_REQUIRED_COVERAGE.md`.
+- Packet 3 architecture lock lives at `docs/specs/PACKET3_MARKER_CONTINUITY_TRUTH_LOCK.md`.

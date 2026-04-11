@@ -12,6 +12,7 @@ const {
   REQUIRED_COVERAGE_POLICY_VERSION,
   RESERVED_MARKER_FAMILY,
   SCAN_FENCE,
+  SNAPSHOT_VERSION,
   TIER_DEFINITIONS,
   TIER_ORDER,
   UNCLASSIFIED_DOMAIN,
@@ -261,6 +262,179 @@ test("ConfidenceGradientEngine keeps .claude-rooted paths anchored under .claude
 
   assert.equal(report.totals.scannedFileCount, 1);
   assert.equal(report.files[0].filePath, ".claude/hooks/run-governance-hook.js");
+});
+
+test("ConfidenceGradientEngine buildSnapshot returns a versioned slash snapshot with scan fence echo", () => {
+  const engine = new ConfidenceGradientEngine();
+  const snapshot = engine.buildSnapshot([
+    buildFile("src/watch.js", "/// watch\n"),
+  ]);
+
+  assert.equal(snapshot.snapshotVersion, SNAPSHOT_VERSION);
+  assert.equal(snapshot.markerFamily, MARKER_FAMILY);
+  assert.deepEqual(snapshot.scanFence, SCAN_FENCE);
+  assert.deepEqual(snapshot.totals, {
+    scannedFileCount: 1,
+    markerFileCount: 1,
+    markerCount: 1,
+    tierTotals: {
+      WATCH: 1,
+      GAP: 0,
+      HOLD: 0,
+      KILL: 0,
+    },
+  });
+});
+
+test("ConfidenceGradientEngine buildSnapshot returns a deterministic empty snapshot for empty input", () => {
+  const engine = new ConfidenceGradientEngine();
+  const snapshot = engine.buildSnapshot([]);
+
+  assert.deepEqual(snapshot, {
+    snapshotVersion: SNAPSHOT_VERSION,
+    markerFamily: MARKER_FAMILY,
+    scanFence: SCAN_FENCE,
+    totals: {
+      scannedFileCount: 0,
+      markerFileCount: 0,
+      markerCount: 0,
+      tierTotals: {
+        WATCH: 0,
+        GAP: 0,
+        HOLD: 0,
+        KILL: 0,
+      },
+    },
+    files: [],
+  });
+});
+
+test("ConfidenceGradientEngine buildSnapshot is deterministic, stateless, and keeps input unchanged", () => {
+  const engine = new ConfidenceGradientEngine();
+  const input = [
+    buildFile(
+      "src/repeat.js",
+      "function repeat() {\n  /// watch once\n  return true;\n}\n"
+    ),
+  ];
+  const snapshot = cloneValue(input);
+
+  const first = engine.buildSnapshot(input);
+  first.files[0].markers[0].anchor.contextFingerprint = "mutated";
+  first.files[0].markers[0].anchor.neighborhoodLines[0] = "mutated";
+
+  const second = engine.buildSnapshot(input);
+  const third = engine.buildSnapshot(input);
+
+  assert.deepEqual(input, snapshot);
+  assert.notEqual(
+    second.files[0].markers[0].anchor.contextFingerprint,
+    "mutated"
+  );
+  assert.notEqual(second.files[0].markers[0].anchor.neighborhoodLines[0], "mutated");
+  assert.deepEqual(second, third);
+});
+
+test("ConfidenceGradientEngine buildSnapshot preserves deterministic file and marker ordering", () => {
+  const engine = new ConfidenceGradientEngine();
+  const snapshot = engine.buildSnapshot([
+    buildFile("src/zeta.js", "///// later hold\n/// later watch\n"),
+    buildFile("src/alpha.js", "//// gap\n////// kill\n"),
+  ]);
+
+  assert.deepEqual(
+    snapshot.files.map((file) => ({
+      filePath: file.filePath,
+      lines: file.markers.map((marker) => marker.lineNumber),
+    })),
+    [
+      { filePath: "src/alpha.js", lines: [1, 2] },
+      { filePath: "src/zeta.js", lines: [1, 2] },
+    ]
+  );
+});
+
+test("ConfidenceGradientEngine buildSnapshot captures normalized trailing text and structural neighborhood anchors", () => {
+  const engine = new ConfidenceGradientEngine();
+  const snapshot = engine.buildSnapshot([
+    buildFile(
+      "src/context.js",
+      [
+        "function calculate() {",
+        "  const alpha = 1;",
+        "  /////   hold   this   block   ",
+        "  return alpha + 1;",
+        "}",
+      ].join("\n")
+    ),
+  ]);
+
+  assert.deepEqual(snapshot.files[0].markers[0], {
+    lineNumber: 3,
+    tier: "HOLD",
+    marker: "/////",
+    slashCount: 5,
+    trailingText: "hold this block",
+    anchor: {
+      contextFingerprint:
+        "} || const alpha = 1; || function calculate() { || return alpha + 1;",
+      neighborhoodLines: [
+        "}",
+        "const alpha = 1;",
+        "function calculate() {",
+        "return alpha + 1;",
+      ],
+    },
+  });
+});
+
+test("ConfidenceGradientEngine buildSnapshot keeps Windows and .claude normalization coherent with Phase 1", () => {
+  const engine = new ConfidenceGradientEngine();
+  const snapshot = engine.buildSnapshot([
+    buildFile(
+      "C:\\dev\\Blue Collar Governance Plugin\\.claude\\hooks\\run-governance-hook.js",
+      "///// anchored under .claude\n"
+    ),
+  ]);
+
+  assert.equal(snapshot.totals.scannedFileCount, 1);
+  assert.equal(snapshot.files[0].filePath, ".claude/hooks/run-governance-hook.js");
+});
+
+test("ConfidenceGradientEngine buildSnapshot remains bounded to the scan fence and marker-bearing files only", () => {
+  const engine = new ConfidenceGradientEngine();
+  const snapshot = engine.buildSnapshot([
+    buildFile("docs/not-scanned.js", "///// docs\n"),
+    buildFile("src/no-markers.js", "const safe = true;\n"),
+    buildFile("hooks/with-marker.js", "//// gap\n"),
+  ]);
+
+  assert.deepEqual(snapshot.totals, {
+    scannedFileCount: 2,
+    markerFileCount: 1,
+    markerCount: 1,
+    tierTotals: {
+      WATCH: 0,
+      GAP: 1,
+      HOLD: 0,
+      KILL: 0,
+    },
+  });
+  assert.deepEqual(snapshot.files.map((file) => file.filePath), ["hooks/with-marker.js"]);
+});
+
+test("ConfidenceGradientEngine buildSnapshot is additive and does not change scan(files) results for existing callers", () => {
+  const engine = new ConfidenceGradientEngine();
+  const files = [
+    buildFile("src/repeat.js", "function repeat() {\n  ///// hold\n  return true;\n}\n"),
+  ];
+
+  const firstScan = engine.scan(files);
+  const snapshot = engine.buildSnapshot(files);
+  const secondScan = engine.scan(files);
+
+  assert.equal(snapshot.files[0].markers[0].tier, "HOLD");
+  assert.deepEqual(firstScan, secondScan);
 });
 
 test("ConfidenceGradientEngine required coverage passes when an opted-in file has one slash-family marker", () => {

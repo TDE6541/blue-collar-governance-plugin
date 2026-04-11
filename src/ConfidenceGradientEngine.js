@@ -4,6 +4,7 @@ const { ControlRodMode } = require("./ControlRodMode");
 
 const MARKER_FAMILY = "slash";
 const RESERVED_MARKER_FAMILY = "semicolon";
+const SNAPSHOT_VERSION = 1;
 const REQUIRED_COVERAGE_POLICY_VERSION = 1;
 const REQUIRED_COVERAGE_POLICY_MODE = "explicit_opt_in";
 const REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT = 1;
@@ -42,6 +43,7 @@ const TIER_BY_MARKER = new Map(
 const SCAN_ROOTS_LONGEST_FIRST = Object.freeze(
   [...SCAN_FENCE.roots].sort((left, right) => right.length - left.length)
 );
+const SNAPSHOT_CONTEXT_WINDOW_RADIUS = 3;
 
 function makeValidationError(code, message) {
   const error = new Error(`${code}: ${message}`);
@@ -267,6 +269,68 @@ function normalizeOptionalTrimmedString(value) {
   return typeof value === "string" && value.trim() !== "" ? value.trim() : null;
 }
 
+function normalizeCollapsedText(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed === "" ? null : trimmed.replace(/\s+/g, " ");
+}
+
+function getLeadingMarkerMatch(line) {
+  return LEADING_MARKER_PATTERN.exec(line);
+}
+
+function isValidMarkerLine(line) {
+  const match = getLeadingMarkerMatch(line);
+  return Boolean(match) && TIER_BY_MARKER.has(match[1]);
+}
+
+function normalizeTrailingMarkerText(line) {
+  const match = getLeadingMarkerMatch(line);
+
+  if (!match) {
+    return null;
+  }
+
+  return normalizeCollapsedText(line.slice(match[0].length));
+}
+
+function collectNeighborhoodLines(lines, markerLineIndex) {
+  const neighborhoodLines = [];
+  const start = Math.max(0, markerLineIndex - SNAPSHOT_CONTEXT_WINDOW_RADIUS);
+  const end = Math.min(lines.length - 1, markerLineIndex + SNAPSHOT_CONTEXT_WINDOW_RADIUS);
+
+  for (let index = start; index <= end; index += 1) {
+    if (index === markerLineIndex) {
+      continue;
+    }
+
+    const line = lines[index];
+
+    if (isValidMarkerLine(line)) {
+      continue;
+    }
+
+    const normalizedLine = normalizeCollapsedText(line);
+
+    if (normalizedLine === null) {
+      continue;
+    }
+
+    neighborhoodLines.push(normalizedLine);
+  }
+
+  return [...new Set(neighborhoodLines)].sort((left, right) => left.localeCompare(right));
+}
+
+function buildContextFingerprint(neighborhoodLines) {
+  return neighborhoodLines.length === 0
+    ? "<empty-neighborhood>"
+    : neighborhoodLines.join(" || ");
+}
+
 function normalizeFiles(files) {
   if (!Array.isArray(files)) {
     throw makeValidationError("INVALID_INPUT", "'files' must be an array");
@@ -312,6 +376,36 @@ function buildFileReport(filePath, domain, markers) {
     markerCount: sortedMarkers.length,
     tierTotals,
     markers: sortedMarkers,
+  };
+}
+
+function buildSnapshotMarker(marker, lines) {
+  const lineIndex = marker.lineNumber - 1;
+  const neighborhoodLines = collectNeighborhoodLines(lines, lineIndex);
+
+  return {
+    lineNumber: marker.lineNumber,
+    tier: marker.tier,
+    marker: marker.marker,
+    slashCount: marker.slashCount,
+    trailingText: normalizeTrailingMarkerText(lines[lineIndex] || ""),
+    anchor: {
+      contextFingerprint: buildContextFingerprint(neighborhoodLines),
+      neighborhoodLines,
+    },
+  };
+}
+
+function buildSnapshotFile(filePath, markers, content) {
+  const lines = content.split(/\r?\n/);
+  const snapshotMarkers = [...markers]
+    .sort(compareMarkers)
+    .map((marker) => buildSnapshotMarker(marker, lines));
+
+  return {
+    filePath,
+    markerCount: snapshotMarkers.length,
+    markers: snapshotMarkers,
   };
 }
 
@@ -519,6 +613,39 @@ class ConfidenceGradientEngine {
     };
   }
 
+  buildSnapshot(files) {
+    const normalizedFiles = normalizeFiles(files);
+    const scannedFiles = normalizedFiles.filter((file) =>
+      isWithinScanFence(file.filePath)
+    );
+    const scannedFilesByPath = new Map(
+      scannedFiles.map((file) => [file.filePath, file])
+    );
+    const scanReport = this.scan(files);
+
+    return {
+      snapshotVersion: SNAPSHOT_VERSION,
+      markerFamily: MARKER_FAMILY,
+      scanFence: {
+        roots: [...SCAN_FENCE.roots],
+        extension: SCAN_FENCE.extension,
+      },
+      totals: {
+        scannedFileCount: scanReport.totals.scannedFileCount,
+        markerFileCount: scanReport.totals.markerFileCount,
+        markerCount: scanReport.totals.markerCount,
+        tierTotals: cloneTierTotals(scanReport.totals.tierTotals),
+      },
+      files: scanReport.files.map((file) =>
+        buildSnapshotFile(
+          file.filePath,
+          file.markers,
+          scannedFilesByPath.get(file.filePath).content
+        )
+      ),
+    };
+  }
+
   evaluateRequiredCoverage(files, policy) {
     const normalizedFiles = normalizeFiles(files);
     const scannedFiles = normalizedFiles.filter((file) =>
@@ -586,6 +713,7 @@ module.exports = {
   REQUIRED_COVERAGE_POLICY_VERSION,
   RESERVED_MARKER_FAMILY,
   SCAN_FENCE,
+  SNAPSHOT_VERSION,
   TIER_DEFINITIONS,
   TIER_ORDER,
   UNCLASSIFIED_DOMAIN,

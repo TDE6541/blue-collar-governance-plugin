@@ -9,12 +9,26 @@ const {
   TIER_DEFINITIONS,
   TIER_ORDER,
 } = require("./ConfidenceGradientEngine");
+const {
+  AMBIGUOUS_STATUS,
+  COMPARISON_VERSION,
+  MATCHED_STATUS,
+  MATCH_FLAGS,
+  NEWLY_OBSERVED_STATUS,
+  NO_LONGER_OBSERVED_STATUS,
+} = require("./MarkerContinuityEngine");
 
 const SKILL_ROUTES = Object.freeze(["/confidence"]);
 const HIGH_SEVERITY_TIERS = new Set(["HOLD", "KILL"]);
 const REQUIRED_COVERAGE_POLICY_ERROR_SET = new Set(
   REQUIRED_COVERAGE_POLICY_ERROR_CODES
 );
+const CONTINUITY_CHANGE_STATUS_SET = new Set([
+  MATCHED_STATUS,
+  NEWLY_OBSERVED_STATUS,
+  NO_LONGER_OBSERVED_STATUS,
+]);
+const MATCH_FLAG_SET = new Set(MATCH_FLAGS);
 const TIER_BY_NAME = new Map(
   TIER_DEFINITIONS.map((definition) => [definition.tier, definition])
 );
@@ -445,6 +459,293 @@ function normalizeRequiredCoverageView(input) {
   };
 }
 
+function normalizeComparisonMarker(input, parentName) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}' must be an object`
+    );
+  }
+
+  assertNonNegativeInteger(input, "lineNumber", parentName);
+  assertRequiredString(input, "tier", parentName);
+  assertRequiredString(input, "marker", parentName);
+  assertNonNegativeInteger(input, "slashCount", parentName);
+
+  if (input.lineNumber < 1) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.lineNumber' must be greater than or equal to 1`
+    );
+  }
+
+  if (!TIER_BY_NAME.has(input.tier)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.tier' must be one of: ${TIER_ORDER.join(", ")}`
+    );
+  }
+
+  if (MARKER_BY_TIER.get(input.tier) !== input.marker) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.marker' must match the marker for tier '${input.tier}'`
+    );
+  }
+
+  if (input.slashCount !== input.marker.length) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.slashCount' must match '${parentName}.marker' length`
+    );
+  }
+
+  return {
+    lineNumber: input.lineNumber,
+    tier: input.tier,
+    marker: input.marker,
+    slashCount: input.slashCount,
+    trailingText: normalizeOptionalStringOrNull(input, "trailingText", parentName),
+  };
+}
+
+function normalizeMatchFlags(input, parentName, status) {
+  if (input === undefined) {
+    return [];
+  }
+
+  if (!Array.isArray(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.flags' must be an array`
+    );
+  }
+
+  const uniqueFlags = [...new Set(input)];
+
+  if (
+    uniqueFlags.some((flag) => typeof flag !== "string" || !MATCH_FLAG_SET.has(flag))
+  ) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.flags' must use only: ${MATCH_FLAGS.join(", ")}`
+    );
+  }
+
+  if (status !== MATCHED_STATUS && uniqueFlags.length > 0) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.flags' may be present only for '${MATCHED_STATUS}' entries`
+    );
+  }
+
+  return [...uniqueFlags].sort();
+}
+
+function normalizeContinuityChange(input, parentName) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}' must be an object`
+    );
+  }
+
+  assertRequiredString(input, "status", parentName);
+  assertRequiredString(input, "filePath", parentName);
+
+  if (!CONTINUITY_CHANGE_STATUS_SET.has(input.status)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.status' must be one of: ${[
+        MATCHED_STATUS,
+        NEWLY_OBSERVED_STATUS,
+        NO_LONGER_OBSERVED_STATUS,
+      ].join(", ")}`
+    );
+  }
+
+  const normalizedFlags = normalizeMatchFlags(input.flags, parentName, input.status);
+  const normalizedPreviousMarker =
+    input.previousMarker === undefined
+      ? undefined
+      : normalizeComparisonMarker(input.previousMarker, `${parentName}.previousMarker`);
+  const normalizedCurrentMarker =
+    input.currentMarker === undefined
+      ? undefined
+      : normalizeComparisonMarker(input.currentMarker, `${parentName}.currentMarker`);
+
+  if (input.status === MATCHED_STATUS) {
+    if (normalizedPreviousMarker === undefined || normalizedCurrentMarker === undefined) {
+      throw makeValidationError(
+        "ERR_INVALID_INPUT",
+        `'${parentName}' must include previous and current markers for '${MATCHED_STATUS}'`
+      );
+    }
+  }
+
+  if (input.status === NEWLY_OBSERVED_STATUS) {
+    if (normalizedPreviousMarker !== undefined || normalizedCurrentMarker === undefined) {
+      throw makeValidationError(
+        "ERR_INVALID_INPUT",
+        `'${parentName}' must include only currentMarker for '${NEWLY_OBSERVED_STATUS}'`
+      );
+    }
+  }
+
+  if (input.status === NO_LONGER_OBSERVED_STATUS) {
+    if (normalizedPreviousMarker === undefined || normalizedCurrentMarker !== undefined) {
+      throw makeValidationError(
+        "ERR_INVALID_INPUT",
+        `'${parentName}' must include only previousMarker for '${NO_LONGER_OBSERVED_STATUS}'`
+      );
+    }
+  }
+
+  return {
+    status: input.status,
+    filePath: input.filePath,
+    ...(input.status === MATCHED_STATUS ? { flags: normalizedFlags } : {}),
+    ...(normalizedPreviousMarker === undefined
+      ? {}
+      : { previousMarker: normalizedPreviousMarker }),
+    ...(normalizedCurrentMarker === undefined
+      ? {}
+      : { currentMarker: normalizedCurrentMarker }),
+  };
+}
+
+function normalizeAmbiguousCase(input, parentName) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}' must be an object`
+    );
+  }
+
+  assertRequiredString(input, "status", parentName);
+  assertRequiredString(input, "filePath", parentName);
+
+  if (input.status !== AMBIGUOUS_STATUS) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.status' must be '${AMBIGUOUS_STATUS}'`
+    );
+  }
+
+  if (!Array.isArray(input.previousCandidates) || !Array.isArray(input.currentCandidates)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}' must include previousCandidates and currentCandidates arrays`
+    );
+  }
+
+  if (input.previousCandidates.length === 0 || input.currentCandidates.length === 0) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}' must include at least one previous and current candidate`
+    );
+  }
+
+  return {
+    status: input.status,
+    filePath: input.filePath,
+    previousCandidates: input.previousCandidates.map((marker, index) =>
+      normalizeComparisonMarker(marker, `${parentName}.previousCandidates[${index}]`)
+    ),
+    currentCandidates: input.currentCandidates.map((marker, index) =>
+      normalizeComparisonMarker(marker, `${parentName}.currentCandidates[${index}]`)
+    ),
+  };
+}
+
+function normalizeSnapshotVersion(input, fieldName, parentName) {
+  const value = input[fieldName];
+
+  if (value === null) {
+    return null;
+  }
+
+  if (!Number.isInteger(value) || value < 1) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.${fieldName}' must be a positive integer or null`
+    );
+  }
+
+  return value;
+}
+
+function normalizeMarkerContinuityView(input) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerContinuityView' must be an object"
+    );
+  }
+
+  assertNonNegativeInteger(input, "comparisonVersion", "markerContinuityView");
+  assertRequiredString(input, "markerFamily", "markerContinuityView");
+  assertNonNegativeInteger(input, "currentSnapshotVersion", "markerContinuityView");
+
+  if (input.comparisonVersion !== COMPARISON_VERSION) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'markerContinuityView.comparisonVersion' must be ${COMPARISON_VERSION}`
+    );
+  }
+
+  if (input.markerFamily !== MARKER_FAMILY) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerContinuityView.markerFamily' must be 'slash'"
+    );
+  }
+
+  if (input.currentSnapshotVersion < 1) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerContinuityView.currentSnapshotVersion' must be greater than or equal to 1"
+    );
+  }
+
+  if (!Array.isArray(input.continuityChanges)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerContinuityView.continuityChanges' must be an array"
+    );
+  }
+
+  if (!Array.isArray(input.ambiguousCases)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerContinuityView.ambiguousCases' must be an array"
+    );
+  }
+
+  return {
+    comparisonVersion: input.comparisonVersion,
+    markerFamily: input.markerFamily,
+    previousSnapshotVersion: normalizeSnapshotVersion(
+      input,
+      "previousSnapshotVersion",
+      "markerContinuityView"
+    ),
+    currentSnapshotVersion: input.currentSnapshotVersion,
+    continuityChanges: input.continuityChanges.map((change, index) =>
+      normalizeContinuityChange(
+        change,
+        `markerContinuityView.continuityChanges[${index}]`
+      )
+    ),
+    ambiguousCases: input.ambiguousCases.map((ambiguousCase, index) =>
+      normalizeAmbiguousCase(
+        ambiguousCase,
+        `markerContinuityView.ambiguousCases[${index}]`
+      )
+    ),
+  };
+}
+
 class ConfidenceSkill {
   renderConfidence(input = {}) {
     if (!isPlainObject(input)) {
@@ -465,6 +766,10 @@ class ConfidenceSkill {
       input.requiredCoverageView === undefined
         ? null
         : normalizeRequiredCoverageView(input.requiredCoverageView);
+    const normalizedMarkerContinuity =
+      input.markerContinuityView === undefined
+        ? null
+        : normalizeMarkerContinuityView(input.markerContinuityView);
 
     const routeView = {
       route: "/confidence",
@@ -493,28 +798,70 @@ class ConfidenceSkill {
     };
 
     if (normalizedRequiredCoverage === null) {
-      return routeView;
+      if (normalizedMarkerContinuity === null) {
+        return routeView;
+      }
+    } else {
+      routeView.requiredCoverage = {
+        policyMode: normalizedRequiredCoverage.policyMode,
+        markerFamily: normalizedRequiredCoverage.markerFamily,
+        targetCount: normalizedRequiredCoverage.targetCount,
+        evaluatedTargetCount: normalizedRequiredCoverage.evaluatedTargetCount,
+        findings: normalizedRequiredCoverage.findings.map((finding) => ({
+          code: finding.code,
+          policyTargetId: finding.policyTargetId,
+          filePath: finding.filePath,
+          domain: cloneDomain(finding.domain),
+          markerCount: finding.markerCount,
+          minimumMarkerCount: finding.minimumMarkerCount,
+        })),
+        policyErrors: normalizedRequiredCoverage.policyErrors.map((policyError) => ({
+          code: policyError.code,
+          policyTargetId: policyError.policyTargetId,
+          filePath: policyError.filePath,
+        })),
+      };
     }
 
-    routeView.requiredCoverage = {
-      policyMode: normalizedRequiredCoverage.policyMode,
-      markerFamily: normalizedRequiredCoverage.markerFamily,
-      targetCount: normalizedRequiredCoverage.targetCount,
-      evaluatedTargetCount: normalizedRequiredCoverage.evaluatedTargetCount,
-      findings: normalizedRequiredCoverage.findings.map((finding) => ({
-        code: finding.code,
-        policyTargetId: finding.policyTargetId,
-        filePath: finding.filePath,
-        domain: cloneDomain(finding.domain),
-        markerCount: finding.markerCount,
-        minimumMarkerCount: finding.minimumMarkerCount,
-      })),
-      policyErrors: normalizedRequiredCoverage.policyErrors.map((policyError) => ({
-        code: policyError.code,
-        policyTargetId: policyError.policyTargetId,
-        filePath: policyError.filePath,
-      })),
-    };
+    if (normalizedMarkerContinuity !== null) {
+      routeView.markerContinuity = {
+        comparisonVersion: normalizedMarkerContinuity.comparisonVersion,
+        markerFamily: normalizedMarkerContinuity.markerFamily,
+        previousSnapshotVersion: normalizedMarkerContinuity.previousSnapshotVersion,
+        currentSnapshotVersion: normalizedMarkerContinuity.currentSnapshotVersion,
+        continuityChanges: normalizedMarkerContinuity.continuityChanges.map((change) => ({
+          status: change.status,
+          filePath: change.filePath,
+          ...(change.flags === undefined ? {} : { flags: [...change.flags] }),
+          ...(change.previousMarker === undefined
+            ? {}
+            : {
+                previousMarker: {
+                  ...change.previousMarker,
+                },
+              }),
+          ...(change.currentMarker === undefined
+            ? {}
+            : {
+                currentMarker: {
+                  ...change.currentMarker,
+                },
+              }),
+        })),
+        ambiguousCases: normalizedMarkerContinuity.ambiguousCases.map(
+          (ambiguousCase) => ({
+            status: ambiguousCase.status,
+            filePath: ambiguousCase.filePath,
+            previousCandidates: ambiguousCase.previousCandidates.map((marker) => ({
+              ...marker,
+            })),
+            currentCandidates: ambiguousCase.currentCandidates.map((marker) => ({
+              ...marker,
+            })),
+          })
+        ),
+      };
+    }
 
     return routeView;
   }

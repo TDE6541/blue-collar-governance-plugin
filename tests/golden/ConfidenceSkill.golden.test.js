@@ -7,6 +7,9 @@ const {
   ConfidenceGradientEngine,
 } = require("../../src/ConfidenceGradientEngine");
 const {
+  MarkerContinuityEngine,
+} = require("../../src/MarkerContinuityEngine");
+const {
   ConfidenceSkill,
   SKILL_ROUTES,
 } = require("../../src/ConfidenceSkill");
@@ -37,6 +40,19 @@ function buildPolicy(targets) {
 function buildRequiredCoverageView(files, policy) {
   const engine = new ConfidenceGradientEngine();
   return engine.evaluateRequiredCoverage(files, policy);
+}
+
+function buildSnapshot(files) {
+  const engine = new ConfidenceGradientEngine();
+  return engine.buildSnapshot(files);
+}
+
+function buildMarkerContinuityView(previousFiles, currentFiles) {
+  const engine = new MarkerContinuityEngine();
+  return engine.compare(
+    previousFiles === null ? null : buildSnapshot(previousFiles),
+    buildSnapshot(currentFiles)
+  );
 }
 
 function expectValidationError(run, code, message) {
@@ -253,6 +269,158 @@ test("/confidence keeps required coverage findings and policy errors separate fr
   ]);
 });
 
+test("/confidence composes marker continuity additively and preserves the current scan surface", () => {
+  const skill = new ConfidenceSkill();
+  const currentFiles = [
+    buildFile(
+      "src/moved.js",
+      "function sample() {\n  const alpha = 1;\n\n  ///// stable hold\n  return alpha;\n}\n"
+    ),
+    buildFile("src/new.js", "//// newly observed\n"),
+  ];
+  const confidenceGradientView = buildConfidenceGradientView(currentFiles);
+  const baseRendered = skill.renderConfidence({
+    confidenceGradientView,
+  });
+  const rendered = skill.renderConfidence({
+    confidenceGradientView,
+    markerContinuityView: buildMarkerContinuityView(
+      [
+        buildFile(
+          "src/moved.js",
+          "function sample() {\n  const alpha = 1;\n  ///// stable hold\n  return alpha;\n}\n"
+        ),
+        buildFile("src/old.js", "///// no longer observed\n"),
+      ],
+      currentFiles
+    ),
+  });
+
+  assert.deepEqual(rendered.route, baseRendered.route);
+  assert.deepEqual(rendered.markerFamily, baseRendered.markerFamily);
+  assert.deepEqual(rendered.tierTotals, baseRendered.tierTotals);
+  assert.deepEqual(rendered.fileMarkerMap, baseRendered.fileMarkerMap);
+  assert.deepEqual(rendered.domainGrouping, baseRendered.domainGrouping);
+  assert.deepEqual(rendered.topHoldKillLocations, baseRendered.topHoldKillLocations);
+  assert.deepEqual(rendered.markerContinuity, {
+    comparisonVersion: 1,
+    markerFamily: "slash",
+    previousSnapshotVersion: 1,
+    currentSnapshotVersion: 1,
+    continuityChanges: [
+      {
+        status: "MATCHED",
+        filePath: "src/moved.js",
+        flags: ["moved"],
+        previousMarker: {
+          lineNumber: 3,
+          tier: "HOLD",
+          marker: "/////",
+          slashCount: 5,
+          trailingText: "stable hold",
+        },
+        currentMarker: {
+          lineNumber: 4,
+          tier: "HOLD",
+          marker: "/////",
+          slashCount: 5,
+          trailingText: "stable hold",
+        },
+      },
+      {
+        status: "NEWLY_OBSERVED",
+        filePath: "src/new.js",
+        currentMarker: {
+          lineNumber: 1,
+          tier: "GAP",
+          marker: "////",
+          slashCount: 4,
+          trailingText: "newly observed",
+        },
+      },
+      {
+        status: "NO_LONGER_OBSERVED",
+        filePath: "src/old.js",
+        previousMarker: {
+          lineNumber: 1,
+          tier: "HOLD",
+          marker: "/////",
+          slashCount: 5,
+          trailingText: "no longer observed",
+        },
+      },
+    ],
+    ambiguousCases: [],
+  });
+});
+
+test("/confidence keeps continuity changes and ambiguous cases in separate additive sections", () => {
+  const skill = new ConfidenceSkill();
+  const currentFiles = [
+    buildFile("src/ambiguous.js", "///// duplicate\n\n///// duplicate\n"),
+  ];
+  const rendered = skill.renderConfidence({
+    confidenceGradientView: buildConfidenceGradientView(currentFiles),
+    markerContinuityView: buildMarkerContinuityView(
+      [buildFile("src/ambiguous.js", "///// duplicate\n")],
+      currentFiles
+    ),
+  });
+
+  assert.deepEqual(rendered.markerContinuity.continuityChanges, []);
+  assert.deepEqual(rendered.markerContinuity.ambiguousCases, [
+    {
+      status: "AMBIGUOUS",
+      filePath: "src/ambiguous.js",
+      previousCandidates: [
+        {
+          lineNumber: 1,
+          tier: "HOLD",
+          marker: "/////",
+          slashCount: 5,
+          trailingText: "duplicate",
+        },
+      ],
+      currentCandidates: [
+        {
+          lineNumber: 1,
+          tier: "HOLD",
+          marker: "/////",
+          slashCount: 5,
+          trailingText: "duplicate",
+        },
+        {
+          lineNumber: 3,
+          tier: "HOLD",
+          marker: "/////",
+          slashCount: 5,
+          trailingText: "duplicate",
+        },
+      ],
+    },
+  ]);
+});
+
+test("/confidence accepts bootstrap comparison truth without making continuity claims", () => {
+  const skill = new ConfidenceSkill();
+  const currentFiles = [
+    buildFile("src/bootstrap.js", "///// current hold\n"),
+  ];
+  const rendered = skill.renderConfidence({
+    confidenceGradientView: buildConfidenceGradientView(currentFiles),
+    markerContinuityView: buildMarkerContinuityView(null, currentFiles),
+  });
+
+  assert.deepEqual(rendered.markerContinuity, {
+    comparisonVersion: 1,
+    markerFamily: "slash",
+    previousSnapshotVersion: null,
+    currentSnapshotVersion: 1,
+    continuityChanges: [],
+    ambiguousCases: [],
+  });
+});
+
 test("/confidence returns top HOLD and KILL locations in deterministic order", () => {
   const skill = new ConfidenceSkill();
   const view = buildConfidenceGradientView([
@@ -354,6 +522,48 @@ test("/confidence rejects non-slash marker families in required coverage input",
   );
 });
 
+test("/confidence rejects non-slash marker families in marker continuity input", () => {
+  const skill = new ConfidenceSkill();
+  const badMarkerContinuityView = buildMarkerContinuityView(
+    [buildFile("src/sample.js", "///// hold\n")],
+    [buildFile("src/sample.js", "///// hold\n")]
+  );
+  badMarkerContinuityView.markerFamily = "semicolon";
+
+  expectValidationError(
+    () =>
+      skill.renderConfidence({
+        confidenceGradientView: buildConfidenceGradientView([
+          buildFile("src/sample.js", "///// hold\n"),
+        ]),
+        markerContinuityView: badMarkerContinuityView,
+      }),
+    "ERR_INVALID_INPUT",
+    "'markerContinuityView.markerFamily' must be 'slash'"
+  );
+});
+
+test("/confidence rejects invalid continuity vocabulary that would force stronger claims", () => {
+  const skill = new ConfidenceSkill();
+  const badMarkerContinuityView = buildMarkerContinuityView(
+    [buildFile("src/sample.js", "///// hold\n")],
+    [buildFile("src/sample.js", "///// hold\n")]
+  );
+  badMarkerContinuityView.continuityChanges[0].status = "RESOLVED";
+
+  expectValidationError(
+    () =>
+      skill.renderConfidence({
+        confidenceGradientView: buildConfidenceGradientView([
+          buildFile("src/sample.js", "///// hold\n"),
+        ]),
+        markerContinuityView: badMarkerContinuityView,
+      }),
+    "ERR_INVALID_INPUT",
+    "'markerContinuityView.continuityChanges[0].status' must be one of: MATCHED, NEWLY_OBSERVED, NO_LONGER_OBSERVED"
+  );
+});
+
 test("/confidence exposes no score, trend, or health-percentage fields and keeps a read-only method surface", () => {
   const skill = new ConfidenceSkill();
   const rendered = skill.renderConfidence({
@@ -364,14 +574,28 @@ test("/confidence exposes no score, trend, or health-percentage fields and keeps
       [buildFile("src/sample.js", "///// hold\n")],
       buildPolicy([{ id: "sample-core", filePath: "src/sample.js" }])
     ),
+    markerContinuityView: buildMarkerContinuityView(
+      [buildFile("src/sample.js", "///// hold\n")],
+      [buildFile("src/sample.js", "//// hold\n")]
+    ),
   });
 
-  const forbiddenFields = ["score", "trendLine", "healthPercentage", "reviewedClean"];
+  const forbiddenFields = [
+    "score",
+    "trendLine",
+    "healthPercentage",
+    "reviewedClean",
+    "resolved",
+  ];
   for (const field of forbiddenFields) {
     assert.equal(Object.prototype.hasOwnProperty.call(rendered, field), false);
   }
   assert.equal(
     Object.prototype.hasOwnProperty.call(rendered.requiredCoverage, "reviewedClean"),
+    false
+  );
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(rendered.markerContinuity, "reviewedClean"),
     false
   );
 
