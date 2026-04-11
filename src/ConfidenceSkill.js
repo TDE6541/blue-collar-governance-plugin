@@ -2,12 +2,19 @@
 
 const {
   MARKER_FAMILY,
+  REQUIRED_COVERAGE_MISSING_CODE,
+  REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT,
+  REQUIRED_COVERAGE_POLICY_ERROR_CODES,
+  REQUIRED_COVERAGE_POLICY_MODE,
   TIER_DEFINITIONS,
   TIER_ORDER,
 } = require("./ConfidenceGradientEngine");
 
 const SKILL_ROUTES = Object.freeze(["/confidence"]);
 const HIGH_SEVERITY_TIERS = new Set(["HOLD", "KILL"]);
+const REQUIRED_COVERAGE_POLICY_ERROR_SET = new Set(
+  REQUIRED_COVERAGE_POLICY_ERROR_CODES
+);
 const TIER_BY_NAME = new Map(
   TIER_DEFINITIONS.map((definition) => [definition.tier, definition])
 );
@@ -68,6 +75,23 @@ function normalizeTierTotals(input, parentName) {
   }
 
   return cloneTierTotals(input);
+}
+
+function normalizeOptionalStringOrNull(input, fieldName, parentName = "input") {
+  const value = input[fieldName];
+
+  if (value === null) {
+    return null;
+  }
+
+  if (typeof value !== "string" || value.trim() === "") {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.${fieldName}' must be a non-empty string or null`
+    );
+  }
+
+  return value;
 }
 
 function cloneDomain(domain) {
@@ -291,6 +315,136 @@ function buildTopHoldKillLocations(files) {
   return locations.sort(compareTopLocations);
 }
 
+function normalizeRequiredCoverageFinding(input, parentName) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}' must be an object`
+    );
+  }
+
+  assertRequiredString(input, "code", parentName);
+  assertRequiredString(input, "policyTargetId", parentName);
+  assertRequiredString(input, "filePath", parentName);
+  assertNonNegativeInteger(input, "markerCount", parentName);
+  assertNonNegativeInteger(input, "minimumMarkerCount", parentName);
+
+  if (input.code !== REQUIRED_COVERAGE_MISSING_CODE) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.code' must be '${REQUIRED_COVERAGE_MISSING_CODE}'`
+    );
+  }
+
+  if (input.minimumMarkerCount !== REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.minimumMarkerCount' must be ${REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT}`
+    );
+  }
+
+  return {
+    code: input.code,
+    policyTargetId: input.policyTargetId,
+    filePath: input.filePath,
+    domain: normalizeDomain(input.domain, `${parentName}.domain`),
+    markerCount: input.markerCount,
+    minimumMarkerCount: input.minimumMarkerCount,
+  };
+}
+
+function normalizeRequiredCoveragePolicyError(input, parentName) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}' must be an object`
+    );
+  }
+
+  assertRequiredString(input, "code", parentName);
+
+  if (!REQUIRED_COVERAGE_POLICY_ERROR_SET.has(input.code)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.code' must be one of: ${REQUIRED_COVERAGE_POLICY_ERROR_CODES.join(", ")}`
+    );
+  }
+
+  return {
+    code: input.code,
+    policyTargetId: normalizeOptionalStringOrNull(input, "policyTargetId", parentName),
+    filePath: normalizeOptionalStringOrNull(input, "filePath", parentName),
+  };
+}
+
+function normalizeRequiredCoverageView(input) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'requiredCoverageView' must be an object"
+    );
+  }
+
+  assertRequiredString(input, "policyMode", "requiredCoverageView");
+  assertRequiredString(input, "markerFamily", "requiredCoverageView");
+  assertNonNegativeInteger(input, "targetCount", "requiredCoverageView");
+  assertNonNegativeInteger(input, "evaluatedTargetCount", "requiredCoverageView");
+
+  if (input.policyMode !== REQUIRED_COVERAGE_POLICY_MODE) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'requiredCoverageView.policyMode' must be '${REQUIRED_COVERAGE_POLICY_MODE}'`
+    );
+  }
+
+  if (input.markerFamily !== MARKER_FAMILY) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'requiredCoverageView.markerFamily' must be 'slash'"
+    );
+  }
+
+  if (input.evaluatedTargetCount > input.targetCount) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'requiredCoverageView.evaluatedTargetCount' must be less than or equal to 'requiredCoverageView.targetCount'"
+    );
+  }
+
+  if (!Array.isArray(input.findings)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'requiredCoverageView.findings' must be an array"
+    );
+  }
+
+  if (!Array.isArray(input.policyErrors)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'requiredCoverageView.policyErrors' must be an array"
+    );
+  }
+
+  return {
+    policyMode: input.policyMode,
+    markerFamily: input.markerFamily,
+    targetCount: input.targetCount,
+    evaluatedTargetCount: input.evaluatedTargetCount,
+    findings: input.findings.map((finding, index) =>
+      normalizeRequiredCoverageFinding(
+        finding,
+        `requiredCoverageView.findings[${index}]`
+      )
+    ),
+    policyErrors: input.policyErrors.map((policyError, index) =>
+      normalizeRequiredCoveragePolicyError(
+        policyError,
+        `requiredCoverageView.policyErrors[${index}]`
+      )
+    ),
+  };
+}
+
 class ConfidenceSkill {
   renderConfidence(input = {}) {
     if (!isPlainObject(input)) {
@@ -307,8 +461,12 @@ class ConfidenceSkill {
     const normalizedView = normalizeConfidenceGradientView(
       input.confidenceGradientView
     );
+    const normalizedRequiredCoverage =
+      input.requiredCoverageView === undefined
+        ? null
+        : normalizeRequiredCoverageView(input.requiredCoverageView);
 
-    return {
+    const routeView = {
       route: "/confidence",
       markerFamily: normalizedView.markerFamily,
       tierTotals: cloneTierTotals(normalizedView.tierTotals),
@@ -333,6 +491,32 @@ class ConfidenceSkill {
       })),
       topHoldKillLocations: buildTopHoldKillLocations(normalizedView.files),
     };
+
+    if (normalizedRequiredCoverage === null) {
+      return routeView;
+    }
+
+    routeView.requiredCoverage = {
+      policyMode: normalizedRequiredCoverage.policyMode,
+      markerFamily: normalizedRequiredCoverage.markerFamily,
+      targetCount: normalizedRequiredCoverage.targetCount,
+      evaluatedTargetCount: normalizedRequiredCoverage.evaluatedTargetCount,
+      findings: normalizedRequiredCoverage.findings.map((finding) => ({
+        code: finding.code,
+        policyTargetId: finding.policyTargetId,
+        filePath: finding.filePath,
+        domain: cloneDomain(finding.domain),
+        markerCount: finding.markerCount,
+        minimumMarkerCount: finding.minimumMarkerCount,
+      })),
+      policyErrors: normalizedRequiredCoverage.policyErrors.map((policyError) => ({
+        code: policyError.code,
+        policyTargetId: policyError.policyTargetId,
+        filePath: policyError.filePath,
+      })),
+    };
+
+    return routeView;
   }
 }
 

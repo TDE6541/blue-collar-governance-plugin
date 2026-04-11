@@ -4,6 +4,16 @@ const { ControlRodMode } = require("./ControlRodMode");
 
 const MARKER_FAMILY = "slash";
 const RESERVED_MARKER_FAMILY = "semicolon";
+const REQUIRED_COVERAGE_POLICY_VERSION = 1;
+const REQUIRED_COVERAGE_POLICY_MODE = "explicit_opt_in";
+const REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT = 1;
+const REQUIRED_COVERAGE_MISSING_CODE = "REQUIRED_COVERAGE_MISSING";
+const REQUIRED_COVERAGE_POLICY_ERROR_CODES = Object.freeze([
+  "POLICY_TARGET_INVALID",
+  "POLICY_TARGET_DUPLICATE",
+  "POLICY_TARGET_OUTSIDE_SCAN_FENCE",
+  "POLICY_TARGET_NOT_IN_SCAN_INPUT",
+]);
 const TIER_ORDER = Object.freeze(["WATCH", "GAP", "HOLD", "KILL"]);
 const TIER_DEFINITIONS = Object.freeze([
   Object.freeze({ tier: "WATCH", marker: "///", slashCount: 3, severityRank: 1 }),
@@ -253,6 +263,10 @@ function compareMarkers(left, right) {
   return left.lineNumber - right.lineNumber;
 }
 
+function normalizeOptionalTrimmedString(value) {
+  return typeof value === "string" && value.trim() !== "" ? value.trim() : null;
+}
+
 function normalizeFiles(files) {
   if (!Array.isArray(files)) {
     throw makeValidationError("INVALID_INPUT", "'files' must be an array");
@@ -339,6 +353,114 @@ function buildDomainGroups(files) {
     }));
 }
 
+function makeRequiredCoveragePolicyError(code, policyTargetId = null, filePath = null) {
+  return {
+    code,
+    policyTargetId,
+    filePath,
+  };
+}
+
+function cloneRequiredCoveragePolicyError(policyError) {
+  return {
+    code: policyError.code,
+    policyTargetId: policyError.policyTargetId,
+    filePath: policyError.filePath,
+  };
+}
+
+function cloneRequiredCoverageFinding(finding) {
+  return {
+    code: finding.code,
+    policyTargetId: finding.policyTargetId,
+    filePath: finding.filePath,
+    domain: cloneDomain(finding.domain),
+    markerCount: finding.markerCount,
+    minimumMarkerCount: finding.minimumMarkerCount,
+  };
+}
+
+function normalizeRequiredCoveragePolicy(policy) {
+  const targetCount =
+    isPlainObject(policy) && Array.isArray(policy.targets) ? policy.targets.length : 0;
+
+  if (
+    !isPlainObject(policy) ||
+    policy.version !== REQUIRED_COVERAGE_POLICY_VERSION ||
+    !Array.isArray(policy.targets)
+  ) {
+    return {
+      targetCount,
+      targets: [],
+      policyErrors: [makeRequiredCoveragePolicyError("POLICY_TARGET_INVALID")],
+    };
+  }
+
+  const targets = [];
+  const policyErrors = [];
+  const seenIds = new Set();
+  const seenFilePaths = new Set();
+
+  for (const target of policy.targets) {
+    if (!isPlainObject(target)) {
+      policyErrors.push(makeRequiredCoveragePolicyError("POLICY_TARGET_INVALID"));
+      continue;
+    }
+
+    const policyTargetId = normalizeOptionalTrimmedString(target.id);
+    const normalizedFilePath =
+      typeof target.filePath === "string" && target.filePath.trim() !== ""
+        ? trimToScanFencePath(target.filePath.trim())
+        : null;
+
+    if (policyTargetId === null || normalizedFilePath === null) {
+      policyErrors.push(
+        makeRequiredCoveragePolicyError(
+          "POLICY_TARGET_INVALID",
+          policyTargetId,
+          normalizedFilePath
+        )
+      );
+      continue;
+    }
+
+    if (!isWithinScanFence(normalizedFilePath)) {
+      policyErrors.push(
+        makeRequiredCoveragePolicyError(
+          "POLICY_TARGET_OUTSIDE_SCAN_FENCE",
+          policyTargetId,
+          normalizedFilePath
+        )
+      );
+      continue;
+    }
+
+    if (seenIds.has(policyTargetId) || seenFilePaths.has(normalizedFilePath)) {
+      policyErrors.push(
+        makeRequiredCoveragePolicyError(
+          "POLICY_TARGET_DUPLICATE",
+          policyTargetId,
+          normalizedFilePath
+        )
+      );
+      continue;
+    }
+
+    seenIds.add(policyTargetId);
+    seenFilePaths.add(normalizedFilePath);
+    targets.push({
+      policyTargetId,
+      filePath: normalizedFilePath,
+    });
+  }
+
+  return {
+    targetCount,
+    targets,
+    policyErrors,
+  };
+}
+
 class ConfidenceGradientEngine {
   scan(files) {
     const normalizedFiles = normalizeFiles(files);
@@ -396,11 +518,72 @@ class ConfidenceGradientEngine {
       domainGroups: buildDomainGroups(markerFiles),
     };
   }
+
+  evaluateRequiredCoverage(files, policy) {
+    const normalizedFiles = normalizeFiles(files);
+    const scannedFiles = normalizedFiles.filter((file) =>
+      isWithinScanFence(file.filePath)
+    );
+    const normalizedPolicy = normalizeRequiredCoveragePolicy(policy);
+    const scannedFilesByPath = new Map(
+      scannedFiles.map((file) => [file.filePath, file])
+    );
+    const findings = [];
+    const policyErrors = normalizedPolicy.policyErrors.map(
+      cloneRequiredCoveragePolicyError
+    );
+    let evaluatedTargetCount = 0;
+
+    for (const target of normalizedPolicy.targets) {
+      const matchedFile = scannedFilesByPath.get(target.filePath);
+
+      if (!matchedFile) {
+        policyErrors.push(
+          makeRequiredCoveragePolicyError(
+            "POLICY_TARGET_NOT_IN_SCAN_INPUT",
+            target.policyTargetId,
+            target.filePath
+          )
+        );
+        continue;
+      }
+
+      const markers = parseMarkers(matchedFile.content);
+      evaluatedTargetCount += 1;
+
+      if (markers.length >= REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT) {
+        continue;
+      }
+
+      findings.push({
+        code: REQUIRED_COVERAGE_MISSING_CODE,
+        policyTargetId: target.policyTargetId,
+        filePath: target.filePath,
+        domain: classifyFileDomain(target.filePath),
+        markerCount: markers.length,
+        minimumMarkerCount: REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT,
+      });
+    }
+
+    return {
+      policyMode: REQUIRED_COVERAGE_POLICY_MODE,
+      markerFamily: MARKER_FAMILY,
+      targetCount: normalizedPolicy.targetCount,
+      evaluatedTargetCount,
+      findings: findings.map(cloneRequiredCoverageFinding),
+      policyErrors: policyErrors.map(cloneRequiredCoveragePolicyError),
+    };
+  }
 }
 
 module.exports = {
   ConfidenceGradientEngine,
   MARKER_FAMILY,
+  REQUIRED_COVERAGE_MISSING_CODE,
+  REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT,
+  REQUIRED_COVERAGE_POLICY_ERROR_CODES,
+  REQUIRED_COVERAGE_POLICY_MODE,
+  REQUIRED_COVERAGE_POLICY_VERSION,
   RESERVED_MARKER_FAMILY,
   SCAN_FENCE,
   TIER_DEFINITIONS,

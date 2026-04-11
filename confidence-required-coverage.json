@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "targets": [
+    {
+      "id": "hook-runtime-core",
+      "filePath": "src/HookRuntime.js"
+    }
+  ]
+}

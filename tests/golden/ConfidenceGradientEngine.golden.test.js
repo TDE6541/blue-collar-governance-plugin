@@ -6,6 +6,10 @@ const assert = require("node:assert/strict");
 const {
   ConfidenceGradientEngine,
   MARKER_FAMILY,
+  REQUIRED_COVERAGE_MISSING_CODE,
+  REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT,
+  REQUIRED_COVERAGE_POLICY_MODE,
+  REQUIRED_COVERAGE_POLICY_VERSION,
   RESERVED_MARKER_FAMILY,
   SCAN_FENCE,
   TIER_DEFINITIONS,
@@ -17,6 +21,13 @@ function buildFile(filePath, content) {
   return {
     filePath,
     content,
+  };
+}
+
+function buildPolicy(targets, version = REQUIRED_COVERAGE_POLICY_VERSION) {
+  return {
+    version,
+    targets,
   };
 }
 
@@ -251,6 +262,239 @@ test("ConfidenceGradientEngine keeps .claude-rooted paths anchored under .claude
   assert.equal(report.totals.scannedFileCount, 1);
   assert.equal(report.files[0].filePath, ".claude/hooks/run-governance-hook.js");
 });
+
+test("ConfidenceGradientEngine required coverage passes when an opted-in file has one slash-family marker", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [buildFile("src/HookRuntime.js", "/// covered\n")],
+    buildPolicy([{ id: "hook-runtime-core", filePath: "src/HookRuntime.js" }])
+  );
+
+  assert.deepEqual(report, {
+    policyMode: REQUIRED_COVERAGE_POLICY_MODE,
+    markerFamily: MARKER_FAMILY,
+    targetCount: 1,
+    evaluatedTargetCount: 1,
+    findings: [],
+    policyErrors: [],
+  });
+});
+
+test("ConfidenceGradientEngine required coverage emits REQUIRED_COVERAGE_MISSING when an opted-in file has zero slash-family markers", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [buildFile("src/HookRuntime.js", "const runtime = true;\n")],
+    buildPolicy([{ id: "hook-runtime-core", filePath: "src/HookRuntime.js" }])
+  );
+
+  assert.deepEqual(report.findings, [
+    {
+      code: REQUIRED_COVERAGE_MISSING_CODE,
+      policyTargetId: "hook-runtime-core",
+      filePath: "src/HookRuntime.js",
+      domain: UNCLASSIFIED_DOMAIN,
+      markerCount: 0,
+      minimumMarkerCount: REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT,
+    },
+  ]);
+  assert.deepEqual(report.policyErrors, []);
+});
+
+test("ConfidenceGradientEngine required coverage ignores non-opted files with zero slash-family markers", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [
+      buildFile("src/HookRuntime.js", "/// covered\n"),
+      buildFile("src/not-opted.js", "const runtime = true;\n"),
+    ],
+    buildPolicy([{ id: "hook-runtime-core", filePath: "src/HookRuntime.js" }])
+  );
+
+  assert.equal(report.evaluatedTargetCount, 1);
+  assert.deepEqual(report.findings, []);
+  assert.deepEqual(report.policyErrors, []);
+});
+
+test("ConfidenceGradientEngine required coverage emits POLICY_TARGET_OUTSIDE_SCAN_FENCE for targets outside the scan fence", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [buildFile("src/HookRuntime.js", "/// covered\n")],
+    buildPolicy([
+      { id: "docs-spec", filePath: "docs/specs/CONFIDENCE_REQUIRED_COVERAGE.md" },
+    ])
+  );
+
+  assert.equal(report.evaluatedTargetCount, 0);
+  assert.deepEqual(report.findings, []);
+  assert.deepEqual(report.policyErrors, [
+    {
+      code: "POLICY_TARGET_OUTSIDE_SCAN_FENCE",
+      policyTargetId: "docs-spec",
+      filePath: "docs/specs/CONFIDENCE_REQUIRED_COVERAGE.md",
+    },
+  ]);
+});
+
+test("ConfidenceGradientEngine required coverage emits POLICY_TARGET_NOT_IN_SCAN_INPUT for valid targets missing from the scan input", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [buildFile("src/other.js", "/// covered\n")],
+    buildPolicy([{ id: "hook-runtime-core", filePath: "src/HookRuntime.js" }])
+  );
+
+  assert.equal(report.evaluatedTargetCount, 0);
+  assert.deepEqual(report.findings, []);
+  assert.deepEqual(report.policyErrors, [
+    {
+      code: "POLICY_TARGET_NOT_IN_SCAN_INPUT",
+      policyTargetId: "hook-runtime-core",
+      filePath: "src/HookRuntime.js",
+    },
+  ]);
+});
+
+test("ConfidenceGradientEngine required coverage emits POLICY_TARGET_DUPLICATE for duplicate target ids", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [buildFile("src/one.js", "/// covered\n")],
+    buildPolicy([
+      { id: "dup", filePath: "src/one.js" },
+      { id: "dup", filePath: "src/two.js" },
+    ])
+  );
+
+  assert.equal(report.evaluatedTargetCount, 1);
+  assert.deepEqual(report.findings, []);
+  assert.deepEqual(report.policyErrors, [
+    {
+      code: "POLICY_TARGET_DUPLICATE",
+      policyTargetId: "dup",
+      filePath: "src/two.js",
+    },
+  ]);
+});
+
+test("ConfidenceGradientEngine required coverage emits POLICY_TARGET_DUPLICATE for duplicate normalized file paths", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [buildFile("src/dup.js", "/// covered\n")],
+    buildPolicy([
+      {
+        id: "first",
+        filePath: "C:\\dev\\Blue Collar Governance Plugin\\src\\dup.js",
+      },
+      { id: "second", filePath: "src/dup.js" },
+    ])
+  );
+
+  assert.equal(report.evaluatedTargetCount, 1);
+  assert.deepEqual(report.findings, []);
+  assert.deepEqual(report.policyErrors, [
+    {
+      code: "POLICY_TARGET_DUPLICATE",
+      policyTargetId: "second",
+      filePath: "src/dup.js",
+    },
+  ]);
+});
+
+test("ConfidenceGradientEngine required coverage treats semicolon-only content as missing coverage", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [buildFile("src/HookRuntime.js", ";;;; reserved\n")],
+    buildPolicy([{ id: "hook-runtime-core", filePath: "src/HookRuntime.js" }])
+  );
+
+  assert.equal(report.evaluatedTargetCount, 1);
+  assert.deepEqual(report.findings, [
+    {
+      code: REQUIRED_COVERAGE_MISSING_CODE,
+      policyTargetId: "hook-runtime-core",
+      filePath: "src/HookRuntime.js",
+      domain: UNCLASSIFIED_DOMAIN,
+      markerCount: 0,
+      minimumMarkerCount: REQUIRED_COVERAGE_MINIMUM_MARKER_COUNT,
+    },
+  ]);
+});
+
+test("ConfidenceGradientEngine required coverage validates policy version deterministically", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [buildFile("src/HookRuntime.js", "/// covered\n")],
+    buildPolicy([{ id: "hook-runtime-core", filePath: "src/HookRuntime.js" }], 2)
+  );
+
+  assert.equal(report.targetCount, 1);
+  assert.equal(report.evaluatedTargetCount, 0);
+  assert.deepEqual(report.findings, []);
+  assert.deepEqual(report.policyErrors, [
+    {
+      code: "POLICY_TARGET_INVALID",
+      policyTargetId: null,
+      filePath: null,
+    },
+  ]);
+});
+
+test("ConfidenceGradientEngine required coverage validates malformed policy targets deterministically", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [buildFile("src/HookRuntime.js", "/// covered\n")],
+    buildPolicy([{ id: "", filePath: "src/HookRuntime.js" }])
+  );
+
+  assert.equal(report.targetCount, 1);
+  assert.equal(report.evaluatedTargetCount, 0);
+  assert.deepEqual(report.findings, []);
+  assert.deepEqual(report.policyErrors, [
+    {
+      code: "POLICY_TARGET_INVALID",
+      policyTargetId: null,
+      filePath: "src/HookRuntime.js",
+    },
+  ]);
+});
+
+test("ConfidenceGradientEngine required coverage keeps Windows and .claude normalization coherent with Phase 1", () => {
+  const engine = new ConfidenceGradientEngine();
+  const report = engine.evaluateRequiredCoverage(
+    [
+      buildFile(
+        "C:\\dev\\Blue Collar Governance Plugin\\.claude\\hooks\\run-governance-hook.js",
+        "///// covered\n"
+      ),
+    ],
+    buildPolicy([
+      {
+        id: "claude-hook",
+        filePath:
+          "C:\\dev\\Blue Collar Governance Plugin\\.claude\\hooks\\run-governance-hook.js",
+      },
+    ])
+  );
+
+  assert.equal(report.evaluatedTargetCount, 1);
+  assert.deepEqual(report.findings, []);
+  assert.deepEqual(report.policyErrors, []);
+});
+
+test("ConfidenceGradientEngine required coverage is additive and does not change scan(files) results for existing callers", () => {
+  const engine = new ConfidenceGradientEngine();
+  const files = [buildFile("src/repeat.js", "///// hold\n")];
+
+  const firstScan = engine.scan(files);
+  const requiredCoverage = engine.evaluateRequiredCoverage(
+    files,
+    buildPolicy([{ id: "repeat-core", filePath: "src/repeat.js" }])
+  );
+  const secondScan = engine.scan(files);
+
+  assert.deepEqual(requiredCoverage.findings, []);
+  assert.deepEqual(requiredCoverage.policyErrors, []);
+  assert.deepEqual(firstScan, secondScan);
+});
+
 test("ConfidenceGradientEngine ignores semicolon-family markers in Phase 1", () => {
   const engine = new ConfidenceGradientEngine();
   const report = engine.scan([

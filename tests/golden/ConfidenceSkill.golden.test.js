@@ -27,6 +27,18 @@ function buildConfidenceGradientView(files) {
   return engine.scan(files);
 }
 
+function buildPolicy(targets) {
+  return {
+    version: 1,
+    targets,
+  };
+}
+
+function buildRequiredCoverageView(files, policy) {
+  const engine = new ConfidenceGradientEngine();
+  return engine.evaluateRequiredCoverage(files, policy);
+}
+
 function expectValidationError(run, code, message) {
   let error;
   try {
@@ -64,6 +76,25 @@ test("/confidence renders deterministically and keeps input unchanged", () => {
   assert.deepEqual(first, second);
   assert.equal(first.route, "/confidence");
   assert.equal(first.markerFamily, "slash");
+});
+
+test("/confidence keeps the exact Packet 1 route shape when no required coverage input is supplied", () => {
+  const skill = new ConfidenceSkill();
+  const rendered = skill.renderConfidence({
+    confidenceGradientView: buildConfidenceGradientView([
+      buildFile("src/sample.js", "/// watch\n"),
+    ]),
+  });
+
+  assert.deepEqual(Object.keys(rendered).sort(), [
+    "domainGrouping",
+    "fileMarkerMap",
+    "markerFamily",
+    "route",
+    "tierTotals",
+    "topHoldKillLocations",
+  ]);
+  assert.equal(Object.prototype.hasOwnProperty.call(rendered, "requiredCoverage"), false);
 });
 
 test("/confidence surfaces exact tier totals from engine truth", () => {
@@ -143,6 +174,83 @@ test("/confidence returns domain grouping from engine truth", () => {
       { domainId: "unclassified", markerCount: 1 },
     ]
   );
+});
+
+test("/confidence composes required coverage additively and preserves observed marker fields", () => {
+  const skill = new ConfidenceSkill();
+  const files = [
+    buildFile("src/HookRuntime.js", "/// covered\n"),
+    buildFile("src/neutral.js", "///// hold\n"),
+  ];
+  const confidenceGradientView = buildConfidenceGradientView(files);
+  const baseRendered = skill.renderConfidence({
+    confidenceGradientView,
+  });
+  const composed = skill.renderConfidence({
+    confidenceGradientView,
+    requiredCoverageView: buildRequiredCoverageView(
+      files,
+      buildPolicy([{ id: "hook-runtime-core", filePath: "src/HookRuntime.js" }])
+    ),
+  });
+
+  assert.deepEqual(composed.route, baseRendered.route);
+  assert.deepEqual(composed.markerFamily, baseRendered.markerFamily);
+  assert.deepEqual(composed.tierTotals, baseRendered.tierTotals);
+  assert.deepEqual(composed.fileMarkerMap, baseRendered.fileMarkerMap);
+  assert.deepEqual(composed.domainGrouping, baseRendered.domainGrouping);
+  assert.deepEqual(composed.topHoldKillLocations, baseRendered.topHoldKillLocations);
+  assert.deepEqual(composed.requiredCoverage, {
+    policyMode: "explicit_opt_in",
+    markerFamily: "slash",
+    targetCount: 1,
+    evaluatedTargetCount: 1,
+    findings: [],
+    policyErrors: [],
+  });
+});
+
+test("/confidence keeps required coverage findings and policy errors separate from observed marker truth", () => {
+  const skill = new ConfidenceSkill();
+  const files = [
+    buildFile("src/HookRuntime.js", "const runtime = true;\n"),
+    buildFile("src/observed.js", "///// observed hold\n"),
+  ];
+  const rendered = skill.renderConfidence({
+    confidenceGradientView: buildConfidenceGradientView(files),
+    requiredCoverageView: buildRequiredCoverageView(
+      files,
+      buildPolicy([
+        { id: "hook-runtime-core", filePath: "src/HookRuntime.js" },
+        { id: "docs-spec", filePath: "docs/specs/not-scanned.js" },
+      ])
+    ),
+  });
+
+  assert.deepEqual(
+    rendered.fileMarkerMap.map((file) => file.filePath),
+    ["src/observed.js"]
+  );
+  assert.deepEqual(rendered.requiredCoverage.findings, [
+    {
+      code: "REQUIRED_COVERAGE_MISSING",
+      policyTargetId: "hook-runtime-core",
+      filePath: "src/HookRuntime.js",
+      domain: {
+        domainId: "unclassified",
+        label: "Unclassified",
+      },
+      markerCount: 0,
+      minimumMarkerCount: 1,
+    },
+  ]);
+  assert.deepEqual(rendered.requiredCoverage.policyErrors, [
+    {
+      code: "POLICY_TARGET_OUTSIDE_SCAN_FENCE",
+      policyTargetId: "docs-spec",
+      filePath: "docs/specs/not-scanned.js",
+    },
+  ]);
 });
 
 test("/confidence returns top HOLD and KILL locations in deterministic order", () => {
@@ -225,18 +333,47 @@ test("/confidence rejects non-slash marker families", () => {
   );
 });
 
+test("/confidence rejects non-slash marker families in required coverage input", () => {
+  const skill = new ConfidenceSkill();
+  const badRequiredCoverageView = buildRequiredCoverageView(
+    [buildFile("src/sample.js", "///// hold\n")],
+    buildPolicy([{ id: "sample-core", filePath: "src/sample.js" }])
+  );
+  badRequiredCoverageView.markerFamily = "semicolon";
+
+  expectValidationError(
+    () =>
+      skill.renderConfidence({
+        confidenceGradientView: buildConfidenceGradientView([
+          buildFile("src/sample.js", "///// hold\n"),
+        ]),
+        requiredCoverageView: badRequiredCoverageView,
+      }),
+    "ERR_INVALID_INPUT",
+    "'requiredCoverageView.markerFamily' must be 'slash'"
+  );
+});
+
 test("/confidence exposes no score, trend, or health-percentage fields and keeps a read-only method surface", () => {
   const skill = new ConfidenceSkill();
   const rendered = skill.renderConfidence({
     confidenceGradientView: buildConfidenceGradientView([
       buildFile("src/sample.js", "///// hold\n"),
     ]),
+    requiredCoverageView: buildRequiredCoverageView(
+      [buildFile("src/sample.js", "///// hold\n")],
+      buildPolicy([{ id: "sample-core", filePath: "src/sample.js" }])
+    ),
   });
 
-  const forbiddenFields = ["score", "trendLine", "healthPercentage"];
+  const forbiddenFields = ["score", "trendLine", "healthPercentage", "reviewedClean"];
   for (const field of forbiddenFields) {
     assert.equal(Object.prototype.hasOwnProperty.call(rendered, field), false);
   }
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(rendered.requiredCoverage, "reviewedClean"),
+    false
+  );
 
   const methodNames = Object.getOwnPropertyNames(ConfidenceSkill.prototype).sort();
   assert.deepEqual(methodNames, ["constructor", "renderConfidence"]);
