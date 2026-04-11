@@ -10,6 +10,9 @@ const {
   MarkerContinuityEngine,
 } = require("../../src/MarkerContinuityEngine");
 const {
+  MarkerTemporalSignalsEngine,
+} = require("../../src/MarkerTemporalSignalsEngine");
+const {
   ConfidenceSkill,
   SKILL_ROUTES,
 } = require("../../src/ConfidenceSkill");
@@ -53,6 +56,11 @@ function buildMarkerContinuityView(previousFiles, currentFiles) {
     previousFiles === null ? null : buildSnapshot(previousFiles),
     buildSnapshot(currentFiles)
   );
+}
+
+function buildMarkerTemporalSignalsView(timelineEntries, options) {
+  const engine = new MarkerTemporalSignalsEngine();
+  return engine.evaluateTimeline(timelineEntries, options);
 }
 
 function expectValidationError(run, code, message) {
@@ -421,6 +429,179 @@ test("/confidence accepts bootstrap comparison truth without making continuity c
   });
 });
 
+test("/confidence composes marker temporal signals additively and preserves the current scan surface", () => {
+  const skill = new ConfidenceSkill();
+  const timelineEntries = [
+    {
+      observedAt: "2026-04-01T00:00:00Z",
+      snapshot: buildSnapshot([buildFile("src/hold.js", "///// stable hold\n")]),
+    },
+    {
+      observedAt: "2026-04-06T00:00:00Z",
+      snapshot: buildSnapshot([buildFile("src/hold.js", "///// stable hold\n")]),
+    },
+  ];
+  const confidenceGradientView = buildConfidenceGradientView([
+    buildFile("src/hold.js", "///// stable hold\n"),
+  ]);
+  const baseRendered = skill.renderConfidence({
+    confidenceGradientView,
+  });
+  const rendered = skill.renderConfidence({
+    confidenceGradientView,
+    markerTemporalSignalsView: buildMarkerTemporalSignalsView(timelineEntries, {
+      staleHoldDays: 3,
+      unresolvedKillDays: 1,
+    }),
+  });
+
+  assert.deepEqual(rendered.route, baseRendered.route);
+  assert.deepEqual(rendered.markerFamily, baseRendered.markerFamily);
+  assert.deepEqual(rendered.tierTotals, baseRendered.tierTotals);
+  assert.deepEqual(rendered.fileMarkerMap, baseRendered.fileMarkerMap);
+  assert.deepEqual(rendered.domainGrouping, baseRendered.domainGrouping);
+  assert.deepEqual(rendered.topHoldKillLocations, baseRendered.topHoldKillLocations);
+  assert.deepEqual(rendered.markerTemporalSignals, {
+    temporalVersion: 1,
+    markerFamily: "slash",
+    thresholds: {
+      staleHoldDays: 3,
+      unresolvedKillDays: 1,
+    },
+    timeline: {
+      entryCount: 2,
+      earliestObservedAt: "2026-04-01T00:00:00Z",
+      latestObservedAt: "2026-04-06T00:00:00Z",
+    },
+    findings: [
+      {
+        code: "STALE_HOLD",
+        filePath: "src/hold.js",
+        currentMarker: {
+          lineNumber: 1,
+          tier: "HOLD",
+          marker: "/////",
+          slashCount: 5,
+          trailingText: "stable hold",
+        },
+        currentTierEnteredAt: "2026-04-01T00:00:00Z",
+        observedAt: "2026-04-06T00:00:00Z",
+        ageDays: 5,
+        thresholdDays: 3,
+      },
+    ],
+    errors: [],
+    trendSummary: {
+      earliestObservedAt: "2026-04-01T00:00:00Z",
+      latestObservedAt: "2026-04-06T00:00:00Z",
+      earliestTierTotals: {
+        WATCH: 0,
+        GAP: 0,
+        HOLD: 1,
+        KILL: 0,
+      },
+      latestTierTotals: {
+        WATCH: 0,
+        GAP: 0,
+        HOLD: 1,
+        KILL: 0,
+      },
+      netTierDeltas: {
+        WATCH: 0,
+        GAP: 0,
+        HOLD: 0,
+        KILL: 0,
+      },
+      continuityCounts: {
+        matched: 1,
+        newlyObserved: 0,
+        noLongerObserved: 0,
+        moved: 0,
+        retiered: 0,
+        ambiguous: 0,
+      },
+    },
+  });
+});
+
+test("/confidence keeps temporal, required coverage, and marker continuity sections separate", () => {
+  const skill = new ConfidenceSkill();
+  const files = [
+    buildFile("src/HookRuntime.js", "const runtime = true;\n"),
+    buildFile("src/observed.js", "///// observed hold\n"),
+  ];
+  const rendered = skill.renderConfidence({
+    confidenceGradientView: buildConfidenceGradientView(files),
+    requiredCoverageView: buildRequiredCoverageView(
+      files,
+      buildPolicy([{ id: "hook-runtime-core", filePath: "src/HookRuntime.js" }])
+    ),
+    markerContinuityView: buildMarkerContinuityView(
+      [buildFile("src/observed.js", "/// observed hold\n")],
+      [buildFile("src/observed.js", "///// observed hold\n")]
+    ),
+    markerTemporalSignalsView: buildMarkerTemporalSignalsView(
+      [
+        {
+          observedAt: "2026-04-01T00:00:00Z",
+          snapshot: buildSnapshot([buildFile("src/observed.js", "/// observed hold\n")]),
+        },
+        {
+          observedAt: "2026-04-03T00:00:00Z",
+          snapshot: buildSnapshot([
+            buildFile("src/observed.js", "///// observed hold\n"),
+          ]),
+        },
+        {
+          observedAt: "2026-04-06T00:00:00Z",
+          snapshot: buildSnapshot([
+            buildFile("src/observed.js", "///// observed hold\n"),
+          ]),
+        },
+      ],
+      {
+        staleHoldDays: 2,
+        unresolvedKillDays: 1,
+      }
+    ),
+  });
+
+  assert.equal(rendered.requiredCoverage.findings.length, 1);
+  assert.equal(rendered.markerContinuity.continuityChanges.length, 1);
+  assert.equal(rendered.markerTemporalSignals.findings.length, 1);
+  assert.equal(rendered.markerTemporalSignals.findings[0].code, "STALE_HOLD");
+});
+
+test("/confidence accepts temporal error reports without changing the current scan surface", () => {
+  const skill = new ConfidenceSkill();
+  const rendered = skill.renderConfidence({
+    confidenceGradientView: buildConfidenceGradientView([
+      buildFile("src/sample.js", "///// hold\n"),
+    ]),
+    markerTemporalSignalsView: buildMarkerTemporalSignalsView(
+      [
+        {
+          observedAt: "2026-04-01T00:00:00Z",
+          snapshot: buildSnapshot([buildFile("src/sample.js", "///// hold\n")]),
+        },
+      ],
+      {
+        staleHoldDays: 2,
+        unresolvedKillDays: 1,
+      }
+    ),
+  });
+
+  assert.deepEqual(rendered.markerTemporalSignals.findings, []);
+  assert.deepEqual(rendered.markerTemporalSignals.errors, [
+    {
+      code: "TIMELINE_TOO_SHORT",
+      details: {},
+    },
+  ]);
+  assert.equal(rendered.markerTemporalSignals.trendSummary, null);
+});
+
 test("/confidence returns top HOLD and KILL locations in deterministic order", () => {
   const skill = new ConfidenceSkill();
   const view = buildConfidenceGradientView([
@@ -564,6 +745,72 @@ test("/confidence rejects invalid continuity vocabulary that would force stronge
   );
 });
 
+test("/confidence rejects non-slash marker families in temporal input", () => {
+  const skill = new ConfidenceSkill();
+  const badMarkerTemporalSignalsView = buildMarkerTemporalSignalsView(
+    [
+      {
+        observedAt: "2026-04-01T00:00:00Z",
+        snapshot: buildSnapshot([buildFile("src/sample.js", "///// hold\n")]),
+      },
+      {
+        observedAt: "2026-04-03T00:00:00Z",
+        snapshot: buildSnapshot([buildFile("src/sample.js", "///// hold\n")]),
+      },
+    ],
+    {
+      staleHoldDays: 2,
+      unresolvedKillDays: 1,
+    }
+  );
+  badMarkerTemporalSignalsView.markerFamily = "semicolon";
+
+  expectValidationError(
+    () =>
+      skill.renderConfidence({
+        confidenceGradientView: buildConfidenceGradientView([
+          buildFile("src/sample.js", "///// hold\n"),
+        ]),
+        markerTemporalSignalsView: badMarkerTemporalSignalsView,
+      }),
+    "ERR_INVALID_INPUT",
+    "'markerTemporalSignalsView.markerFamily' must be 'slash'"
+  );
+});
+
+test("/confidence rejects invalid temporal finding vocabulary that would force stronger claims", () => {
+  const skill = new ConfidenceSkill();
+  const badMarkerTemporalSignalsView = buildMarkerTemporalSignalsView(
+    [
+      {
+        observedAt: "2026-04-01T00:00:00Z",
+        snapshot: buildSnapshot([buildFile("src/sample.js", "///// hold\n")]),
+      },
+      {
+        observedAt: "2026-04-04T00:00:00Z",
+        snapshot: buildSnapshot([buildFile("src/sample.js", "///// hold\n")]),
+      },
+    ],
+    {
+      staleHoldDays: 2,
+      unresolvedKillDays: 1,
+    }
+  );
+  badMarkerTemporalSignalsView.findings[0].code = "RESOLVED";
+
+  expectValidationError(
+    () =>
+      skill.renderConfidence({
+        confidenceGradientView: buildConfidenceGradientView([
+          buildFile("src/sample.js", "///// hold\n"),
+        ]),
+        markerTemporalSignalsView: badMarkerTemporalSignalsView,
+      }),
+    "ERR_INVALID_INPUT",
+    "'markerTemporalSignalsView.findings[0].code' must be one of: STALE_HOLD, UNRESOLVED_KILL"
+  );
+});
+
 test("/confidence exposes no score, trend, or health-percentage fields and keeps a read-only method surface", () => {
   const skill = new ConfidenceSkill();
   const rendered = skill.renderConfidence({
@@ -577,6 +824,22 @@ test("/confidence exposes no score, trend, or health-percentage fields and keeps
     markerContinuityView: buildMarkerContinuityView(
       [buildFile("src/sample.js", "///// hold\n")],
       [buildFile("src/sample.js", "//// hold\n")]
+    ),
+    markerTemporalSignalsView: buildMarkerTemporalSignalsView(
+      [
+        {
+          observedAt: "2026-04-01T00:00:00Z",
+          snapshot: buildSnapshot([buildFile("src/sample.js", "///// hold\n")]),
+        },
+        {
+          observedAt: "2026-04-04T00:00:00Z",
+          snapshot: buildSnapshot([buildFile("src/sample.js", "///// hold\n")]),
+        },
+      ],
+      {
+        staleHoldDays: 2,
+        unresolvedKillDays: 1,
+      }
     ),
   });
 
@@ -596,6 +859,22 @@ test("/confidence exposes no score, trend, or health-percentage fields and keeps
   );
   assert.equal(
     Object.prototype.hasOwnProperty.call(rendered.markerContinuity, "reviewedClean"),
+    false
+  );
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(rendered.markerTemporalSignals, "reviewedClean"),
+    false
+  );
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(rendered.markerTemporalSignals, "score"),
+    false
+  );
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(rendered.markerTemporalSignals, "priority"),
+    false
+  );
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(rendered.markerTemporalSignals, "resolved"),
     false
   );
 

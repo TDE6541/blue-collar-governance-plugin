@@ -17,6 +17,11 @@ const {
   NEWLY_OBSERVED_STATUS,
   NO_LONGER_OBSERVED_STATUS,
 } = require("./MarkerContinuityEngine");
+const {
+  TEMPORAL_ERROR_CODES,
+  TEMPORAL_FINDING_CODES,
+  TEMPORAL_SIGNALS_VERSION,
+} = require("./MarkerTemporalSignalsEngine");
 
 const SKILL_ROUTES = Object.freeze(["/confidence"]);
 const HIGH_SEVERITY_TIERS = new Set(["HOLD", "KILL"]);
@@ -29,6 +34,8 @@ const CONTINUITY_CHANGE_STATUS_SET = new Set([
   NO_LONGER_OBSERVED_STATUS,
 ]);
 const MATCH_FLAG_SET = new Set(MATCH_FLAGS);
+const TEMPORAL_FINDING_CODE_SET = new Set(TEMPORAL_FINDING_CODES);
+const TEMPORAL_ERROR_CODE_SET = new Set(TEMPORAL_ERROR_CODES);
 const TIER_BY_NAME = new Map(
   TIER_DEFINITIONS.map((definition) => [definition.tier, definition])
 );
@@ -63,6 +70,16 @@ function assertNonNegativeInteger(input, fieldName, parentName = "input") {
     throw makeValidationError(
       "ERR_INVALID_INPUT",
       `'${parentName}.${fieldName}' must be a non-negative integer`
+    );
+  }
+}
+
+function assertInteger(input, fieldName, parentName = "input") {
+  const value = input[fieldName];
+  if (!Number.isInteger(value)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.${fieldName}' must be an integer`
     );
   }
 }
@@ -746,6 +763,301 @@ function normalizeMarkerContinuityView(input) {
   };
 }
 
+function normalizeMarkerTemporalSignalsThresholds(input) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerTemporalSignalsView.thresholds' must be an object"
+    );
+  }
+
+  assertNonNegativeInteger(input, "staleHoldDays", "markerTemporalSignalsView.thresholds");
+  assertNonNegativeInteger(
+    input,
+    "unresolvedKillDays",
+    "markerTemporalSignalsView.thresholds"
+  );
+
+  return {
+    staleHoldDays: input.staleHoldDays,
+    unresolvedKillDays: input.unresolvedKillDays,
+  };
+}
+
+function normalizeMarkerTemporalSignalFinding(input, parentName) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}' must be an object`
+    );
+  }
+
+  assertRequiredString(input, "code", parentName);
+  assertRequiredString(input, "filePath", parentName);
+  assertRequiredString(input, "currentTierEnteredAt", parentName);
+  assertRequiredString(input, "observedAt", parentName);
+  assertNonNegativeInteger(input, "ageDays", parentName);
+  assertNonNegativeInteger(input, "thresholdDays", parentName);
+
+  if (!TEMPORAL_FINDING_CODE_SET.has(input.code)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.code' must be one of: ${TEMPORAL_FINDING_CODES.join(", ")}`
+    );
+  }
+
+  return {
+    code: input.code,
+    filePath: input.filePath,
+    currentMarker: normalizeComparisonMarker(
+      input.currentMarker,
+      `${parentName}.currentMarker`
+    ),
+    currentTierEnteredAt: input.currentTierEnteredAt,
+    observedAt: input.observedAt,
+    ageDays: input.ageDays,
+    thresholdDays: input.thresholdDays,
+  };
+}
+
+function normalizeMarkerTemporalSignalErrorDetails(input, parentName) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}' must be an object`
+    );
+  }
+
+  const normalized = {};
+
+  if (Object.prototype.hasOwnProperty.call(input, "timelineIndex")) {
+    if (input.timelineIndex !== null) {
+      assertNonNegativeInteger(input, "timelineIndex", parentName);
+    }
+    normalized.timelineIndex = input.timelineIndex;
+  }
+
+  for (const fieldName of [
+    "observedAt",
+    "previousObservedAt",
+    "currentObservedAt",
+    "markerFamily",
+    "filePath",
+  ]) {
+    if (Object.prototype.hasOwnProperty.call(input, fieldName)) {
+      normalized[fieldName] = normalizeOptionalStringOrNull(input, fieldName, parentName);
+    }
+  }
+
+  if (Object.prototype.hasOwnProperty.call(input, "currentMarker")) {
+    normalized.currentMarker =
+      input.currentMarker === null
+        ? null
+        : normalizeComparisonMarker(input.currentMarker, `${parentName}.currentMarker`);
+  }
+
+  return normalized;
+}
+
+function normalizeMarkerTemporalSignalError(input, parentName) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}' must be an object`
+    );
+  }
+
+  assertRequiredString(input, "code", parentName);
+
+  if (!TEMPORAL_ERROR_CODE_SET.has(input.code)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'${parentName}.code' must be one of: ${TEMPORAL_ERROR_CODES.join(", ")}`
+    );
+  }
+
+  return {
+    code: input.code,
+    details: normalizeMarkerTemporalSignalErrorDetails(
+      input.details,
+      `${parentName}.details`
+    ),
+  };
+}
+
+function normalizeMarkerTemporalSignalTimeline(input) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerTemporalSignalsView.timeline' must be an object"
+    );
+  }
+
+  assertNonNegativeInteger(input, "entryCount", "markerTemporalSignalsView.timeline");
+
+  return {
+    entryCount: input.entryCount,
+    earliestObservedAt: normalizeOptionalStringOrNull(
+      input,
+      "earliestObservedAt",
+      "markerTemporalSignalsView.timeline"
+    ),
+    latestObservedAt: normalizeOptionalStringOrNull(
+      input,
+      "latestObservedAt",
+      "markerTemporalSignalsView.timeline"
+    ),
+  };
+}
+
+function normalizeMarkerTemporalSignalTrendSummary(input) {
+  if (input === null) {
+    return null;
+  }
+
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerTemporalSignalsView.trendSummary' must be an object or null"
+    );
+  }
+
+  assertRequiredString(
+    input,
+    "earliestObservedAt",
+    "markerTemporalSignalsView.trendSummary"
+  );
+  assertRequiredString(
+    input,
+    "latestObservedAt",
+    "markerTemporalSignalsView.trendSummary"
+  );
+
+  if (!isPlainObject(input.continuityCounts)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerTemporalSignalsView.trendSummary.continuityCounts' must be an object"
+    );
+  }
+
+  if (!isPlainObject(input.netTierDeltas)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerTemporalSignalsView.trendSummary.netTierDeltas' must be an object"
+    );
+  }
+
+  for (const fieldName of [
+    "matched",
+    "newlyObserved",
+    "noLongerObserved",
+    "moved",
+    "retiered",
+    "ambiguous",
+  ]) {
+    assertNonNegativeInteger(
+      input.continuityCounts,
+      fieldName,
+      "markerTemporalSignalsView.trendSummary.continuityCounts"
+    );
+  }
+
+  for (const tier of TIER_ORDER) {
+    assertInteger(
+      input.netTierDeltas,
+      tier,
+      "markerTemporalSignalsView.trendSummary.netTierDeltas"
+    );
+  }
+
+  return {
+    earliestObservedAt: input.earliestObservedAt,
+    latestObservedAt: input.latestObservedAt,
+    earliestTierTotals: normalizeTierTotals(
+      input.earliestTierTotals,
+      "markerTemporalSignalsView.trendSummary.earliestTierTotals"
+    ),
+    latestTierTotals: normalizeTierTotals(
+      input.latestTierTotals,
+      "markerTemporalSignalsView.trendSummary.latestTierTotals"
+    ),
+    netTierDeltas: {
+      WATCH: input.netTierDeltas.WATCH,
+      GAP: input.netTierDeltas.GAP,
+      HOLD: input.netTierDeltas.HOLD,
+      KILL: input.netTierDeltas.KILL,
+    },
+    continuityCounts: {
+      matched: input.continuityCounts.matched,
+      newlyObserved: input.continuityCounts.newlyObserved,
+      noLongerObserved: input.continuityCounts.noLongerObserved,
+      moved: input.continuityCounts.moved,
+      retiered: input.continuityCounts.retiered,
+      ambiguous: input.continuityCounts.ambiguous,
+    },
+  };
+}
+
+function normalizeMarkerTemporalSignalsView(input) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerTemporalSignalsView' must be an object"
+    );
+  }
+
+  assertNonNegativeInteger(input, "temporalVersion", "markerTemporalSignalsView");
+  assertRequiredString(input, "markerFamily", "markerTemporalSignalsView");
+
+  if (input.temporalVersion !== TEMPORAL_SIGNALS_VERSION) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      `'markerTemporalSignalsView.temporalVersion' must be ${TEMPORAL_SIGNALS_VERSION}`
+    );
+  }
+
+  if (input.markerFamily !== MARKER_FAMILY) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerTemporalSignalsView.markerFamily' must be 'slash'"
+    );
+  }
+
+  if (!Array.isArray(input.findings)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerTemporalSignalsView.findings' must be an array"
+    );
+  }
+
+  if (!Array.isArray(input.errors)) {
+    throw makeValidationError(
+      "ERR_INVALID_INPUT",
+      "'markerTemporalSignalsView.errors' must be an array"
+    );
+  }
+
+  return {
+    temporalVersion: input.temporalVersion,
+    markerFamily: input.markerFamily,
+    thresholds: normalizeMarkerTemporalSignalsThresholds(input.thresholds),
+    timeline: normalizeMarkerTemporalSignalTimeline(input.timeline),
+    findings: input.findings.map((finding, index) =>
+      normalizeMarkerTemporalSignalFinding(
+        finding,
+        `markerTemporalSignalsView.findings[${index}]`
+      )
+    ),
+    errors: input.errors.map((error, index) =>
+      normalizeMarkerTemporalSignalError(
+        error,
+        `markerTemporalSignalsView.errors[${index}]`
+      )
+    ),
+    trendSummary: normalizeMarkerTemporalSignalTrendSummary(input.trendSummary),
+  };
+}
+
 class ConfidenceSkill {
   renderConfidence(input = {}) {
     if (!isPlainObject(input)) {
@@ -770,6 +1082,10 @@ class ConfidenceSkill {
       input.markerContinuityView === undefined
         ? null
         : normalizeMarkerContinuityView(input.markerContinuityView);
+    const normalizedMarkerTemporalSignals =
+      input.markerTemporalSignalsView === undefined
+        ? null
+        : normalizeMarkerTemporalSignalsView(input.markerTemporalSignalsView);
 
     const routeView = {
       route: "/confidence",
@@ -798,7 +1114,10 @@ class ConfidenceSkill {
     };
 
     if (normalizedRequiredCoverage === null) {
-      if (normalizedMarkerContinuity === null) {
+      if (
+        normalizedMarkerContinuity === null &&
+        normalizedMarkerTemporalSignals === null
+      ) {
         return routeView;
       }
     } else {
@@ -860,6 +1179,90 @@ class ConfidenceSkill {
             })),
           })
         ),
+      };
+    }
+
+    if (normalizedMarkerTemporalSignals !== null) {
+      routeView.markerTemporalSignals = {
+        temporalVersion: normalizedMarkerTemporalSignals.temporalVersion,
+        markerFamily: normalizedMarkerTemporalSignals.markerFamily,
+        thresholds: {
+          staleHoldDays: normalizedMarkerTemporalSignals.thresholds.staleHoldDays,
+          unresolvedKillDays:
+            normalizedMarkerTemporalSignals.thresholds.unresolvedKillDays,
+        },
+        timeline: {
+          entryCount: normalizedMarkerTemporalSignals.timeline.entryCount,
+          earliestObservedAt:
+            normalizedMarkerTemporalSignals.timeline.earliestObservedAt,
+          latestObservedAt: normalizedMarkerTemporalSignals.timeline.latestObservedAt,
+        },
+        findings: normalizedMarkerTemporalSignals.findings.map((finding) => ({
+          code: finding.code,
+          filePath: finding.filePath,
+          currentMarker: {
+            ...finding.currentMarker,
+          },
+          currentTierEnteredAt: finding.currentTierEnteredAt,
+          observedAt: finding.observedAt,
+          ageDays: finding.ageDays,
+          thresholdDays: finding.thresholdDays,
+        })),
+        errors: normalizedMarkerTemporalSignals.errors.map((error) => ({
+          code: error.code,
+          details: {
+            ...error.details,
+            ...(error.details.currentMarker === undefined ||
+            error.details.currentMarker === null
+              ? {}
+              : {
+                  currentMarker: {
+                    ...error.details.currentMarker,
+                  },
+                }),
+          },
+        })),
+        trendSummary:
+          normalizedMarkerTemporalSignals.trendSummary === null
+            ? null
+            : {
+                earliestObservedAt:
+                  normalizedMarkerTemporalSignals.trendSummary.earliestObservedAt,
+                latestObservedAt:
+                  normalizedMarkerTemporalSignals.trendSummary.latestObservedAt,
+                earliestTierTotals: cloneTierTotals(
+                  normalizedMarkerTemporalSignals.trendSummary.earliestTierTotals
+                ),
+                latestTierTotals: cloneTierTotals(
+                  normalizedMarkerTemporalSignals.trendSummary.latestTierTotals
+                ),
+                netTierDeltas: {
+                  WATCH: normalizedMarkerTemporalSignals.trendSummary.netTierDeltas.WATCH,
+                  GAP: normalizedMarkerTemporalSignals.trendSummary.netTierDeltas.GAP,
+                  HOLD: normalizedMarkerTemporalSignals.trendSummary.netTierDeltas.HOLD,
+                  KILL: normalizedMarkerTemporalSignals.trendSummary.netTierDeltas.KILL,
+                },
+                continuityCounts: {
+                  matched:
+                    normalizedMarkerTemporalSignals.trendSummary.continuityCounts
+                      .matched,
+                  newlyObserved:
+                    normalizedMarkerTemporalSignals.trendSummary.continuityCounts
+                      .newlyObserved,
+                  noLongerObserved:
+                    normalizedMarkerTemporalSignals.trendSummary.continuityCounts
+                      .noLongerObserved,
+                  moved:
+                    normalizedMarkerTemporalSignals.trendSummary.continuityCounts
+                      .moved,
+                  retiered:
+                    normalizedMarkerTemporalSignals.trendSummary.continuityCounts
+                      .retiered,
+                  ambiguous:
+                    normalizedMarkerTemporalSignals.trendSummary.continuityCounts
+                      .ambiguous,
+                },
+              },
       };
     }
 

@@ -1,4 +1,4 @@
-**Status:** Confidence `/confidence` read/query/render-only baseline plus Packet 2 required coverage and Packet 3 marker continuity composition (v3)
+**Status:** Confidence `/confidence` read/query/render-only baseline plus Packet 2 required coverage, Packet 3 marker continuity, and Packet 4 temporal signals composition (v4)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -21,6 +21,7 @@ The slice introduces one operator-facing route as a read/query/render-only surfa
 - deterministic top `HOLD` / `KILL` locations
 - optional additive required coverage composition over existing `ConfidenceGradientEngine.evaluateRequiredCoverage(...)` output
 - optional additive marker continuity composition over existing `MarkerContinuityEngine.compare(...)` output
+- optional additive temporal signals composition over existing `MarkerTemporalSignalsEngine.evaluateTimeline(...)` output
 
 This spec does not define:
 
@@ -29,7 +30,7 @@ This spec does not define:
 - policy file reads from disk
 - semicolon-family execution
 - reviewed-clean semantics
-- score, trend-line, percentage, or governance-health output
+- score, trend-line, percentage, or governance-health output at the route root
 - board writes
 - chain writes
 - lifecycle behavior
@@ -47,8 +48,10 @@ This spec does not define:
 - `/confidence` always maps the existing `ConfidenceGradientEngine.scan(...)` output as current observed marker truth.
 - When a caller explicitly supplies existing `ConfidenceGradientEngine.evaluateRequiredCoverage(...)` output, `/confidence` may compose it additively under a separate `requiredCoverage` section.
 - When a caller explicitly supplies existing `MarkerContinuityEngine.compare(...)` output, `/confidence` may compose it additively under a separate `markerContinuity` section.
-- No policy input means the route stays exact Packet 1 shape unless continuity input is explicitly supplied.
-- No continuity input means the route stays exact Packet 1/2 shape.
+- When a caller explicitly supplies existing `MarkerTemporalSignalsEngine.evaluateTimeline(...)` output, `/confidence` may compose it additively under a separate `markerTemporalSignals` section.
+- No policy input means the route stays exact Packet 1 shape unless continuity or temporal input is explicitly supplied.
+- No continuity input means the route stays exact Packet 1/2 shape unless temporal input is explicitly supplied.
+- No temporal input means the route stays exact Packet 1/2/3 shape.
 - The canonical route object is the first-class output.
 - Mapping reinterpretation is not allowed in this slice.
 
@@ -63,11 +66,12 @@ This spec does not define:
 
 ## `/confidence`
 
-Input includes one required field and two optional fields:
+Input includes one required field and three optional fields:
 
 - `confidenceGradientView`: object shaped as existing `ConfidenceGradientEngine.scan(...)` output
 - `requiredCoverageView`: optional object shaped as existing `ConfidenceGradientEngine.evaluateRequiredCoverage(...)` output
 - `markerContinuityView`: optional object shaped as existing `MarkerContinuityEngine.compare(...)` output
+- `markerTemporalSignalsView`: optional object shaped as existing `MarkerTemporalSignalsEngine.evaluateTimeline(...)` output
 
 Route behavior:
 
@@ -79,6 +83,7 @@ Route behavior:
 6. Surface deterministic top `HOLD` / `KILL` locations only.
 7. When `requiredCoverageView` is supplied, attach it additively as separate required coverage truth.
 8. When `markerContinuityView` is supplied, attach it additively as separate continuity-change truth.
+9. When `markerTemporalSignalsView` is supplied, attach it additively as separate temporal-lineage truth.
 
 `topHoldKillLocations` ordering is:
 
@@ -101,6 +106,7 @@ Packet 1 fields remain required:
 | `topHoldKillLocations` | object[] | Yes | Deterministic `HOLD` / `KILL` location list only. |
 | `requiredCoverage` | object | No | Additive required coverage section present only when `requiredCoverageView` is supplied. |
 | `markerContinuity` | object | No | Additive marker continuity section present only when `markerContinuityView` is supplied. |
+| `markerTemporalSignals` | object | No | Additive temporal signals section present only when `markerTemporalSignalsView` is supplied. |
 
 `topHoldKillLocations` item shape:
 
@@ -135,50 +141,36 @@ Packet 1 fields remain required:
 | `continuityChanges` | object[] | Yes | Deterministic non-ambiguous continuity outcomes only. |
 | `ambiguousCases` | object[] | Yes | Deterministic ambiguous candidate sets only. |
 
-`markerContinuity.continuityChanges` item shape:
+`markerTemporalSignals` shape:
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `status` | string | Yes | One of `MATCHED`, `NEWLY_OBSERVED`, or `NO_LONGER_OBSERVED`. |
-| `filePath` | string | Yes | Normalized file path. |
-| `flags` | string[] | No | Present only for `MATCHED`; uses only `moved` and `retiered`. |
-| `previousMarker` | object | No | Present for `MATCHED` and `NO_LONGER_OBSERVED`. |
-| `currentMarker` | object | No | Present for `MATCHED` and `NEWLY_OBSERVED`. |
-
-`markerContinuity.ambiguousCases` item shape:
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `status` | string | Yes | Literal `AMBIGUOUS`. |
-| `filePath` | string | Yes | Normalized file path. |
-| `previousCandidates` | object[] | Yes | Plausible previous candidates. |
-| `currentCandidates` | object[] | Yes | Plausible current candidates. |
-
-Comparison marker object shape:
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `lineNumber` | integer | Yes | 1-based line number. |
-| `tier` | string | Yes | One of `WATCH`, `GAP`, `HOLD`, or `KILL`. |
-| `marker` | string | Yes | Exact slash marker run. |
-| `slashCount` | integer | Yes | Exact slash count. |
-| `trailingText` | string or null | Yes | Normalized trailing marker text when present; otherwise `null`. |
+| `temporalVersion` | integer | Yes | Literal `1`. |
+| `markerFamily` | string | Yes | Literal `slash`. |
+| `thresholds` | object | Yes | Echoed temporal thresholds. |
+| `timeline` | object | Yes | Entry count plus earliest/latest observed timestamps. |
+| `findings` | object[] | Yes | `STALE_HOLD` and `UNRESOLVED_KILL` only. |
+| `errors` | object[] | Yes | Deterministic temporal error vocabulary only. |
+| `trendSummary` | object or null | Yes | Bounded trend summary when temporal evaluation succeeds; otherwise `null`. |
 
 ## Composition Rules
 
 - Existing Packet 1 fields remain the current scan surface.
 - Required coverage remains a distinct additive surface.
 - Marker continuity remains a distinct additive surface.
+- Temporal signals remain a distinct additive surface.
 - Ambiguous continuity cases remain separate from non-ambiguous continuity changes.
+- Temporal lineage ambiguity remains separate from stronger temporal findings.
 - The route must not imply reviewed-and-clean semantics.
 - The route must not reinterpret required coverage findings as observed marker counts.
-- The route must not reinterpret ambiguity into stronger continuity claims.
+- The route must not reinterpret continuity ambiguity into stronger continuity claims.
+- The route must not reinterpret temporal ambiguity into stronger age claims.
+- Packet 2 required coverage and Packet 4 temporal signals must stay separate.
 - No policy input means no `requiredCoverage` section.
 - No continuity input means no `markerContinuity` section.
+- No temporal input means no `markerTemporalSignals` section.
 
-## Comparison Render Rules
-
-Comparison mode is additive and opt-in only.
+## Comparison And Temporal Render Rules
 
 Comparison render language must stay bounded to:
 
@@ -192,12 +184,23 @@ Comparison render language must stay bounded to:
 - no longer observed
 - ambiguous
 
-Comparison render language must not introduce:
+Temporal render language must stay bounded to:
+
+- explicit timeline
+- thresholds used
+- current-tier age
+- stale hold
+- unresolved kill
+- bounded earliest-versus-latest trend summary
+- deterministic temporal errors
+
+Comparison and temporal render language must not introduce:
 
 - reviewed-clean semantics
-- score/trend/health language
-- resolution/stale/aging vocabulary
-- Packet 2 policy dependency
+- standing-risk semantics
+- score/trend-line/health language at the route root
+- resolution/fixed/improved vocabulary
+- Packet 2 policy dependency for temporal output
 
 ## Contract Invariants
 
@@ -205,10 +208,7 @@ Comparison render language must not introduce:
 - output is deterministic for same input
 - input objects remain unchanged after rendering
 - canonical current-scan render remains primary
-- no score is introduced
-- no trend line is introduced
-- no health percentage is introduced
-- no reviewed-clean field is introduced
+- no score is introduced at the route root
 - no hidden write path is introduced
 - no board or chain write path is introduced
 - no new public skill methods are introduced
@@ -220,4 +220,5 @@ Comparison render language must not introduce:
 - Operator-facing skill artifact exists at `skills/confidence/SKILL.md`.
 - Required coverage policy contract is locked at `docs/specs/CONFIDENCE_REQUIRED_COVERAGE.md`.
 - Marker continuity contract is locked at `docs/specs/MARKER_CONTINUITY_ENGINE.md`.
-- Packet 3 architecture lock lives at `docs/specs/PACKET3_MARKER_CONTINUITY_TRUTH_LOCK.md`.
+- Marker temporal signals contract is locked at `docs/specs/MARKER_TEMPORAL_SIGNALS_ENGINE.md`.
+- Packet 4 architecture lock lives at `docs/specs/PACKET4_TEMPORAL_SIGNALS_TRUTH_LOCK.md`.
