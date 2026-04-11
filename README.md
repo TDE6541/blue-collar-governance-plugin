@@ -2,6 +2,9 @@
 
 A Claude Code plugin that enforces governance rules through deterministic local hooks — not just prompt instructions.
 
+> [!WARNING]
+> 🚧 Active Construction: This repository is currently being worked on.
+
 ## What This Does
 
 This plugin adds a runtime governance layer to Claude Code sessions:
