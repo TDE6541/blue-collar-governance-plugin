@@ -115,6 +115,7 @@ Use this index to find the right canon surface before making a change.
 
 - Change `docs/specs/CONFIDENCE_GRADIENT_ENGINE.md` for ConfidenceGradientEngine marker family rules, tier ladder, line-leading parser behavior, scan-fence boundaries, and deterministic/stateless report contract.
 - Change `docs/specs/CONFIDENCE_SKILL.md` and `skills/confidence/SKILL.md` for `/confidence` read/query/render behavior, deterministic mapping to engine output, and no-mutation boundaries.
+- Change `docs/specs/CONFIDENCE_REQUIRED_COVERAGE.md` and `confidence-required-coverage.json` for Packet 2 required coverage truth (explicit opt-in policy, repo-root policy file, file-first exact-path targeting, and additive separation from observed marker truth).
 - Change `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` for the durable Confidence Gradient Phase 1 finish-lane closeout (acceptance status, HOLDs, blast radius, and signoff posture).
 - Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when Confidence front-door discoverability, bounded shipped-truth wording, or proof-count references change.
 

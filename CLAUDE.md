@@ -124,6 +124,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - B' finish-lane closeout artifact: `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md`.
 - Confidence Gradient Phase 1 is shipped: `ConfidenceGradientEngine` and `/confidence` are implemented (`docs/specs/CONFIDENCE_GRADIENT_ENGINE.md`, `docs/specs/CONFIDENCE_SKILL.md`, `skills/confidence/SKILL.md`).
 - Confidence Gradient Phase 1 is bounded: slash-family markers only (`///`, `////`, `/////`, `//////`), semicolon-family remains reserved, scanner is deterministic/stateless over explicit file snapshots, and `/confidence` is read/query/render-only.
+- Confidence Required Coverage (Packet 2) is shipped as an explicit opt-in additive layer (`docs/specs/CONFIDENCE_REQUIRED_COVERAGE.md`) with repo-root policy file `confidence-required-coverage.json` and file-first exact-path targets.
+- Confidence Required Coverage remains bounded: no hook/lifecycle/omission/temporal integration, no reviewed-clean semantics, and no package/install/marketplace claim widening.
 - Confidence Phase 1 scan fence is exactly `src/`, `hooks/`, `scripts/`, `.claude/`, `*.js`; current repo scan posture is zero line-leading slash markers, so the real repo scan returns an empty report in current state.
 - Confidence finish-lane closeout artifact: `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md`.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect signed off 2026-04-03.

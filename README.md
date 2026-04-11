@@ -147,8 +147,14 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Scan fence is bounded to `src/`, `hooks/`, `scripts/`, `.claude/`, and `*.js`.
 - Parsing is line-leading only with structural delimiter rules.
 - `/confidence` is read/query/render-only with no mutation path.
+- Confidence Required Coverage (Packet 2) is explicit opt-in and additive over observed marker truth.
+- Required coverage policy file is repo-root `confidence-required-coverage.json`.
+- Required coverage policy targets are file-first exact-path entries only.
+- `/confidence` may compose required coverage findings additively while keeping observed marker truth separate.
+- Packet 2 introduces no reviewed-clean semantics.
 - No shared contract widening ships in Phase 1; `MIGRATIONS.md` remains unchanged.
-- Hook/lifecycle/chain/board integration, temporal behavior, and semicolon-family execution remain outside Phase 1.
+- Hook/lifecycle/omission/chain/board integration, temporal behavior, and semicolon-family execution remain outside Phase 1.
+- Packet 2 introduces no package/install/marketplace claims.
 - The current repo has zero line-leading slash markers in the Phase 1 scan fence, so the real repo scan currently returns an empty report.
 
 ## What This Does Not Do

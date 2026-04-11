@@ -35,6 +35,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` - durable B' Phase 1 finish-lane closeout evidence map
 - `docs/specs/CONFIDENCE_GRADIENT_ENGINE.md` - authoritative Confidence Gradient Phase 1 scanner contract baseline (slash-only markers, deterministic/stateless scan, bounded source fence)
 - `docs/specs/CONFIDENCE_SKILL.md` - authoritative Confidence Gradient Phase 1 `/confidence` read/query/render contract baseline
+- `docs/specs/CONFIDENCE_REQUIRED_COVERAGE.md` - authoritative Confidence Required Coverage Packet 2 additive contract baseline (explicit opt-in policy, file-first exact-path targeting, separate report family)
 - `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` - durable Confidence Gradient Phase 1 finish-lane closeout evidence map
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
@@ -124,6 +125,8 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - B' Phase 1 closeout is implemented at `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md`; no shared-contract widening shipped and `MIGRATIONS.md` remains unchanged.
 - Confidence Gradient Phase 1 is shipped: `ConfidenceGradientEngine` and `/confidence` are implemented with slash-only markers (`///`, `////`, `/////`, `//////`), deterministic/stateless explicit-snapshot scan behavior, and a bounded scan fence (`src/`, `hooks/`, `scripts/`, `.claude/`, `*.js`).
 - Confidence Gradient Phase 1 remains bounded: semicolon-family markers are reserved and not executable, `/confidence` is read/query/render-only, no shared-contract widening ships, and no hook/lifecycle/chain/board/temporal integration is introduced.
+- Confidence Required Coverage (Packet 2) is shipped as explicit opt-in with repo-root `confidence-required-coverage.json`, file-first exact-path targeting, and additive required coverage composition that remains separate from observed marker truth.
+- Confidence Required Coverage remains bounded: no hook/lifecycle/omission/temporal integration, no reviewed-clean semantics, and no package/install/marketplace claims.
 - Confidence Gradient Phase 1 closeout is implemented at `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md`; current repo scan posture in the bounded fence is empty (zero line-leading slash markers).
 - Phase 3 lifecycle expansion closeout is implemented at `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving current 24-event truth, `WorktreeCreate`/`WorktreeRemove` pending boundary truth, and front-door sync status.
 - Phase 3 structural lane closeout is implemented at `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md`, preserving the A/B shipped and C held record.

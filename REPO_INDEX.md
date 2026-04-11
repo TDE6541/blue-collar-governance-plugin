@@ -63,6 +63,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` - durable B' Phase 1 finish-lane closeout evidence map
 - `docs/specs/CONFIDENCE_GRADIENT_ENGINE.md` - Confidence Gradient Phase 1 scanner contract baseline (slash-only markers, deterministic/stateless scan, bounded source fence)
 - `docs/specs/CONFIDENCE_SKILL.md` - Confidence Gradient Phase 1 `/confidence` read/query/render contract baseline
+- `docs/specs/CONFIDENCE_REQUIRED_COVERAGE.md` - Confidence Required Coverage Packet 2 additive contract baseline (explicit opt-in policy, file-first exact-path targeting, separate report family)
+- `confidence-required-coverage.json` - repo-root explicit opt-in required coverage policy artifact
 - `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` - durable Confidence Gradient Phase 1 finish-lane closeout evidence map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
@@ -157,6 +159,8 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - B' Phase 1 closeout is captured at `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md`; no shared contract widening shipped and `MIGRATIONS.md` remains unchanged.
 - Confidence Gradient Phase 1 is shipped on `main`: `ConfidenceGradientEngine` and `/confidence` are implemented with slash-only markers (`///`, `////`, `/////`, `//////`), deterministic/stateless explicit-snapshot scan behavior, line-leading parser rules, and a scan fence locked to `src/`, `hooks/`, `scripts/`, `.claude/`, and `*.js`.
 - Confidence Phase 1 remains bounded: semicolon-family is reserved and not executable, `/confidence` is read/query/render-only, no shared-contract widening shipped, and no hook/lifecycle/chain/board/temporal integration is introduced.
+- Confidence Required Coverage (Packet 2) is shipped as explicit opt-in with repo-root `confidence-required-coverage.json`, file-first exact-path targeting, and additive required coverage composition that remains separate from observed marker truth.
+- Confidence Required Coverage remains bounded: no hook/lifecycle/omission/temporal integration, no reviewed-clean semantics, and no package/install/marketplace claim widening.
 - Current repo scan posture for Confidence Phase 1 is empty: zero line-leading slash markers are present in the bounded scan fence, so the real repo scan returns an empty report.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
