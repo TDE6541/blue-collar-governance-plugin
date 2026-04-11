@@ -69,10 +69,13 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/PACKET3_MARKER_CONTINUITY_TRUTH_LOCK.md` - Confidence Packet 3 architecture lock and no-ship boundary truth
 - `docs/specs/MARKER_TEMPORAL_SIGNALS_ENGINE.md` - Confidence Packet 4 bounded temporal signals contract baseline (explicit dated timeline input, slash-only lineage, deterministic temporal errors)
 - `docs/specs/PACKET4_TEMPORAL_SIGNALS_TRUTH_LOCK.md` - Confidence Packet 4 architecture lock and no-ship boundary truth
+- `docs/specs/PACKET5_WALK_COMPOSITION_TRUTH_LOCK.md` - Packet 5 `/walk` confidence sidecar composition truth lock (Option A only; render-side composition only)
+- `docs/specs/WALK_CONFIDENCE_SIDECAR.md` - Packet 5 additive `/walk` confidence sidecar contract baseline (supported section ids and informational-only boundary)
 - `confidence-required-coverage.json` - repo-root explicit opt-in required coverage policy artifact
 - `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` - durable Confidence Gradient Phase 1 finish-lane closeout evidence map
 - `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md` - durable Confidence Packet 3 marker continuity closeout evidence map
 - `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` - durable Confidence Packet 4 temporal signals closeout evidence map
+- `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md` - durable Packet 5 `/walk` confidence sidecar composition closeout evidence map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 closeout evidence map
@@ -176,6 +179,12 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Current repo scan posture for Confidence Phase 1 is empty: zero line-leading slash markers are present in the bounded scan fence, so the real repo scan returns an empty report.
 - Confidence Packet 3 closeout is implemented at `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md`.
 - Confidence Packet 4 closeout is implemented at `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md`.
+- Confidence Packet 5 `/walk` confidence sidecar composition is shipped additively on `main`: `SessionLifecycleSkills.renderWalk(walkEvaluation, { confidenceSidecarView })` may compose optional precomputed sidecar input as a separate informational `confidence` block.
+- Packet 5 sidecar v1 supports only `observedMarkers`, `requiredCoverage`, and `markerContinuity`; temporal sidecar sections are excluded in Packet 5.
+- Packet 5 sidecar composition does not change walk findings, severity, blocking posture, clean-closeout posture, `sessionOfRecordRef`, or `asBuiltStatusCounts`.
+- Packet 5 keeps Foreman's Walk and persistence/hook-runtime shapes unchanged; no Pass 6, no persistence widening, no hook-runtime/chain/board/standing-risk widening, and no skin translation wave are shipped.
+- Packet 5 wrapper/runtime posture remains persisted-walk-only: `scripts/render-skill.js walk` does not auto-supply or compute confidence sidecar input.
+- Packet 5 closeout is implemented at `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md`.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.

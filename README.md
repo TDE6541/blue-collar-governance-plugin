@@ -170,6 +170,17 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Packet 2 introduces no package/install/marketplace claims.
 - The current repo has zero line-leading slash markers in the Phase 1 scan fence, so the real repo scan currently returns an empty report.
 
+## Packet 5 `/walk` Confidence Sidecar Composition
+
+- `/walk` may compose one optional precomputed `confidenceSidecarView` at render time.
+- Packet 5 sidecar v1 supports only `observedMarkers`, `requiredCoverage`, and `markerContinuity`.
+- The sidecar is informational only and does not change walk findings, severity, blocking posture, clean-closeout posture, `sessionOfRecordRef`, or `asBuiltStatusCounts`.
+- Foreman's Walk remains unchanged and no Walk Pass 6 is shipped.
+- Packet 5 sidecar composition remains independent from Packet 4 temporal signals.
+- The shipped `scripts/render-skill.js walk` wrapper/runtime path remains persisted-walk-only in Packet 5 and does not discover or compute sidecar input.
+- No persistence widening, hook-runtime widening, chain/board/standing-risk integration, or skin translation wave is introduced by Packet 5.
+- Unsupported skin + sidecar requests remain on raw canonical `/walk` fallback behavior.
+
 ## What This Does Not Do
 
 - **No npm package or marketplace install.** There is no `package.json`. Load the repo directly with `--plugin-dir`.
@@ -198,6 +209,7 @@ Detailed proof documentation:
 - `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` — Confidence Gradient Phase 1 finish-lane closeout, acceptance status, and bounded HOLDs
 - `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md` — Packet 3 marker continuity closeout, mandatory proof posture, and front-door sync status
 - `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` — Packet 4 temporal signals closeout, mandatory proof posture, and front-door sync status
+- `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md` — Packet 5 `/walk` confidence sidecar composition closeout, mandatory proof posture, and front-door sync status
 - `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 3 finish-lane closeout, current 24-event posture, and public/history sync status
 - `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md` — Phase 3 structural closeout (Blocks A/B shipped, Block C held)
 - `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 2 lifecycle expansion closeout and 21-event waypoint
