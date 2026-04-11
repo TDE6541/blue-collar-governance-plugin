@@ -117,9 +117,11 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/CONFIDENCE_SKILL.md` and `skills/confidence/SKILL.md` for `/confidence` read/query/render behavior, deterministic mapping to engine output, and no-mutation boundaries.
 - Change `docs/specs/CONFIDENCE_REQUIRED_COVERAGE.md` and `confidence-required-coverage.json` for Packet 2 required coverage truth (explicit opt-in policy, repo-root policy file, file-first exact-path targeting, and additive separation from observed marker truth).
 - Change `docs/specs/CONFIDENCE_MARKER_SNAPSHOT.md`, `docs/specs/MARKER_CONTINUITY_ENGINE.md`, and `docs/specs/PACKET3_MARKER_CONTINUITY_TRUTH_LOCK.md` for Packet 3 snapshot/compare architecture lock, ambiguity posture, and no-ship boundaries.
+- Change `docs/specs/MARKER_TEMPORAL_SIGNALS_ENGINE.md` and `docs/specs/PACKET4_TEMPORAL_SIGNALS_TRUTH_LOCK.md` for Packet 4 temporal signals architecture lock, explicit timeline-only posture, bounded findings/errors vocabulary, and no-ship boundaries.
 - Change `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` for the durable Confidence Gradient Phase 1 finish-lane closeout (acceptance status, HOLDs, blast radius, and signoff posture).
 - Change `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md` for the durable Packet 3 marker continuity closeout (structural scope, mandatory proof, optional full-golden posture, migration posture, HOLDs, and ship status).
-- Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when Confidence front-door discoverability or bounded shipped-truth wording for Packet 1/2/3 changes.
+- Change `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` for the durable Packet 4 temporal signals closeout (structural scope, mandatory proof, optional full-golden posture, migration posture, HOLDs, and ship status).
+- Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when Confidence front-door discoverability or bounded shipped-truth wording for Packet 1/2/3/4 changes.
 
 ## Wave 6A Runtime Truth
 

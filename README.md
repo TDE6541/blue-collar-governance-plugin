@@ -116,7 +116,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - 34 operator-facing skills under `skills/<name>/SKILL.md`
 - Work Order pilot chain surfaces at `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`
 - B' Phase 1 restoration surfaces at `/resolve` and `/restoration`, backed by `RestorationEngine` and `RestorationProjectionAdapter`
-- Confidence Gradient Packet 3 surfaces at `/confidence`, backed by `ConfidenceGradientEngine`, `MarkerContinuityEngine`, and `ConfidenceSkill`
+- Confidence Gradient Packet 4 surfaces at `/confidence`, backed by `ConfidenceGradientEngine`, `MarkerContinuityEngine`, `MarkerTemporalSignalsEngine`, and `ConfidenceSkill`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance modules under `src/`, including engines, skill surfaces, and hook adapters
 - Golden and live verification under `tests/`
@@ -138,12 +138,16 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Manual-only and walk-only restored items stay visible on `/restoration` and do not enter Board projection unless continuity-linked and verified.
 - No shared contract widening ships in Phase 1; `MIGRATIONS.md` remains unchanged.
 
-## Confidence Gradient Phase 1 + Packet 3 Marker Continuity
+## Confidence Gradient Phase 1 + Packets 2/3/4
 
 - Confidence Gradient Phase 1 ships `ConfidenceGradientEngine` and `/confidence`.
+- Confidence Required Coverage (Packet 2) is explicit opt-in and additive over observed marker truth.
 - Packet 3 ships additive snapshot capture via `ConfidenceGradientEngine.buildSnapshot(files)` and deterministic file-local comparison via `MarkerContinuityEngine.compare(previousSnapshot, currentSnapshot)`.
-- Packet 3 comparison mode is explicit and additive; without comparison input, `/confidence` remains the existing single-scan route.
+- Packet 4 ships additive temporal interpretation via `MarkerTemporalSignalsEngine.evaluateTimeline(timelineEntries, options)` and optional `/confidence` composition via `markerTemporalSignalsView`.
+- `/confidence` single-scan behavior remains unchanged when optional Packet 2/3/4 inputs are not supplied.
+- `/confidence` Packet 3 comparison behavior remains unchanged when only comparison input is supplied.
 - Packet 3 preserves explicit ambiguity by emitting `AMBIGUOUS` when candidate sets remain non-unique.
+- Packet 4 preserves explicit temporal ambiguity by emitting `TEMPORAL_LINEAGE_AMBIGUOUS` instead of forcing stronger claims.
 - Shipped marker family is slash only; semicolon family is reserved and not executable in Phase 1.
 - Tier ladder is fixed to `WATCH (///)`, `GAP (////)`, `HOLD (/////)`, and `KILL (//////)`.
 - Scanning is deterministic and stateless over explicit file snapshots only.
@@ -151,16 +155,18 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Parsing is line-leading only with structural delimiter rules.
 - `/confidence` is read/query/render-only with no mutation path.
 - Packet 3 remains file-local and slash-only; no rename-aware or cross-file continuity claim is shipped.
-- Packet 3 introduces no temporal, stale-marker, trend, or resolution semantics.
-- Packet 3 does not widen `ContinuityLedger`, `ForensicChain`, `ForemansWalk`, or hook/lifecycle behavior.
-- Confidence Required Coverage (Packet 2) is explicit opt-in and additive over observed marker truth.
+- Packet 4 temporal interpretation uses explicit dated timeline input only and does not infer time from git, filesystem metadata, branch age, session date, or closeout date.
+- Packet 4 ships only bounded temporal findings `STALE_HOLD` and `UNRESOLVED_KILL` plus deterministic timeline/lineage errors.
+- Packet 3 and Packet 4 do not widen `ContinuityLedger`, `StandingRiskEngine`, `ForensicChain`, `ForemansWalk`, or hook/lifecycle behavior.
+- Packet 4 does not age Packet 2 required-coverage misses.
+- Packet 4 does not ship resolution semantics, standing-risk semantics, scores, priorities, or health math.
 - Required coverage policy file is repo-root `confidence-required-coverage.json`.
 - Required coverage policy targets are file-first exact-path entries only.
 - `/confidence` may compose required coverage findings additively while keeping observed marker truth separate.
 - Packet 3 does not depend on Packet 2 required coverage policy to function.
 - Packet 2 introduces no reviewed-clean semantics.
 - No shared contract widening ships in Phase 1; `MIGRATIONS.md` remains unchanged.
-- Hook/lifecycle/omission/chain/board integration, temporal behavior, and semicolon-family execution remain outside Phase 1.
+- Hook/lifecycle/omission/chain/board integration and semicolon-family execution remain outside Phase 1.
 - Packet 2 introduces no package/install/marketplace claims.
 - The current repo has zero line-leading slash markers in the Phase 1 scan fence, so the real repo scan currently returns an empty report.
 
@@ -183,7 +189,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
 - **Lifecycle expansion proof boundary:** 24 handled official lifecycle events are shipped; `TaskCreated`, `TaskCompleted`, and `TeammateIdle` now have bounded proof; `WorktreeCreate` and `WorktreeRemove` remain pending, and `Setup` remains unclaimed.
-- **Confidence Packet 3 boundary proof:** `/confidence` remains slash-only, deterministic, and read/query/render-only; Packet 3 comparison is additive/file-local with explicit ambiguity handling; semicolon-family execution, rename-aware/cross-file continuity, and hook/lifecycle/temporal integration remain deferred.
+- **Confidence Packet 4 boundary proof:** `/confidence` remains slash-only, deterministic, and read/query/render-only; Packet 3 comparison behavior remains additive/file-local with explicit ambiguity handling; Packet 4 temporal interpretation is explicit-timeline-only and bounded to `STALE_HOLD`/`UNRESOLVED_KILL`; semicolon-family execution, rename-aware/cross-file continuity, and hook/lifecycle integration remain deferred.
 
 Detailed proof documentation:
 
@@ -191,6 +197,7 @@ Detailed proof documentation:
 - `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` — B' Phase 1 finish-lane closeout, acceptance status, and bounded HOLDs
 - `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` — Confidence Gradient Phase 1 finish-lane closeout, acceptance status, and bounded HOLDs
 - `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md` — Packet 3 marker continuity closeout, mandatory proof posture, and front-door sync status
+- `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` — Packet 4 temporal signals closeout, mandatory proof posture, and front-door sync status
 - `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 3 finish-lane closeout, current 24-event posture, and public/history sync status
 - `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md` — Phase 3 structural closeout (Blocks A/B shipped, Block C held)
 - `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 2 lifecycle expansion closeout and 21-event waypoint

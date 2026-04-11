@@ -39,8 +39,11 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/CONFIDENCE_MARKER_SNAPSHOT.md` - authoritative Confidence Packet 3 snapshot contract baseline (explicit/versioned snapshot capture for file-local marker identity evidence)
 - `docs/specs/MARKER_CONTINUITY_ENGINE.md` - authoritative Confidence Packet 3 deterministic file-local marker comparison contract baseline
 - `docs/specs/PACKET3_MARKER_CONTINUITY_TRUTH_LOCK.md` - authoritative Confidence Packet 3 architecture lock and no-ship boundary truth
+- `docs/specs/MARKER_TEMPORAL_SIGNALS_ENGINE.md` - authoritative Confidence Packet 4 bounded temporal signals contract baseline (explicit dated timeline input, slash-only lineage, deterministic temporal errors)
+- `docs/specs/PACKET4_TEMPORAL_SIGNALS_TRUTH_LOCK.md` - authoritative Confidence Packet 4 architecture lock and no-ship boundary truth
 - `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` - durable Confidence Gradient Phase 1 finish-lane closeout evidence map
 - `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md` - durable Confidence Packet 3 marker continuity closeout evidence map
+- `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` - durable Confidence Packet 4 temporal signals closeout evidence map
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
@@ -128,13 +131,17 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - B' Phase 1 board projection remains continuity-linked and verified-only; manual-only and walk-only restored items stay on `/restoration` unless continuity-linked and verified.
 - B' Phase 1 closeout is implemented at `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md`; no shared-contract widening shipped and `MIGRATIONS.md` remains unchanged.
 - Confidence Gradient Phase 1 is shipped: `ConfidenceGradientEngine` and `/confidence` are implemented with slash-only markers (`///`, `////`, `/////`, `//////`), deterministic/stateless explicit-snapshot scan behavior, and a bounded scan fence (`src/`, `hooks/`, `scripts/`, `.claude/`, `*.js`).
-- Confidence Gradient Phase 1 remains bounded: semicolon-family markers are reserved and not executable, `/confidence` is read/query/render-only, no shared-contract widening ships, and no hook/lifecycle/chain/board/temporal integration is introduced.
+- Confidence Gradient Phase 1 remains bounded: semicolon-family markers are reserved and not executable, `/confidence` is read/query/render-only, and no shared-contract widening ships.
 - Confidence Packet 3 marker continuity is shipped additively: explicit snapshot capture via `ConfidenceGradientEngine.buildSnapshot(files)`, deterministic file-local comparison via `MarkerContinuityEngine.compare(previousSnapshot, currentSnapshot)`, optional `/confidence` marker-continuity composition, and explicit ambiguity handling via `AMBIGUOUS`.
-- Confidence Packet 3 remains bounded: no rename-aware or cross-file continuity, no temporal/stale/trend/resolution semantics, no widening of `ContinuityLedger`/`ForensicChain`/`ForemansWalk`/hook-lifecycle behavior, and no dependency on Packet 2 required-coverage policy.
+- Confidence Packet 3 remains bounded: no rename-aware or cross-file continuity, no widening of `ContinuityLedger`/`ForensicChain`/`ForemansWalk`/hook-lifecycle behavior, and no dependency on Packet 2 required-coverage policy.
+- Confidence Packet 4 temporal signals are shipped additively: explicit dated timeline evaluation via `MarkerTemporalSignalsEngine.evaluateTimeline(timelineEntries, options)`, optional `/confidence` composition via `markerTemporalSignalsView`, and bounded findings `STALE_HOLD` and `UNRESOLVED_KILL`.
+- Confidence Packet 4 remains bounded: temporal interpretation depends on explicit dated timeline input only (no git/filesystem/session/branch/closeout inferred time), ambiguity is preserved (`TEMPORAL_LINEAGE_AMBIGUOUS`), no Packet 2 required-coverage aging is introduced, and no resolution/standing-risk/score/priority/health semantics are introduced.
+- Confidence Packet 4 introduces no semicolon-family runtime support and no rename-aware or cross-file temporal continuity claims.
 - Confidence Required Coverage (Packet 2) is shipped as explicit opt-in with repo-root `confidence-required-coverage.json`, file-first exact-path targeting, and additive required coverage composition that remains separate from observed marker truth.
 - Confidence Required Coverage remains bounded: no hook/lifecycle/omission/temporal integration, no reviewed-clean semantics, and no package/install/marketplace claims.
 - Confidence Gradient Phase 1 closeout is implemented at `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md`; current repo scan posture in the bounded fence is empty (zero line-leading slash markers).
 - Confidence Packet 3 closeout is implemented at `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md`.
+- Confidence Packet 4 closeout is implemented at `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md`.
 - Phase 3 lifecycle expansion closeout is implemented at `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving current 24-event truth, `WorktreeCreate`/`WorktreeRemove` pending boundary truth, and front-door sync status.
 - Phase 3 structural lane closeout is implemented at `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md`, preserving the A/B shipped and C held record.
 - Phase 2 lifecycle expansion closeout is implemented at `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving the historical 21-event waypoint and bounded MCP observability proof.
