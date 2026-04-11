@@ -1,5 +1,5 @@
 # SESSION_LIFECYCLE_SKILLS.md
-**Status:** Wave 5B Block A contract baseline (v1)
+**Status:** Wave 5B Block A baseline plus Packet 5 `/walk` confidence sidecar composition (v2)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -20,6 +20,7 @@ This spec defines:
 - deterministic skill-surface output contracts for the four approved routes
 - input validation rules for adapting existing engine outputs
 - explicit anti-widening and anti-gamification constraints for skill surfaces
+- additive Packet 5 canonical `/walk` confidence sidecar composition from optional precomputed input
 
 This spec does not define:
 
@@ -27,9 +28,11 @@ This spec does not define:
 - SessionBrief schema changes
 - SessionReceipt schema changes
 - Foreman's Walk contract changes
+- hook-runtime contract changes
 - Control Rod enum/profile changes
 - Operator Trust Ledger, Journeyman, Warranty, or Scarcity contract changes
 - skins, onboarding, package, install, runtime-hook, compatibility, or marketplace behavior
+- confidence scan, required-coverage, marker-continuity, or temporal engine behavior
 - telemetry, phone-home, external API, account-required, or payment-gate behavior
 - storage backend, transport layer, or UI presentation
 
@@ -111,7 +114,10 @@ Output object:
 
 ## `/walk`
 
-Input: Foreman's Walk evaluation object from existing Foreman's Walk read/query path (`evaluate` output).
+Input:
+
+- Foreman's Walk evaluation object from existing Foreman's Walk read/query path (`evaluate` output)
+- optional `confidenceSidecarView` object supplied only when a caller already has precomputed Packet 5 confidence sidecar data
 
 Output object:
 
@@ -123,6 +129,30 @@ Output object:
 | `findings` | object[] | Yes | Deterministic finding list from evaluation output. |
 | `sessionOfRecordRef` | string | Yes | As-Built session-of-record ref from walk output. |
 | `asBuiltStatusCounts` | object | Yes | As-Built status count map (`MATCHED`, `MODIFIED`, `ADDED`, `DEFERRED`, `HELD`). |
+| `confidence` | object | No | Optional informational Packet 5 sidecar block composed only from supported supplied sidecar sections. |
+
+`confidence` shape:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `source` | string | Yes | Literal `confidence`. |
+| `sections` | object[] | Yes | Deterministic ordered sidecar sections composed only from supported supplied sections. |
+
+`confidence.sections` item shape:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `sectionId` | string | Yes | Exactly `observedMarkers`, `requiredCoverage`, or `markerContinuity`. |
+| `view` | object | Yes | Caller-supplied precomputed informational section payload. |
+
+Packet 5 `/walk` sidecar rules:
+
+- sidecar composition is render-side only
+- `/walk` does not run confidence scans or comparisons
+- sidecar section order is fixed to `observedMarkers`, `requiredCoverage`, `markerContinuity`
+- absent sections are omitted, not fabricated
+- temporal sections are not rendered in Packet 5 v1
+- sidecar is informational only and must not change findings, severity, blocking posture, clean-closeout posture, `sessionOfRecordRef`, or `asBuiltStatusCounts`
 
 ## Anti-Gamification Rule
 
@@ -142,12 +172,14 @@ Session Lifecycle skills must not emit:
 - Existing engine contracts remain unchanged.
 - SessionBrief no-widening remains enforced (`journeymanLevel` is not introduced).
 - No hidden write path is introduced.
+- Packet 5 `/walk` sidecar composition remains canonical-only and does not widen skin behavior.
 
 ## Current Implementation Truth
 
-- This is a Wave 5B Block A v1 spec baseline.
+- This is the Wave 5B Block A baseline plus the additive Packet 5 `/walk` confidence sidecar contract.
 - Runtime adapter implementation exists at `src/SessionLifecycleSkills.js`.
 - Golden proof exists at `tests/golden/SessionLifecycleSkills.golden.test.js`.
+- Packet 5 `/walk` sidecar contract is further locked at `docs/specs/WALK_CONFIDENCE_SIDECAR.md`.
 - Operator-facing skill artifacts exist at:
   - `skills/toolbox-talk/SKILL.md`
   - `skills/receipt/SKILL.md`

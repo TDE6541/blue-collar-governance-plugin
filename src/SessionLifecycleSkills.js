@@ -22,6 +22,13 @@ const AS_BUILT_STATUSES = Object.freeze([
   "HELD",
 ]);
 
+const WALK_CONFIDENCE_SOURCE = "confidence";
+const WALK_CONFIDENCE_SECTION_ORDER = Object.freeze([
+  "observedMarkers",
+  "requiredCoverage",
+  "markerContinuity",
+]);
+
 const ISO_8601_PATTERN =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
@@ -34,6 +41,24 @@ function makeValidationError(code, message) {
 
 function isPlainObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function cloneJsonValue(value) {
+  if (Array.isArray(value)) {
+    return value.map((entry) => cloneJsonValue(entry));
+  }
+
+  if (isPlainObject(value)) {
+    const cloned = {};
+
+    for (const [key, entry] of Object.entries(value)) {
+      cloned[key] = cloneJsonValue(entry);
+    }
+
+    return cloned;
+  }
+
+  return value;
 }
 
 function isIso8601Timestamp(value) {
@@ -336,6 +361,78 @@ function normalizeWalkEvaluation(input) {
   };
 }
 
+function normalizeWalkRenderOptions(input) {
+  if (input === undefined) {
+    return {
+      confidence: undefined,
+    };
+  }
+
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "INVALID_INPUT",
+      "'options' must be an object"
+    );
+  }
+
+  return {
+    confidence:
+      input.confidenceSidecarView === undefined
+        ? undefined
+        : normalizeConfidenceSidecarView(input.confidenceSidecarView),
+  };
+}
+
+function normalizeConfidenceSidecarView(input) {
+  if (!isPlainObject(input)) {
+    throw makeValidationError(
+      "INVALID_INPUT",
+      "'confidenceSidecarView' must be an object"
+    );
+  }
+
+  if (
+    input.source !== undefined &&
+    input.source !== WALK_CONFIDENCE_SOURCE
+  ) {
+    throw makeValidationError(
+      "INVALID_FIELD",
+      `'confidenceSidecarView.source' must be '${WALK_CONFIDENCE_SOURCE}' when provided`
+    );
+  }
+
+  const sections = [];
+
+  for (const sectionId of WALK_CONFIDENCE_SECTION_ORDER) {
+    const sectionView = input[sectionId];
+
+    if (sectionView === undefined) {
+      continue;
+    }
+
+    if (!isPlainObject(sectionView)) {
+      throw makeValidationError(
+        "INVALID_FIELD",
+        `'confidenceSidecarView.${sectionId}' must be an object when provided`
+      );
+    }
+
+    sections.push({
+      sectionId,
+      view: cloneJsonValue(sectionView),
+    });
+  }
+
+  if (sections.length === 0) {
+    return undefined;
+  }
+
+  return {
+    source: WALK_CONFIDENCE_SOURCE,
+    sections,
+  };
+}
+
 class SessionLifecycleSkills {
   renderToolboxTalk(sessionBrief) {
     const normalized = normalizeSessionBrief(sessionBrief);
@@ -408,10 +505,11 @@ class SessionLifecycleSkills {
     };
   }
 
-  renderWalk(walkEvaluation) {
+  renderWalk(walkEvaluation, options) {
     const normalized = normalizeWalkEvaluation(walkEvaluation);
+    const normalizedOptions = normalizeWalkRenderOptions(options);
 
-    return {
+    const rendered = {
       route: "/walk",
       findingCount: normalized.findings.length,
       findingSummary: { ...normalized.findingSummary },
@@ -422,6 +520,12 @@ class SessionLifecycleSkills {
       sessionOfRecordRef: normalized.asBuilt.sessionOfRecordRef,
       asBuiltStatusCounts: { ...normalized.asBuilt.statusCounts },
     };
+
+    if (normalizedOptions.confidence) {
+      rendered.confidence = normalizedOptions.confidence;
+    }
+
+    return rendered;
   }
 }
 

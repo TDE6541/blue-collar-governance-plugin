@@ -7,6 +7,7 @@ const {
   SessionLifecycleSkills,
   SKILL_ROUTES,
 } = require("../../src/SessionLifecycleSkills");
+const { SkinFramework } = require("../../src/SkinFramework");
 
 const CREATED_AT = "2026-04-02T08:30:00Z";
 
@@ -96,6 +97,109 @@ function buildWalkEvaluation(overrides = {}) {
   };
 }
 
+function buildObservedMarkersSection(overrides = {}) {
+  return {
+    markerFamily: "slash",
+    tierTotals: {
+      WATCH: 0,
+      GAP: 1,
+      HOLD: 1,
+      KILL: 0,
+    },
+    fileMarkerMap: [
+      {
+        filePath: "src/HookRuntime.js",
+        markerCount: 2,
+        tierTotals: {
+          WATCH: 0,
+          GAP: 1,
+          HOLD: 1,
+          KILL: 0,
+        },
+      },
+    ],
+    domainGrouping: [
+      {
+        domainId: "governance_runtime",
+        label: "Governance Runtime",
+        fileCount: 1,
+        markerCount: 2,
+      },
+    ],
+    topHoldKillLocations: [
+      {
+        filePath: "src/HookRuntime.js",
+        lineNumber: 20,
+        tier: "HOLD",
+        marker: "/////",
+      },
+    ],
+    ...overrides,
+  };
+}
+
+function buildRequiredCoverageSection(overrides = {}) {
+  return {
+    policyMode: "explicit_opt_in",
+    markerFamily: "slash",
+    targetCount: 1,
+    evaluatedTargetCount: 1,
+    findings: [
+      {
+        code: "REQUIRED_COVERAGE_MISSING",
+        policyTargetId: "hook-runtime-core",
+        filePath: "src/HookRuntime.js",
+        markerCount: 0,
+        minimumMarkerCount: 1,
+      },
+    ],
+    policyErrors: [],
+    ...overrides,
+  };
+}
+
+function buildMarkerContinuitySection(overrides = {}) {
+  return {
+    comparisonVersion: 1,
+    markerFamily: "slash",
+    previousSnapshotVersion: 1,
+    currentSnapshotVersion: 1,
+    continuityChanges: [
+      {
+        status: "MATCHED",
+        filePath: "src/HookRuntime.js",
+        flags: ["moved"],
+        previousMarker: {
+          lineNumber: 10,
+          tier: "HOLD",
+          marker: "/////",
+          slashCount: 5,
+          trailingText: "Persist walk inputs.",
+        },
+        currentMarker: {
+          lineNumber: 12,
+          tier: "HOLD",
+          marker: "/////",
+          slashCount: 5,
+          trailingText: "Persist walk inputs.",
+        },
+      },
+    ],
+    ambiguousCases: [],
+    ...overrides,
+  };
+}
+
+function buildConfidenceSidecarView(overrides = {}) {
+  return {
+    source: "confidence",
+    observedMarkers: buildObservedMarkersSection(),
+    requiredCoverage: buildRequiredCoverageSection(),
+    markerContinuity: buildMarkerContinuitySection(),
+    ...overrides,
+  };
+}
+
 function expectValidationError(run, code, message) {
   let error;
   try {
@@ -179,6 +283,220 @@ test("/walk render returns deterministic findings and as-built status counts", (
   assert.equal(walkView.sessionOfRecordRef, "receipt_wave5b_a_001");
   assert.equal(walkView.asBuiltStatusCounts.MATCHED, 1);
   assert.equal(walkView.asBuiltStatusCounts.DEFERRED, 1);
+  assert.equal(Object.prototype.hasOwnProperty.call(walkView, "confidence"), false);
+});
+
+test("/walk render composes observedMarkers as a separate confidence block", () => {
+  const skills = new SessionLifecycleSkills();
+  const walkView = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: {
+      observedMarkers: buildObservedMarkersSection(),
+    },
+  });
+
+  assert.equal(walkView.route, "/walk");
+  assert.ok(walkView.confidence);
+  assert.equal(walkView.confidence.source, "confidence");
+  assert.deepEqual(
+    walkView.confidence.sections.map((section) => section.sectionId),
+    ["observedMarkers"]
+  );
+  assert.deepEqual(
+    walkView.confidence.sections[0].view,
+    buildObservedMarkersSection()
+  );
+});
+
+test("/walk render composes requiredCoverage as a separate confidence block", () => {
+  const skills = new SessionLifecycleSkills();
+  const walkView = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: {
+      requiredCoverage: buildRequiredCoverageSection(),
+    },
+  });
+
+  assert.ok(walkView.confidence);
+  assert.equal(walkView.confidence.source, "confidence");
+  assert.deepEqual(
+    walkView.confidence.sections.map((section) => section.sectionId),
+    ["requiredCoverage"]
+  );
+  assert.deepEqual(
+    walkView.confidence.sections[0].view,
+    buildRequiredCoverageSection()
+  );
+});
+
+test("/walk render composes markerContinuity as a separate confidence block", () => {
+  const skills = new SessionLifecycleSkills();
+  const walkView = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: {
+      markerContinuity: buildMarkerContinuitySection(),
+    },
+  });
+
+  assert.ok(walkView.confidence);
+  assert.equal(walkView.confidence.source, "confidence");
+  assert.deepEqual(
+    walkView.confidence.sections.map((section) => section.sectionId),
+    ["markerContinuity"]
+  );
+  assert.deepEqual(
+    walkView.confidence.sections[0].view,
+    buildMarkerContinuitySection()
+  );
+});
+
+test("/walk render keeps combined confidence sidecar section order deterministic", () => {
+  const skills = new SessionLifecycleSkills();
+  const walkView = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: buildConfidenceSidecarView({
+      requiredCoverage: buildRequiredCoverageSection(),
+      observedMarkers: buildObservedMarkersSection(),
+      markerContinuity: buildMarkerContinuitySection(),
+    }),
+  });
+
+  assert.ok(walkView.confidence);
+  assert.deepEqual(
+    walkView.confidence.sections.map((section) => section.sectionId),
+    ["observedMarkers", "requiredCoverage", "markerContinuity"]
+  );
+});
+
+test("/walk render ignores unsupported sidecar sections without breaking canonical output", () => {
+  const skills = new SessionLifecycleSkills();
+  const withoutSidecar = skills.renderWalk(buildWalkEvaluation());
+  const withUnknownSection = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: {
+      futureSection: {
+        status: "pending",
+      },
+    },
+  });
+
+  assert.deepEqual(withUnknownSection, withoutSidecar);
+});
+
+test("/walk render does not render temporal sidecar input in Packet 5 v1", () => {
+  const skills = new SessionLifecycleSkills();
+  const walkView = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: {
+      observedMarkers: buildObservedMarkersSection(),
+      markerTemporalSignals: {
+        temporalVersion: 1,
+      },
+    },
+  });
+
+  assert.ok(walkView.confidence);
+  assert.deepEqual(
+    walkView.confidence.sections.map((section) => section.sectionId),
+    ["observedMarkers"]
+  );
+});
+
+test("/walk confidence sidecar keeps walk truth and gating fields unchanged", () => {
+  const skills = new SessionLifecycleSkills();
+  const withoutSidecar = skills.renderWalk(buildWalkEvaluation());
+  const withSidecar = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: buildConfidenceSidecarView(),
+  });
+
+  assert.equal(withSidecar.findingCount, withoutSidecar.findingCount);
+  assert.deepEqual(withSidecar.findingSummary, withoutSidecar.findingSummary);
+  assert.deepEqual(withSidecar.findings, withoutSidecar.findings);
+  assert.equal(withSidecar.sessionOfRecordRef, withoutSidecar.sessionOfRecordRef);
+  assert.deepEqual(
+    withSidecar.asBuiltStatusCounts,
+    withoutSidecar.asBuiltStatusCounts
+  );
+});
+
+test("/walk confidence sidecar output is cloned and does not mutate inputs across renders", () => {
+  const skills = new SessionLifecycleSkills();
+  const sidecar = buildConfidenceSidecarView();
+
+  const viewA = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: sidecar,
+  });
+  viewA.confidence.sections[0].view.tierTotals.HOLD = 99;
+  viewA.confidence.sections[1].view.findings.push("forbidden_mutation");
+
+  const viewB = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: sidecar,
+  });
+
+  assert.equal(viewB.confidence.sections[0].view.tierTotals.HOLD, 1);
+  assert.equal(viewB.confidence.sections[1].view.findings.length, 1);
+  assert.equal(sidecar.observedMarkers.tierTotals.HOLD, 1);
+  assert.equal(sidecar.requiredCoverage.findings.length, 1);
+});
+
+test("/walk confidence sidecar preserves honest empty-state observedMarkers payloads", () => {
+  const skills = new SessionLifecycleSkills();
+  const emptyObservedMarkers = buildObservedMarkersSection({
+    tierTotals: {
+      WATCH: 0,
+      GAP: 0,
+      HOLD: 0,
+      KILL: 0,
+    },
+    fileMarkerMap: [],
+    domainGrouping: [],
+    topHoldKillLocations: [],
+  });
+  const walkView = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: {
+      observedMarkers: emptyObservedMarkers,
+    },
+  });
+
+  assert.ok(walkView.confidence);
+  assert.deepEqual(walkView.confidence.sections[0].view, emptyObservedMarkers);
+  assert.deepEqual(
+    walkView.confidence.sections[0].view.tierTotals,
+    {
+      WATCH: 0,
+      GAP: 0,
+      HOLD: 0,
+      KILL: 0,
+    }
+  );
+});
+
+test("unsupported skin plus confidence sidecar falls back to raw canonical /walk", () => {
+  const skills = new SessionLifecycleSkills();
+  const framework = new SkinFramework();
+  const walkView = skills.renderWalk(buildWalkEvaluation(), {
+    confidenceSidecarView: buildConfidenceSidecarView(),
+  });
+
+  const skinned = framework.render(walkView, { skinId: "work-order" });
+
+  assert.equal(skinned.route, "/walk");
+  assert.equal(skinned.requestedSkinId, "work-order");
+  assert.equal(skinned.appliedSkinId, null);
+  assert.equal(skinned.supported, false);
+  assert.equal(skinned.fallbackMode, "raw_canonical_view");
+  assert.deepEqual(skinned.rawView, walkView);
+  assert.equal(skinned.presentation, null);
+});
+
+test("SessionLifecycleSkills validates confidence sidecar source when provided", () => {
+  const skills = new SessionLifecycleSkills();
+
+  expectValidationError(
+    () =>
+      skills.renderWalk(buildWalkEvaluation(), {
+        confidenceSidecarView: {
+          source: "not-confidence",
+          observedMarkers: buildObservedMarkersSection(),
+        },
+      }),
+    "INVALID_FIELD",
+    "'confidenceSidecarView.source' must be 'confidence' when provided"
+  );
 });
 
 test("SessionLifecycleSkills validates required walk status counts", () => {
