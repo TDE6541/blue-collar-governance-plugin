@@ -49,7 +49,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/FORENSIC_CHAIN.md` - Forensic Chain v1 append-only evidence-substrate contract baseline
 - `docs/specs/CONTROL_ROD_MODE.md` - Control Rod Mode v2 deterministic HARD_STOP LOTO + Permit contract baseline
 - `docs/specs/FOREMANS_WALK_ENGINE.md` - Foreman's Walk Engine v1 post-session verification contract baseline
-- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - Hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections + Phase 1/2 lifecycle expansion + Phase 3 Blocks A/B; 24 lifecycle events with `WorktreeCreate` and `WorktreeRemove` pending)
+- `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` - Hook runtime enforcement spine contract baseline (Slice 2 + Wave 6A/6B additive sections + Phase 1/2 lifecycle expansion + Phase 3 Blocks A/B + Packet 7A advisory presence lane; 24 lifecycle events with `WorktreeCreate` and `WorktreeRemove` pending)
 - `docs/specs/CHANGE_ORDER_ENGINE.md` - Change Order Engine v1 formal live drift-governance contract baseline
 - `docs/specs/BUDDY_SYSTEM.md` - Buddy System v1 watcher-only live oversight contract baseline
 - `docs/specs/WAVE7_TRUTH_LOCK.md` - Wave 7 umbrella truth lock and final seam-status/front-door sync for C1/C2/C3, the Work Order-only intake/scaffold/posture pilot chain, and parked scope
@@ -73,12 +73,15 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/WALK_CONFIDENCE_SIDECAR.md` - Packet 5 additive `/walk` confidence sidecar contract baseline (supported section ids and informational-only boundary)
 - `docs/specs/PACKET6_TRANSITION_EVIDENCE_TRUTH_LOCK.md` - Packet 6 Confidence Transition Evidence truth lock (neutral transition evidence, dedicated `/confidence-transitions`, and no `/confidence` mutation)
 - `docs/specs/CONFIDENCE_TRANSITIONS_SKILL.md` - Packet 6 `/confidence-transitions` authoring surface contract baseline (preview by default, explicit append only through existing ForensicChain API)
+- `docs/specs/PACKET7A_ADVISORY_PRESENCE_TRUTH_LOCK.md` - Packet 7A advisory presence awareness truth lock (presence-only, on-disk-only, SUPERVISED-only message composition)
+- `docs/specs/HOOK_CONFIDENCE_ADVISOR.md` - Packet 7A ConfidenceAdvisor helper contract baseline (file-path-only, on-disk-only, `HOLD` / `KILL` advisory only)
 - `confidence-required-coverage.json` - repo-root explicit opt-in required coverage policy artifact
 - `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` - durable Confidence Gradient Phase 1 finish-lane closeout evidence map
 - `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md` - durable Confidence Packet 3 marker continuity closeout evidence map
 - `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` - durable Confidence Packet 4 temporal signals closeout evidence map
 - `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md` - durable Packet 5 `/walk` confidence sidecar composition closeout evidence map
 - `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md` - durable Packet 6 Confidence Transition Evidence closeout evidence map
+- `docs/PACKET7A_ADVISORY_PRESENCE_CLOSEOUT.md` - durable Packet 7A advisory presence awareness closeout evidence map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 closeout evidence map
@@ -192,6 +195,9 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Confidence Packet 6 transition evidence is shipped additively in current repo truth: `ConfidenceTransitionGenerator.generateConfidenceTransitionEntries(input)` maps explicit Packet 3 compare output into append-ready neutral `FINDING` entries, and `ConfidenceTransitionsSkill.renderConfidenceTransitions(input)` provides dedicated `/confidence-transitions` preview or explicit append through existing `ForensicChain.appendEntry(...)`.
 - Confidence Packet 6 remains bounded: transition classes are limited to `NEWLY_OBSERVED`, `NO_LONGER_OBSERVED`, and `RETIERED`; `/confidence` remains read/query/render-only; no resolution/restoration semantics, no new `ForensicChain` entry types, no linked history traversal, and no shared-contract widening ship.
 - Confidence Packet 6 closeout is implemented at `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md`.
+- Confidence Packet 7A advisory presence awareness is shipped additively in current repo truth: `ConfidenceAdvisor.buildConfidenceAdvisory(filePath)` reads one existing on-disk file, and `src/HookRuntime.js` may append advisory text only on `PreToolUse` SUPERVISED `Write` / `Edit` asks through the existing `permissionDecisionReason` string.
+- Confidence Packet 7A remains bounded: only slash-family `HOLD` / `KILL` markers trigger advisory; missing/unreadable/out-of-fence files and `WATCH` / `GAP` remain silent; deny / `FULL_AUTO` / permitted `HARD_STOP` / unclassified paths remain silent; advisory failure is locally swallowed; and no shared-contract widening ships.
+- Confidence Packet 7A closeout is implemented at `docs/PACKET7A_ADVISORY_PRESENCE_CLOSEOUT.md`.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.

@@ -6,6 +6,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
+const ConfidenceAdvisor = require("../../src/ConfidenceAdvisor");
 const {
   DEFAULT_PROFILE_ID,
   KNOWN_HOOK_EVENTS,
@@ -45,6 +46,13 @@ function makeTempProject() {
   fs.writeFileSync(path.join(projectDir, "src", "pricing-engine.js"), "module.exports = {};\n");
   fs.writeFileSync(path.join(projectDir, "src", "worker.js"), "module.exports = {};\n");
   return projectDir;
+}
+
+function writeProjectFile(projectDir, relativePath, content) {
+  const fullPath = path.join(projectDir, ...relativePath.split("/"));
+  fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+  fs.writeFileSync(fullPath, content, "utf8");
+  return fullPath;
 }
 
 function forceHardStopObservedAction(state, timestamp = "2026-04-02T12:15:00Z") {
@@ -260,6 +268,230 @@ test("HookRuntime PermissionRequest preserves SUPERVISED approval flow for exist
   assert.equal(state.observedActions.length, 1);
   assert.equal(state.observedActions[0].domainId, "existing_file_modification");
   assert.equal(state.observedActions[0].approvalState, "permission_user_review");
+});
+
+test("HookRuntime SUPERVISED PreToolUse with no advisory keeps the existing ask shape", () => {
+  const projectDir = makeTempProject();
+
+  const result = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-pretool-supervised-no-advisory",
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "worker.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { worker: true };",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-11T13:00:00Z",
+    }
+  );
+
+  assert.deepEqual(Object.keys(result.hookSpecificOutput).sort(), [
+    "hookEventName",
+    "permissionDecision",
+    "permissionDecisionReason",
+  ]);
+  assert.equal(result.hookSpecificOutput.hookEventName, "PreToolUse");
+  assert.equal(result.hookSpecificOutput.permissionDecision, "ask");
+  assert.doesNotMatch(result.hookSpecificOutput.permissionDecisionReason, /Advisory:/);
+});
+
+test("HookRuntime SUPERVISED PreToolUse appends HOLD advisory to the existing reason", () => {
+  const projectDir = makeTempProject();
+  writeProjectFile(projectDir, "src/worker.js", "///// hold\nmodule.exports = {};\n");
+
+  const result = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-pretool-supervised-hold",
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "worker.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { worker: true };",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-11T13:01:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.permissionDecision, "ask");
+  assert.match(
+    result.hookSpecificOutput.permissionDecisionReason,
+    /Advisory: existing on-disk confidence markers present \(HOLD at line 1\)\.$/
+  );
+});
+
+test("HookRuntime SUPERVISED PreToolUse appends KILL advisory to the existing reason", () => {
+  const projectDir = makeTempProject();
+  writeProjectFile(projectDir, "src/worker.js", "module.exports = {};\n////// kill\n");
+
+  const result = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-pretool-supervised-kill",
+      cwd: projectDir,
+      hook_event_name: "PreToolUse",
+      tool_name: "Edit",
+      tool_input: {
+        file_path: path.join(projectDir, "src", "worker.js"),
+        old_string: "module.exports = {};",
+        new_string: "module.exports = { worker: true };",
+      },
+    },
+    {
+      projectDir,
+      now: "2026-04-11T13:02:00Z",
+    }
+  );
+
+  assert.equal(result.hookSpecificOutput.permissionDecision, "ask");
+  assert.match(
+    result.hookSpecificOutput.permissionDecisionReason,
+    /Advisory: existing on-disk confidence markers present \(KILL at line 2\)\.$/
+  );
+});
+
+test("HookRuntime swallows advisor throws on SUPERVISED PreToolUse and preserves the existing ask", () => {
+  const projectDir = makeTempProject();
+  const input = {
+    cwd: projectDir,
+    hook_event_name: "PreToolUse",
+    tool_name: "Edit",
+    tool_input: {
+      file_path: path.join(projectDir, "src", "worker.js"),
+      old_string: "module.exports = {};",
+      new_string: "module.exports = { worker: true };",
+    },
+  };
+  const baseline = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-pretool-advisor-baseline",
+      ...input,
+    },
+    {
+      projectDir,
+      now: "2026-04-11T13:03:00Z",
+    }
+  );
+  const originalBuildConfidenceAdvisory = ConfidenceAdvisor.buildConfidenceAdvisory;
+
+  ConfidenceAdvisor.buildConfidenceAdvisory = function patchedBuildConfidenceAdvisory() {
+    throw new Error("advisor boom");
+  };
+
+  try {
+    const result = runHookEvent(
+      "PreToolUse",
+      {
+        session_id: "session-pretool-advisor-throw",
+        ...input,
+      },
+      {
+        projectDir,
+        now: "2026-04-11T13:04:00Z",
+      }
+    );
+
+    assert.deepEqual(result, baseline);
+    assert.doesNotMatch(result.hookSpecificOutput.permissionDecisionReason, /FAIL_CLOSED/);
+  } finally {
+    ConfidenceAdvisor.buildConfidenceAdvisory = originalBuildConfidenceAdvisory;
+  }
+});
+
+test("HookRuntime HARD_STOP deny remains advisory-silent", () => {
+  const projectDir = makeTempProject();
+  const input = {
+    cwd: projectDir,
+    hook_event_name: "PreToolUse",
+    tool_name: "Edit",
+    tool_input: {
+      file_path: path.join(projectDir, "src", "pricing-engine.js"),
+      old_string: "module.exports = {};",
+      new_string: "module.exports = { changed: true };",
+    },
+  };
+  const baseline = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-pretool-hard-stop-baseline",
+      ...input,
+    },
+    {
+      projectDir,
+      now: "2026-04-11T13:05:00Z",
+    }
+  );
+
+  writeProjectFile(projectDir, "src/pricing-engine.js", "///// hold\nmodule.exports = {};\n");
+
+  const result = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-pretool-hard-stop-marker",
+      ...input,
+    },
+    {
+      projectDir,
+      now: "2026-04-11T13:06:00Z",
+    }
+  );
+
+  assert.deepEqual(result, baseline);
+  assert.doesNotMatch(result.hookSpecificOutput.permissionDecisionReason, /Advisory:/);
+});
+
+test("HookRuntime FULL_AUTO allow remains advisory-silent and returns the same shape as before", () => {
+  const projectDir = makeTempProject();
+  const input = {
+    cwd: projectDir,
+    hook_event_name: "PreToolUse",
+    tool_name: "Write",
+    tool_input: {
+      file_path: path.join(projectDir, "docs", "guide.md"),
+      content: "# guide\n",
+    },
+  };
+  const baseline = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-pretool-full-auto-baseline",
+      ...input,
+    },
+    {
+      projectDir,
+      now: "2026-04-11T13:07:00Z",
+    }
+  );
+
+  writeProjectFile(projectDir, "docs/guide.md", "////// kill\n");
+
+  const result = runHookEvent(
+    "PreToolUse",
+    {
+      session_id: "session-pretool-full-auto-marker",
+      ...input,
+    },
+    {
+      projectDir,
+      now: "2026-04-11T13:08:00Z",
+    }
+  );
+
+  assert.deepEqual(baseline, {});
+  assert.deepEqual(result, baseline);
 });
 
 test("HookRuntime PreCompact preserves state and SessionStart compact rehydrates it", () => {
