@@ -36,7 +36,7 @@ The plugin registers hooks for twenty-four Claude Code lifecycle events:
 | **UserPromptSubmit** | Blocks prompts containing exact disallowed governance-bypass phrases |
 | **PreCompact** | Preserves governance state before context compaction |
 | **PostCompact** | Verifies governance state survived compaction; advisory only, no gating |
-| **PreToolUse** | Classifies the tool action; denies HARD_STOP domains; asks on SUPERVISED |
+| **PreToolUse** | Classifies the tool action; denies HARD_STOP domains; asks on SUPERVISED; appends on-disk HOLD/KILL advisory only on the existing SUPERVISED message path |
 | **PermissionRequest** | Resolves permission dialogs against the active control rod profile |
 | **PermissionDenied** | Records denied tool actions for governed domains to the forensic chain |
 | **PostToolUse** | Records completed tool actions on classified domains to the forensic chain |
@@ -121,6 +121,7 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - B' Phase 1 restoration surfaces at `/resolve` and `/restoration`, backed by `RestorationEngine` and `RestorationProjectionAdapter`
 - Confidence Gradient Packet 4 surfaces at `/confidence`, backed by `ConfidenceGradientEngine`, `MarkerContinuityEngine`, `MarkerTemporalSignalsEngine`, and `ConfidenceSkill`
 - Confidence Transition Evidence at `/confidence-transitions`, backed by `ConfidenceTransitionGenerator` and `ConfidenceTransitionsSkill`
+- Packet 7A advisory presence awareness in `PreToolUse` SUPERVISED asks only, backed by `ConfidenceAdvisor`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance modules under `src/`, including engines, skill surfaces, and hook adapters
 - Golden and live verification under `tests/`
@@ -196,6 +197,16 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Packet 6 truth lock lives at `docs/specs/PACKET6_TRANSITION_EVIDENCE_TRUTH_LOCK.md`, the skill spec lives at `docs/specs/CONFIDENCE_TRANSITIONS_SKILL.md`, and the closeout lives at `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md`.
 - No shared contract widening ships in Packet 6; `MIGRATIONS.md` remains unchanged.
 
+## Packet 7A Advisory Presence Awareness
+
+- Packet 7A ships `ConfidenceAdvisor.buildConfidenceAdvisory(filePath)` and `PreToolUse` SUPERVISED-only advisory composition through the existing `permissionDecisionReason` string.
+- Advisory reads only the current on-disk contents of one candidate file and reuses the existing slash-family confidence scan fence.
+- Advisory fires only for existing on-disk `HOLD` and `KILL` markers and only on `Write` / `Edit` actions that already resolved to `SUPERVISED`.
+- Missing, unreadable, and out-of-fence files remain silent; `WATCH` and `GAP` remain silent.
+- Deny paths, `FULL_AUTO` allow, permitted `HARD_STOP` allow, unclassified allow, `/confidence`, `PostToolUse`, chain writes, and host-facing hook response shape remain unchanged.
+- Packet 7A truth lock lives at `docs/specs/PACKET7A_ADVISORY_PRESENCE_TRUTH_LOCK.md`, the helper spec lives at `docs/specs/HOOK_CONFIDENCE_ADVISOR.md`, and the closeout lives at `docs/PACKET7A_ADVISORY_PRESENCE_CLOSEOUT.md`.
+- No shared contract widening ships in Packet 7A; `MIGRATIONS.md` remains unchanged.
+
 ## What This Does Not Do
 
 - **No npm package or marketplace install.** There is no `package.json`. Load the repo directly with `--plugin-dir`.
@@ -207,16 +218,18 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - **No multi-agent governance.** This is single-session, single-operator enforcement.
 - **No trust-transfer or certificate claims.** That work remains parked.
 - **No `PARTIAL` restoration verification state in Phase 1.** Verification states are locked to `UNVERIFIED` and `VERIFIED`.
+- **No removal-awareness or payload inspection in Packet 7A.** Advisory presence awareness reads current on-disk file truth only and does not inspect intended edits.
 
 ## Proof
 
-- **Golden verification:** the current repo state passes 555 tests in full golden regression.
+- **Golden verification:** the current repo state passes 569 tests in full golden regression.
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
 - **Lifecycle expansion proof boundary:** 24 handled official lifecycle events are shipped; `TaskCreated`, `TaskCompleted`, and `TeammateIdle` now have bounded proof; `WorktreeCreate` and `WorktreeRemove` remain pending, and `Setup` remains unclaimed.
 - **Confidence Packet 4 boundary proof:** `/confidence` remains slash-only, deterministic, and read/query/render-only; Packet 3 comparison behavior remains additive/file-local with explicit ambiguity handling; Packet 4 temporal interpretation is explicit-timeline-only and bounded to `STALE_HOLD`/`UNRESOLVED_KILL`; semicolon-family execution, rename-aware/cross-file continuity, and hook/lifecycle integration remain deferred.
 - **Confidence Packet 6 boundary proof:** `/confidence-transitions` remains a dedicated preview-first surface; generated entries stay on existing `FINDING` only with `NEWLY_OBSERVED`, `NO_LONGER_OBSERVED`, and `RETIERED`; `/confidence` gained no append path; and no resolution semantics or `ForensicChain` contract widening shipped.
+- **Confidence Packet 7A boundary proof:** `ConfidenceAdvisor` reads one current on-disk file only, advisory appears only on SUPERVISED `Write` / `Edit` asks through existing `permissionDecisionReason`, `HOLD` / `KILL` are the only advisory tiers, `FULL_AUTO` / permitted `HARD_STOP` / deny paths remain silent, and advisor failure stays locally swallowed without changing governance decisions or exit behavior.
 
 Detailed proof documentation:
 
@@ -227,6 +240,7 @@ Detailed proof documentation:
 - `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` — Packet 4 temporal signals closeout, mandatory proof posture, and front-door sync status
 - `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md` — Packet 5 `/walk` confidence sidecar composition closeout, mandatory proof posture, and front-door sync status
 - `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md` — Packet 6 confidence transition evidence closeout, bounded lane split, and targeted recheck status
+- `docs/PACKET7A_ADVISORY_PRESENCE_CLOSEOUT.md` — Packet 7A advisory presence awareness closeout, bounded hook-runtime lane, and proof recheck status
 - `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 3 finish-lane closeout, current 24-event posture, and public/history sync status
 - `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md` — Phase 3 structural closeout (Blocks A/B shipped, Block C held)
 - `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 2 lifecycle expansion closeout and 21-event waypoint

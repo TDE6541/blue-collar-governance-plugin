@@ -4,6 +4,7 @@ const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 
+const ConfidenceAdvisor = require("./ConfidenceAdvisor");
 const { ControlRodMode } = require("./ControlRodMode");
 const { ForemansWalk } = require("./ForemansWalk");
 const {
@@ -769,6 +770,29 @@ function describeAction(classification, profile) {
   return `${classification.domainLabel} is ${classification.autonomyLevel} under '${profile.profileId}'. ${classification.justification}`;
 }
 
+function isConfidenceAdvisoryEligible(input) {
+  return (
+    Boolean(input) &&
+    (input.tool_name === "Write" || input.tool_name === "Edit") &&
+    Boolean(input.tool_input) &&
+    typeof input.tool_input.file_path === "string" &&
+    input.tool_input.file_path.trim() !== ""
+  );
+}
+
+function appendConfidenceAdvisory(reason, advisory) {
+  if (
+    !advisory ||
+    advisory.present !== true ||
+    typeof advisory.summary !== "string" ||
+    advisory.summary.trim() === ""
+  ) {
+    return reason;
+  }
+
+  return `${reason} ${advisory.summary}`;
+}
+
 function recordObservedAction(state, fingerprint, classification, approvalState, observedAt) {
   upsertByFingerprint(state.observedActions, fingerprint, {
     fingerprint,
@@ -1368,14 +1392,31 @@ function handlePreToolUse(input, config, options) {
       recordObservedAction(state, fingerprint, classification, "pretool_supervised", now);
       saveSessionState(config, input.session_id, state);
 
+      let permissionDecisionReason = `Control Rod SUPERVISED: ${describeAction(
+        classification,
+        config.profile
+      )}`;
+
+      if (isConfidenceAdvisoryEligible(input)) {
+        try {
+          // Advisory presence is non-governing and must not leak into fail-closed posture.
+          const advisory = ConfidenceAdvisor.buildConfidenceAdvisory(
+            input.tool_input.file_path
+          );
+          permissionDecisionReason = appendConfidenceAdvisory(
+            permissionDecisionReason,
+            advisory
+          );
+        } catch (_error) {
+          // Intentionally swallowed so advisory failure cannot affect governance decisions.
+        }
+      }
+
       return {
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           permissionDecision: "ask",
-          permissionDecisionReason: `Control Rod SUPERVISED: ${describeAction(
-            classification,
-            config.profile
-          )}`,
+          permissionDecisionReason,
         },
       };
     }

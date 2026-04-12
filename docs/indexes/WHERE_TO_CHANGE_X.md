@@ -111,7 +111,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` for the durable B' Phase 1 finish-lane closeout (acceptance status, HOLDs, blast radius, and signoff posture).
 - Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when front-door discoverability or bounded shipped-truth wording for B' Phase 1 changes.
 
-## Confidence Gradient And Transition Packet Truth
+## Confidence Gradient, Transition, And Advisory Packet Truth
 
 - Change `docs/specs/CONFIDENCE_GRADIENT_ENGINE.md` for ConfidenceGradientEngine marker family rules, tier ladder, line-leading parser behavior, scan-fence boundaries, and deterministic/stateless report contract.
 - Change `docs/specs/CONFIDENCE_SKILL.md` and `skills/confidence/SKILL.md` for `/confidence` read/query/render behavior, deterministic mapping to engine output, and no-mutation boundaries.
@@ -127,12 +127,16 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/specs/PACKET6_TRANSITION_EVIDENCE_TRUTH_LOCK.md` for Packet 6 transition-evidence truth lock, transition-class fence, dedicated `/confidence-transitions` boundary, and no-ship list.
 - Change `docs/specs/CONFIDENCE_TRANSITIONS_SKILL.md` and `skills/confidence-transitions/SKILL.md` for `/confidence-transitions` preview/explicit-append behavior, existing `ForensicChain.appendEntry(...)` usage, and no-resolution/no-`/confidence`-mutation posture.
 - Change `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md` for the durable Packet 6 confidence transition evidence closeout (lane split, exact file fence, final recheck, and push posture).
-- Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when Confidence front-door discoverability or bounded shipped-truth wording for Packet 1/2/3/4/5/6 changes.
+- Change `docs/specs/PACKET7A_ADVISORY_PRESENCE_TRUTH_LOCK.md` for Packet 7A advisory presence scope lock, SUPERVISED-only message path, file fence, and no-ship list.
+- Change `docs/specs/HOOK_CONFIDENCE_ADVISOR.md` for ConfidenceAdvisor file-path-only, on-disk-only, `HOLD` / `KILL`-only advisory contract truth.
+- Change `docs/PACKET7A_ADVISORY_PRESENCE_CLOSEOUT.md` for the durable Packet 7A advisory presence awareness closeout (bounded hook-runtime lane, proof recheck, and no-schema-widening posture).
+- Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when Confidence front-door discoverability or bounded shipped-truth wording for Packet 1/2/3/4/5/6/7A changes.
 
-## Wave 6A Runtime Truth
+## Hook Runtime Truth
 
-- Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for Wave 6A Slice 3 fail-closed hook hardening, Block B enforcement matrix (ConfigChange/CwdChanged/FileChanged), Block C live chain population (PostToolUse/PostToolUseFailure/chain writes), and Block D permit/lockout runtime closure.
-- Change `src/HookRuntime.js` for Wave 6A hook event handlers, fail-closed error handling, chain-write logic, permit-gate consultation in HARD_STOP paths, and known-event set.
+- Change `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md` for the hook runtime enforcement spine truth, including Wave 6A Slice 3 fail-closed hardening, Blocks B/C/D runtime closure, and Packet 7A SUPERVISED-only advisory presence composition boundaries.
+- Change `src/HookRuntime.js` for hook runtime enforcement behavior, including fail-closed error handling, chain-write logic, permit-gate consultation in HARD_STOP paths, known-event set, and Packet 7A SUPERVISED-only advisory composition on existing `permissionDecisionReason`.
+- Change `src/ConfidenceAdvisor.js` for Packet 7A file-path-only, on-disk-only advisory helper behavior over the existing confidence scan fence.
 - Change `src/HookRuntimeSlice2.js` for Wave 6A compaction persistence of chainEntries, nextChainCounter, activePermits, and activeAuthorizations.
 - Change `docs/WAVE6A_CLOSEOUT.md` for Wave 6A closeout evidence.
 
@@ -248,6 +252,7 @@ Use this index to find the right canon surface before making a change.
 - Add `tests/golden/BuddySystem.golden.test.js` for Buddy System v1 golden verification.
 - Add `tests/golden/ForemansWalk.golden.test.js` for Foreman's Walk golden verification.
 - Add `tests/golden/HookRuntime.golden.test.js` for hook runtime golden verification across all shipped slices and lifecycle events.
+- Add `tests/golden/ConfidenceAdvisor.golden.test.js` for Packet 7A advisory helper golden verification.
 - Add `tests/golden/StandingRiskEngine.golden.test.js` for Standing Risk Engine golden verification.
 - Add `tests/golden/OmissionCoverageEngine.golden.test.js` for Omission & Coverage Engine golden verification.
 - Add `tests/golden/OpenItemsBoard.golden.test.js` for Open Items Board golden verification.

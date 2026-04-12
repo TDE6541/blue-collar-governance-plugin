@@ -30,6 +30,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Confidence Packet 4 temporal signals are shipped additively on `/confidence` through `MarkerTemporalSignalsEngine` with explicit timeline-only input and bounded temporal vocabulary.
 - Confidence Packet 5 `/walk` confidence sidecar composition is shipped additively in `SessionLifecycleSkills.renderWalk(walkEvaluation, { confidenceSidecarView })`; sidecar v1 supports only `observedMarkers`, `requiredCoverage`, and `markerContinuity`; composition is informational-only; Foreman's Walk, persistence shapes, and hook-runtime behavior are unchanged; Packet 5 remains independent from Packet 4 temporal sidecar input; unsupported skin plus sidecar remains raw canonical `/walk` fallback; and the shipped wrapper/runtime path remains persisted-walk-only (no auto-supplied sidecar input).
 - Confidence Packet 6 transition evidence is shipped additively through dedicated `/confidence-transitions` preview/explicit-append behavior backed by `ConfidenceTransitionGenerator` and `ConfidenceTransitionsSkill`; generated entries stay neutral `FINDING` evidence only, `/confidence` remains read/query/render-only, and no resolution semantics or `ForensicChain` contract widening ship.
+- Confidence Packet 7A advisory presence awareness is shipped additively through `ConfidenceAdvisor` and `PreToolUse` SUPERVISED-only message composition on the existing `permissionDecisionReason` string; advisory reads one current on-disk file only, fires only for slash-family `HOLD` / `KILL`, remains silent on deny / `FULL_AUTO` / permitted `HARD_STOP` / unclassified paths, and introduces no `/confidence`, chain, or host-schema widening.
 - Git: initialized on `main`, Wave 0 bootstrap committed, `origin` remote configured
 - Runtime implementation: Wave 1 systems implemented (`HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, `SessionReceipt`)
 - HoldEngine contract spec: `docs/specs/HOLD_ENGINE.md`
@@ -105,6 +106,7 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Whiteboard and Punch List support `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report supports `/receipt`, `/as-built`, and `/walk`; Work Order supports `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board supports `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System supports `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log supports `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order supports `/receipt` and `/as-built`; Kitchen Ticket supports `/walk`, `/phantoms`, and `/change-order`; Farm Ledger supports `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log supports `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.
 - Wave 5 hook/runtime Slice 2 enforcement spine is implemented at `.claude/settings.json`, `.claude/hooks/run-governance-hook.js`, `src/HookRuntime.js`, `src/HookRuntimeSlice2.js`, `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`, `tests/golden/HookRuntime.golden.test.js`, and `tests/live/wave5.hook-runtime.live.test.js`.
 - Slice 2 keeps fail-closed command hooks over `Bash`, `Write`, and `Edit`, and adds bounded `SessionStart` re-injection plus `PreCompact` preservation for compaction survival while retaining the session-local `Stop`/`ForemansWalk` gate.
+- Packet 7A keeps that hook/runtime spine bounded: advisory awareness is presence-only, on-disk-only, `PreToolUse`-only, `SUPERVISED`-only, and uses the existing `permissionDecisionReason` path only.
 - Additive plugin conversion structure is implemented at `.claude-plugin/plugin.json`, `hooks/hooks.json`, `hooks/run-governance-hook.js`, and `skills/<name>/SKILL.md`.
 - Project `.claude/settings.json` remains the standalone compatibility path and the current `permissions.deny` delivery surface.
 - Standalone and plugin hook registration should be treated as alternate modes until simultaneous loading is explicitly proven.
@@ -143,6 +145,9 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
 - Confidence Packet 6 transition evidence is shipped as a dedicated authoring lane: `ConfidenceTransitionGenerator.generateConfidenceTransitionEntries(input)` maps explicit Packet 3 compare truth into append-ready neutral `FINDING` entries, and `ConfidenceTransitionsSkill.renderConfidenceTransitions(input)` provides `/confidence-transitions` preview or explicit append through existing `ForensicChain.appendEntry(...)`.
 - Confidence Packet 6 remains bounded: transition classes are limited to `NEWLY_OBSERVED`, `NO_LONGER_OBSERVED`, and `RETIERED`; `/confidence` remains read/query/render-only; no resolution/restoration semantics, no new `ForensicChain` entry types, no linked history traversal, and no shared-contract widening ship.
 - Confidence Packet 6 closeout artifact: `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md`.
+- Confidence Packet 7A advisory presence awareness is shipped as a bounded hook-runtime lane: `ConfidenceAdvisor.buildConfidenceAdvisory(filePath)` reads one existing on-disk file, and `src/HookRuntime.js` may append advisory text only on `PreToolUse` SUPERVISED `Write` / `Edit` asks through the existing `permissionDecisionReason` string.
+- Confidence Packet 7A remains bounded: only slash-family `HOLD` / `KILL` markers trigger advisory; missing/unreadable/out-of-fence files and `WATCH` / `GAP` remain silent; deny / `FULL_AUTO` / permitted `HARD_STOP` / unclassified paths remain silent; advisory failure is locally swallowed; and no shared-contract widening ships.
+- Confidence Packet 7A closeout artifact: `docs/PACKET7A_ADVISORY_PRESENCE_CLOSEOUT.md`.
 - Wave 2 closeout evidence map exists at `docs/WAVE2_CLOSEOUT.md`; Architect signed off 2026-04-03.
 - `package.json` is absent; local plugin artifact structure is shipped, but package metadata, marketplace installation, and publishing surfaces are not implemented.
 - Canon specs for current scope:
@@ -167,6 +172,8 @@ This repository is the Blue Collar Governance Plugin runtime trust layer. It is 
   - `docs/specs/WORK_ORDER_SCAFFOLD.md`
   - `docs/specs/WORK_ORDER_POSTURE.md`
   - `docs/specs/HOOK_RUNTIME_ENFORCEMENT_SPINE.md`
+  - `docs/specs/PACKET7A_ADVISORY_PRESENCE_TRUTH_LOCK.md`
+  - `docs/specs/HOOK_CONFIDENCE_ADVISOR.md`
   - `docs/specs/SKIN_FRAMEWORK.md`
   - `docs/specs/OPERATOR_TRUST_LEDGER.md`
   - `docs/specs/JOURNEYMAN_TRUST_ENGINE.md`

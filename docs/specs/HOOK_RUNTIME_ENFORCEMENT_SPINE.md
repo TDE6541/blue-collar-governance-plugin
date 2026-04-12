@@ -1,5 +1,5 @@
 # HOOK_RUNTIME_ENFORCEMENT_SPINE.md
-**Status:** Hook runtime enforcement spine contract baseline (Slice 2 core + Wave 6A Slice 3/Blocks B-D + Wave 6B Block A + Phase 1 lifecycle structural lane + Phase 2 MCP observe-only lane + Phase 3 task/idle structural lane; 24 lifecycle events)
+**Status:** Hook runtime enforcement spine contract baseline (Slice 2 core + Wave 6A Slice 3/Blocks B-D + Wave 6B Block A + Phase 1 lifecycle structural lane + Phase 2 MCP observe-only lane + Phase 3 task/idle structural lane + Packet 7A advisory presence lane; 24 lifecycle events)
 **Audience:** Architect, implementers, maintainers
 
 ## Purpose
@@ -100,6 +100,7 @@ Current enforcement posture still resolves from `.claude/settings.json` and uses
 - classify matched `Bash`, `Write`, and `Edit` calls against `ControlRodMode` domain/operation truth
 - deny `HARD_STOP` actions before execution
 - ask on `SUPERVISED` actions
+- on `Write` / `Edit` `SUPERVISED` asks only, may append advisory text about existing on-disk slash-family `HOLD` / `KILL` markers through the existing `permissionDecisionReason` string only
 - record `FULL_AUTO` observations for stop verification
 
 `PermissionRequest` behavior remains:
@@ -137,7 +138,9 @@ Hook runtime behavior remains an adapter over existing truth.
 - Hook registration exists at `.claude/settings.json`.
 - Hook command entrypoint exists at `.claude/hooks/run-governance-hook.js`.
 - Deterministic runtime adapter exists at `src/HookRuntime.js` with Slice 2 helper logic at `src/HookRuntimeSlice2.js`.
+- Packet 7A advisory helper exists at `src/ConfidenceAdvisor.js`.
 - Golden proof exists at `tests/golden/HookRuntime.golden.test.js`.
+- Golden proof for Packet 7A advisory helper exists at `tests/golden/ConfidenceAdvisor.golden.test.js`.
 - Live proof exists at `tests/live/wave5.hook-runtime.live.test.js`.
 - Canonical onboarding/runtime-proof artifact exists at `docs/WAVE5_ONBOARDING_RUNTIME_PROOF.md`.
 - Wave 5 closeout evidence map exists at `docs/WAVE5_CLOSEOUT.md`.
@@ -626,3 +629,67 @@ Phase 3 does not widen:
 - `SessionReceipt`
 
 All additive chain writes continue to use existing entry types only (`EVIDENCE`, `OPERATOR_ACTION`). `MIGRATIONS.md` remains unchanged.
+
+## Packet 7A: Advisory Presence Awareness
+
+Packet 7A adds one bounded advisory-presence lane to the existing `PreToolUse` runtime path.
+
+### What Ships
+
+- one pure helper module: `ConfidenceAdvisor`
+- one hook wiring point: `src/HookRuntime.js`
+- one advisory landing path: `PreToolUse` `SUPERVISED` `Write` / `Edit` asks only
+- one human-readable message surface: existing `permissionDecisionReason`
+
+### Advisory Source And Trigger Lock
+
+Advisory source is fixed to:
+
+- one current on-disk file only
+
+Advisory marker family and tiers are fixed to:
+
+- slash-family only
+- `HOLD`
+- `KILL`
+
+The helper reuses the existing Confidence Gradient scan fence only. Missing, unreadable, and out-of-fence files collapse to empty advisory. `WATCH` and `GAP` remain advisory-silent.
+
+### Non-Governing Boundary
+
+Packet 7A does not change:
+
+- exit code
+- permission decision outcome
+- classification
+- domain posture
+- permit logic
+- deny reasoning
+- `PostToolUse`
+- chain writes
+- host-facing response shape
+
+`FULL_AUTO` allow, permitted `HARD_STOP` allow, deny, unclassified allow, and fail-closed paths remain advisory-silent.
+
+### Failure Isolation
+
+Advisory failure is isolated by a local inner try-catch inside `handlePreToolUse`.
+
+If advisory evaluation throws unexpectedly:
+
+- advisory collapses to empty
+- the existing `SUPERVISED` ask result remains unchanged
+- the outer fail-closed governance path is not entered
+
+### Contract Boundaries
+
+Packet 7A does not widen:
+
+- `ControlRodMode`
+- `ForemansWalk`
+- `SessionBrief`
+- `SessionReceipt`
+- `ConstraintsRegistry`
+- `ForensicChain`
+
+`src/HookRuntimeSlice2.js` remains untouched. `MIGRATIONS.md` remains unchanged.
