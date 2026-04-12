@@ -71,11 +71,14 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `docs/specs/PACKET4_TEMPORAL_SIGNALS_TRUTH_LOCK.md` - Confidence Packet 4 architecture lock and no-ship boundary truth
 - `docs/specs/PACKET5_WALK_COMPOSITION_TRUTH_LOCK.md` - Packet 5 `/walk` confidence sidecar composition truth lock (Option A only; render-side composition only)
 - `docs/specs/WALK_CONFIDENCE_SIDECAR.md` - Packet 5 additive `/walk` confidence sidecar contract baseline (supported section ids and informational-only boundary)
+- `docs/specs/PACKET6_TRANSITION_EVIDENCE_TRUTH_LOCK.md` - Packet 6 Confidence Transition Evidence truth lock (neutral transition evidence, dedicated `/confidence-transitions`, and no `/confidence` mutation)
+- `docs/specs/CONFIDENCE_TRANSITIONS_SKILL.md` - Packet 6 `/confidence-transitions` authoring surface contract baseline (preview by default, explicit append only through existing ForensicChain API)
 - `confidence-required-coverage.json` - repo-root explicit opt-in required coverage policy artifact
 - `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` - durable Confidence Gradient Phase 1 finish-lane closeout evidence map
 - `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md` - durable Confidence Packet 3 marker continuity closeout evidence map
 - `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` - durable Confidence Packet 4 temporal signals closeout evidence map
 - `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md` - durable Packet 5 `/walk` confidence sidecar composition closeout evidence map
+- `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md` - durable Packet 6 Confidence Transition Evidence closeout evidence map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
 - `docs/WAVE2_CLOSEOUT.md` - durable Wave 2 closeout evidence map
@@ -143,6 +146,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - `skills/work-order-scaffold/SKILL.md` - Wave 7B `/work-order-scaffold` operator-facing scaffold pilot skill artifact
 - `skills/work-order-posture/SKILL.md` - Wave 7B `/work-order-posture` operator-facing posture pilot skill artifact
 - `skills/confidence/SKILL.md` - Confidence Gradient Phase 1 `/confidence` operator-facing read/query/render skill artifact
+- `skills/confidence-transitions/SKILL.md` - Packet 6 `/confidence-transitions` operator-facing preview/explicit-append skill artifact
 - `docs/WAVE6A_CLOSEOUT.md` - durable Wave 6A closeout evidence map
 - `docs/WAVE6B_CLOSEOUT.md` - durable Wave 6B closeout evidence map
 - `docs/WAVE6_CLOSEOUT.md` - durable Wave 6 full closeout evidence map
@@ -185,6 +189,9 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Packet 5 keeps Foreman's Walk and persistence/hook-runtime shapes unchanged; no Pass 6, no persistence widening, no hook-runtime/chain/board/standing-risk widening, and no skin translation wave are shipped.
 - Packet 5 wrapper/runtime posture remains persisted-walk-only: `scripts/render-skill.js walk` does not auto-supply or compute confidence sidecar input.
 - Packet 5 closeout is implemented at `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md`.
+- Confidence Packet 6 transition evidence is shipped additively in current repo truth: `ConfidenceTransitionGenerator.generateConfidenceTransitionEntries(input)` maps explicit Packet 3 compare output into append-ready neutral `FINDING` entries, and `ConfidenceTransitionsSkill.renderConfidenceTransitions(input)` provides dedicated `/confidence-transitions` preview or explicit append through existing `ForensicChain.appendEntry(...)`.
+- Confidence Packet 6 remains bounded: transition classes are limited to `NEWLY_OBSERVED`, `NO_LONGER_OBSERVED`, and `RETIERED`; `/confidence` remains read/query/render-only; no resolution/restoration semantics, no new `ForensicChain` entry types, no linked history traversal, and no shared-contract widening ship.
+- Confidence Packet 6 closeout is implemented at `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md`.
 - Git is initialized on `main`.
 - All six Wave 1 systems have promoted contract specs.
 - Runtime systems are implemented for all six Wave 1 systems: `HoldEngine`, `ConstraintsRegistry`, `SafetyInterlocks`, `ScopeGuard`, `SessionBrief`, and `SessionReceipt`.
@@ -259,7 +266,7 @@ This index is the quick map for the Blue Collar Governance Plugin repository. It
 - Session Lifecycle skills are read/query/render-only surfaces over existing SessionBrief, SessionReceipt, and Foreman's Walk outputs.
 - Compressed Intelligence skills are read/query/render-only surfaces over existing Foreman's Walk truthfulness findings, Standing Risk unresolved/aging views, and Omission expected-signal-missing findings.
 - Compressed History & Trust skills are read/query/render-only surfaces over existing Forensic Chain history views, Warranty Monitor derived posture views, and persisted trust posture read paths.
-- Wave 5 skill topology shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, Wave 7B Blocks D/E/F added `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`, B' Phase 1 added `/resolve` and `/restoration`, and Confidence Gradient Phase 1 added `/confidence`, bringing the total to 34 skills.
+- Wave 5 skill topology shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, Wave 7B Blocks D/E/F added `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`, B' Phase 1 added `/resolve` and `/restoration`, Confidence Gradient Phase 1 added `/confidence`, and Packet 6 added `/confidence-transitions`, bringing the total to 35 skills.
 - SessionBrief no-widening remains hard-locked for Wave 5; `journeymanLevel` is not introduced.
 - Shipped now: the current Wave 5 operator/action surface chain runs through `/lockout`, and shipped skill tranches remain deterministic route adapters over existing engine truth.
 - Tranche 4 skin support is locked to Whiteboard and Punch List for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Inspection Report for `/receipt`, `/as-built`, and `/walk`; Work Order for `/toolbox-talk`, `/receipt`, and `/as-built`; Dispatch Board for `/walk`, `/phantoms`, `/change-order`, and `/control-rods`; Ticket System for `/receipt`, `/walk`, `/phantoms`, and `/change-order`; Daily Log for `/toolbox-talk`, `/receipt`, `/as-built`, and `/walk`; Repair Order for `/receipt` and `/as-built`; Kitchen Ticket for `/walk`, `/phantoms`, and `/change-order`; Farm Ledger for `/toolbox-talk`, `/receipt`, `/as-built`, `/walk`, and `/change-order`; Safety / LOTO Log for `/permit` and `/lockout`; unsupported combinations fail closed to raw canonical render.

@@ -43,10 +43,13 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - `docs/specs/PACKET4_TEMPORAL_SIGNALS_TRUTH_LOCK.md` - authoritative Confidence Packet 4 architecture lock and no-ship boundary truth
 - `docs/specs/PACKET5_WALK_COMPOSITION_TRUTH_LOCK.md` - authoritative Packet 5 `/walk` confidence sidecar composition truth lock (Option A only; render-side composition only)
 - `docs/specs/WALK_CONFIDENCE_SIDECAR.md` - authoritative Packet 5 additive `/walk` confidence sidecar contract baseline (supported section ids and informational-only boundary)
+- `docs/specs/PACKET6_TRANSITION_EVIDENCE_TRUTH_LOCK.md` - authoritative Packet 6 Confidence Transition Evidence truth lock (neutral transition evidence, dedicated `/confidence-transitions`, and no `/confidence` mutation)
+- `docs/specs/CONFIDENCE_TRANSITIONS_SKILL.md` - authoritative Packet 6 `/confidence-transitions` authoring surface contract baseline (preview by default, explicit append only through existing ForensicChain API)
 - `docs/CONFIDENCE_GRADIENT_PHASE1_CLOSEOUT.md` - durable Confidence Gradient Phase 1 finish-lane closeout evidence map
 - `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md` - durable Confidence Packet 3 marker continuity closeout evidence map
 - `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` - durable Confidence Packet 4 temporal signals closeout evidence map
 - `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md` - durable Packet 5 `/walk` confidence sidecar composition closeout evidence map
+- `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md` - durable Packet 6 Confidence Transition Evidence closeout evidence map
 - `docs/indexes/WHERE_TO_CHANGE_X.md` - maintenance navigation map
 - `docs/BLUE_COLLAR_CODING_THESIS.md` - bounded thesis rider for the first Wave 7 front door
 - `docs/OWASP_AGENTIC_MAPPING.md` - public reviewer-facing OWASP agentic security mapping and positioning/proof artifact
@@ -106,7 +109,7 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Wave 4 Buddy behavior is shipped as watcher-only; multi-agent control-room behavior is not shipped.
 - Wave 4 Block D is shipped in current docs/runtime truth: live integration proof exists at `tests/live/wave4.live-oversight.live.test.js` and closeout evidence exists at `docs/WAVE4_CLOSEOUT.md`.
 - Wave 5 is one narrative wave executed as 5A / 5B.
-- Wave 5 shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, Wave 7B Blocks D/E/F added `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`, B' Phase 1 added `/resolve` and `/restoration`, and Confidence Gradient Phase 1 added `/confidence`, bringing the total to 34 skills. SessionBrief no-widening remains (`journeymanLevel` is not introduced).
+- Wave 5 shipped 26 skills. Wave 6B added `/loto-clearance` and `/issue-permit`, Wave 7B Blocks D/E/F added `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`, B' Phase 1 added `/resolve` and `/restoration`, Confidence Gradient Phase 1 added `/confidence`, and Packet 6 added `/confidence-transitions`, bringing the total to 35 skills. SessionBrief no-widening remains (`journeymanLevel` is not introduced).
 - Shipped now: Wave 5A Block 0 truth-sync/substrate-gate/naming-scrub, Wave 5A Blocks A-C, Wave 5B Blocks A-D-E1, and the read-only or thin surfaces `/control-rods`, `/fire-break`, `/census`, `/diagnose`, `/keystone`, `/eliminate`, `/buddy-status`, `/change-order`, `/callout`, `/red-tag`, `/permit`, and `/lockout`.
 - Warranty remains derived-first in Wave 5 and HoldEngine Scarcity Signal remains derived-only enrichment.
 - Shipped skill tranches remain deterministic route adapters over existing engine truth with no hidden behavior.
@@ -151,6 +154,9 @@ This directory holds canonical documentation and navigation aids for the Blue Co
 - Packet 5 keeps Foreman's Walk and persistence/hook-runtime shapes unchanged; no Pass 6, no persistence widening, no hook-runtime/chain/board/standing-risk widening, and no skin translation wave are shipped.
 - Packet 5 wrapper/runtime posture remains persisted-walk-only: `scripts/render-skill.js walk` does not auto-supply or compute confidence sidecar input.
 - Packet 5 closeout is implemented at `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md`.
+- Confidence Packet 6 transition evidence is shipped additively in current repo truth: `ConfidenceTransitionGenerator.generateConfidenceTransitionEntries(input)` maps explicit Packet 3 compare output into append-ready neutral `FINDING` entries, and `ConfidenceTransitionsSkill.renderConfidenceTransitions(input)` provides dedicated `/confidence-transitions` preview or explicit append through existing `ForensicChain.appendEntry(...)`.
+- Confidence Packet 6 remains bounded: transition classes are limited to `NEWLY_OBSERVED`, `NO_LONGER_OBSERVED`, and `RETIERED`; `/confidence` remains read/query/render-only; no resolution/restoration semantics, no new `ForensicChain` entry types, no linked history traversal, and no shared-contract widening ship.
+- Confidence Packet 6 closeout is implemented at `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md`.
 - Phase 3 lifecycle expansion closeout is implemented at `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving current 24-event truth, `WorktreeCreate`/`WorktreeRemove` pending boundary truth, and front-door sync status.
 - Phase 3 structural lane closeout is implemented at `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md`, preserving the A/B shipped and C held record.
 - Phase 2 lifecycle expansion closeout is implemented at `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md`, preserving the historical 21-event waypoint and bounded MCP observability proof.

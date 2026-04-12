@@ -116,10 +116,11 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - Claude plugin manifest at `.claude-plugin/plugin.json`
 - Plugin hook registry at `hooks/hooks.json`
 - Fail-closed hook runtime at `src/HookRuntime.js` and `src/HookRuntimeSlice2.js`
-- 34 operator-facing skills under `skills/<name>/SKILL.md`
+- 35 operator-facing skills under `skills/<name>/SKILL.md`
 - Work Order pilot chain surfaces at `/work-order-intake`, `/work-order-scaffold`, and `/work-order-posture`
 - B' Phase 1 restoration surfaces at `/resolve` and `/restoration`, backed by `RestorationEngine` and `RestorationProjectionAdapter`
 - Confidence Gradient Packet 4 surfaces at `/confidence`, backed by `ConfidenceGradientEngine`, `MarkerContinuityEngine`, `MarkerTemporalSignalsEngine`, and `ConfidenceSkill`
+- Confidence Transition Evidence at `/confidence-transitions`, backed by `ConfidenceTransitionGenerator` and `ConfidenceTransitionsSkill`
 - Standalone compatibility path at `.claude/settings.json`
 - Runtime governance modules under `src/`, including engines, skill surfaces, and hook adapters
 - Golden and live verification under `tests/`
@@ -184,6 +185,17 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 - No persistence widening, hook-runtime widening, chain/board/standing-risk integration, or skin translation wave is introduced by Packet 5.
 - Unsupported skin + sidecar requests remain on raw canonical `/walk` fallback behavior.
 
+## Packet 6 Confidence Transition Evidence
+
+- Packet 6 ships `ConfidenceTransitionGenerator.generateConfidenceTransitionEntries(input)` and dedicated `/confidence-transitions` rendering via `ConfidenceTransitionsSkill.renderConfidenceTransitions(input)`.
+- `skills/confidence-transitions/SKILL.md` is the operator-facing skill, and golden proof lives at `tests/golden/ConfidenceTransitionGenerator.golden.test.js` and `tests/golden/ConfidenceTransitionsSkill.golden.test.js`.
+- Packet 6 maps explicit Packet 3 compare truth into neutral append-ready `FINDING` entries for only `NEWLY_OBSERVED`, `NO_LONGER_OBSERVED`, and `RETIERED`.
+- `/confidence-transitions` previews by default and appends only when the operator explicitly requests append through existing `ForensicChain.appendEntry(...)`.
+- `/confidence` remains read/query/render-only; Packet 6 adds no `/confidence` append behavior.
+- Packet 6 introduces no resolution semantics, no `RESOLVED`, no restoration crossover, no new `ForensicChain` entry types, and no linked history traversal.
+- Packet 6 truth lock lives at `docs/specs/PACKET6_TRANSITION_EVIDENCE_TRUTH_LOCK.md`, the skill spec lives at `docs/specs/CONFIDENCE_TRANSITIONS_SKILL.md`, and the closeout lives at `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md`.
+- No shared contract widening ships in Packet 6; `MIGRATIONS.md` remains unchanged.
+
 ## What This Does Not Do
 
 - **No npm package or marketplace install.** There is no `package.json`. Load the repo directly with `--plugin-dir`.
@@ -198,12 +210,13 @@ The active profile and matched tools are configured in `.claude/settings.json`:
 
 ## Proof
 
-- **Golden verification:** the current repo state passes 454 tests in full golden regression.
+- **Golden verification:** the current repo state passes 555 tests in full golden regression.
 - **Live enforcement proof:** A real `Write` to a pricing file on a foreign repo was classified into `pricing_quote_logic`, resolved to `HARD_STOP`, denied by `PreToolUse`, and never executed.
 - **Compaction survival proof:** Governance state is preserved through `PreCompact` and rehydrated on `SessionStart` with source `compact`.
 - **Fail-closed proof:** Corrupted state files, unknown hook events, and internal errors all produce deny/block decisions — never silent pass-through.
 - **Lifecycle expansion proof boundary:** 24 handled official lifecycle events are shipped; `TaskCreated`, `TaskCompleted`, and `TeammateIdle` now have bounded proof; `WorktreeCreate` and `WorktreeRemove` remain pending, and `Setup` remains unclaimed.
 - **Confidence Packet 4 boundary proof:** `/confidence` remains slash-only, deterministic, and read/query/render-only; Packet 3 comparison behavior remains additive/file-local with explicit ambiguity handling; Packet 4 temporal interpretation is explicit-timeline-only and bounded to `STALE_HOLD`/`UNRESOLVED_KILL`; semicolon-family execution, rename-aware/cross-file continuity, and hook/lifecycle integration remain deferred.
+- **Confidence Packet 6 boundary proof:** `/confidence-transitions` remains a dedicated preview-first surface; generated entries stay on existing `FINDING` only with `NEWLY_OBSERVED`, `NO_LONGER_OBSERVED`, and `RETIERED`; `/confidence` gained no append path; and no resolution semantics or `ForensicChain` contract widening shipped.
 
 Detailed proof documentation:
 
@@ -213,6 +226,7 @@ Detailed proof documentation:
 - `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md` — Packet 3 marker continuity closeout, mandatory proof posture, and front-door sync status
 - `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` — Packet 4 temporal signals closeout, mandatory proof posture, and front-door sync status
 - `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md` — Packet 5 `/walk` confidence sidecar composition closeout, mandatory proof posture, and front-door sync status
+- `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md` — Packet 6 confidence transition evidence closeout, bounded lane split, and targeted recheck status
 - `docs/PHASE3_LIFECYCLE_EXPANSION_CLOSEOUT.md` — Phase 3 finish-lane closeout, current 24-event posture, and public/history sync status
 - `docs/PHASE3_REMAINING_LIFECYCLE_SEAMS_CLOSEOUT.md` — Phase 3 structural closeout (Blocks A/B shipped, Block C held)
 - `docs/PHASE2_LIFECYCLE_EXPANSION_CLOSEOUT.md` — historical Phase 2 lifecycle expansion closeout and 21-event waypoint

@@ -111,7 +111,7 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/B_PRIME_RESTORATION_PHASE1_CLOSEOUT.md` for the durable B' Phase 1 finish-lane closeout (acceptance status, HOLDs, blast radius, and signoff posture).
 - Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when front-door discoverability or bounded shipped-truth wording for B' Phase 1 changes.
 
-## Confidence Gradient Packet Truth
+## Confidence Gradient And Transition Packet Truth
 
 - Change `docs/specs/CONFIDENCE_GRADIENT_ENGINE.md` for ConfidenceGradientEngine marker family rules, tier ladder, line-leading parser behavior, scan-fence boundaries, and deterministic/stateless report contract.
 - Change `docs/specs/CONFIDENCE_SKILL.md` and `skills/confidence/SKILL.md` for `/confidence` read/query/render behavior, deterministic mapping to engine output, and no-mutation boundaries.
@@ -124,7 +124,10 @@ Use this index to find the right canon surface before making a change.
 - Change `docs/PACKET3_MARKER_CONTINUITY_CLOSEOUT.md` for the durable Packet 3 marker continuity closeout (structural scope, mandatory proof, optional full-golden posture, migration posture, HOLDs, and ship status).
 - Change `docs/PACKET4_TEMPORAL_SIGNALS_CLOSEOUT.md` for the durable Packet 4 temporal signals closeout (structural scope, mandatory proof, optional full-golden posture, migration posture, HOLDs, and ship status).
 - Change `docs/PACKET5_WALK_COMPOSITION_CLOSEOUT.md` for the durable Packet 5 `/walk` confidence sidecar closeout (structural scope, mandatory proof, optional full-golden posture, migration posture, HOLDs, and ship status).
-- Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when Confidence front-door discoverability or bounded shipped-truth wording for Packet 1/2/3/4/5 changes.
+- Change `docs/specs/PACKET6_TRANSITION_EVIDENCE_TRUTH_LOCK.md` for Packet 6 transition-evidence truth lock, transition-class fence, dedicated `/confidence-transitions` boundary, and no-ship list.
+- Change `docs/specs/CONFIDENCE_TRANSITIONS_SKILL.md` and `skills/confidence-transitions/SKILL.md` for `/confidence-transitions` preview/explicit-append behavior, existing `ForensicChain.appendEntry(...)` usage, and no-resolution/no-`/confidence`-mutation posture.
+- Change `docs/PACKET6_TRANSITION_EVIDENCE_CLOSEOUT.md` for the durable Packet 6 confidence transition evidence closeout (lane split, exact file fence, final recheck, and push posture).
+- Change `README.md`, `CLAUDE.md`, `REPO_INDEX.md`, and `docs/INDEX.md` when Confidence front-door discoverability or bounded shipped-truth wording for Packet 1/2/3/4/5/6 changes.
 
 ## Wave 6A Runtime Truth
 
